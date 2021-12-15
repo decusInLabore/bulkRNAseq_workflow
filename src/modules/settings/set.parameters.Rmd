@@ -12,7 +12,7 @@ VersionPdfExt <- VersionPdfExt <- paste0(".",chnkPrefix,"V", gsub("-", "", Sys.D
 ###############################################################################
 ## Create biologic Metadata object                                           ##
 
-FN <- paste0(workdir, "/design/bulk.design.file.csv")
+FN <- "design/bulk.design.file.csv"
 
 if (file.exists(FN)){
     dfObio <- read.csv(FN, header = F, stringsAsFactors = F)

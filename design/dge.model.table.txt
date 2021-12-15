@@ -1,0 +1,8 @@
+"comparison"	"comparisonID"	"test"	"type"	"model"	"reducedModel"	"normalizeAllSamplesTogether"	"betaPrior"
+"1"	"T_TCD90pos_vs_N_NCD90pos"	"comp_1"	"Wald"	"DGE"	"~ f_patient + condition"	""	FALSE	"TRUE"
+"2"	"T_TCD90pos_vs_C_CAF"	"comp_2"	"Wald"	"DGE"	"~ f_patient + condition"	""	FALSE	"TRUE"
+"3"	"N_NCD90pos_vs_N_NF"	"comp_3"	"Wald"	"DGE"	"~ f_patient + condition"	""	FALSE	"TRUE"
+"4"	"C_CAF_vs_N_NF"	"comp_4"	"Wald"	"DGE"	"~ f_patient + condition"	""	FALSE	"TRUE"
+"5"	"LRT_overall_T_vs_N"	"LRT_overall_T_vs_N"	"LRT"	"LRT"	"~ f_patient + condition"	"~ f_patient"	FALSE	""
+"6"	"LRT_patient"	"LRT_patient"	"LRT"	"LRT"	"~ f_patient + condition"	"~ f_patient"	FALSE	""
+"7"	"LRT_Cell_Type"	"LRT_Cell_Type"	"LRT"	"LRT"	"~ f_patient + condition"	"~ f_patient"	FALSE	""
