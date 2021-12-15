@@ -1,0 +1,118 @@
+<!-- Set PArameters Module -->
+<!-- Set the chnkPrefix to make all chunks unique in the overall folder -->
+```{r, echo=TRUE, eval=TRUE, warning=FALSE}
+chnkPrefix <- "load.files."
+VersionPdfExt <- VersionPdfExt <- paste0(".",chnkPrefix,"V", gsub("-", "", Sys.Date()), ".pdf")
+
+```
+
+## Data Preparation
+### Load Design File
+```{r, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
+###############################################################################
+## Load design file                                                          ##
+
+
+Obio@parameterList$designFN <- "design/experimental.design.file.txt"
+
+
+if (file.exists(Obio@parameterList$designFN)){
+    dfDesign <- read.delim(
+        Obio@parameterList$designFN, 
+        sep = "\t",
+        stringsAsFactors = F
+    )    
+} else {
+    stop("No design file specified")
+}
+
+
+Obio@dfDesign <- dfDesign
+
+##                                                                           ##
+###############################################################################
+```
+
+
+### Load TPM File
+```{r, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
+
+###############################################################################
+## Load TPM/count file                                                       ##
+
+FNtpm <- paste0(hpc.mount, "Projects/swantonc/dhruva.biswas/361B_CSL_DB_bulkRNA_seq_traxerX_oxford_part2_9_lanes_subsampling/basedata/dfTPM.txt")
+
+
+Obio@parameterList$count_table <- paste0(hpc.mount, "Projects/swantonc/dhruva.biswas/361B_CSL_DB_bulkRNA_seq_traxerX_oxford_part2_9_lanes_subsampling/basedata/dfTPM.txt")
+
+
+
+if (file.exists(Obio@parameterList$count_table)){
+    dfTPM <- read.delim(
+        Obio@parameterList$count_table, 
+        sep = "\t",
+        stringsAsFactors = F
+    )    
+} else {
+    stop("No design file specified")
+}
+
+
+dfTPM <- dfTPM[rowSums(dfTPM[,2:ncol(dfTPM)]) != 0,]
+
+head(dfTPM)
+# 
+Obio@dfTPM <- dfTPM
+
+
+designSampleIDs <- unique(Obio@dfDesign$sample.id)
+dfTPMSampleIDs <- unique(names(Obio@dfTPM))
+checkTPM <- gsub("_TPM", "", dfTPMSampleIDs[dfTPMSampleIDs != "gene_id"])
+check <- !(designSampleIDs %in% checkTPM)
+
+if (sum(check) > 0){
+  stop("Sample IDs in dfDesign don't match the column names in the count file")
+}
+
+##                                                                           ##
+###############################################################################
+
+```
+
+
+### Load RSEM raw count matrix
+```{r, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
+
+pathToRSEMoutputFiles <- paste0(hpc.mount, "Projects/swantonc/dhruva.biswas/361_CSL_DB_bulkRNA_seq_traxerX_oxford_part2_9_lanes/workdir/RSEM/Ensembl")
+
+#RSEMcountDataFile 
+
+dfRSEM <- readAndPrepareCountMatrix(
+    count.data.fn = RSEMcountDataFile ,
+    string.to.be.deleted.in.raw.counts.columns = "",
+    df.design = Obio@dfDesign
+)
+
+Obio@RSEMcountMatrix <- dfRSEM
+
+
+
+```
+
+
+### Load Model 
+```{r, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
+
+FN <- "design/dge.model.table.txt"
+
+dfModel <- read.delim(
+    FN, 
+    stringsAsFactors = F, 
+    sep = "\t"
+)
+
+Obio@dfModel <- dfModel
+
+
+
+```
