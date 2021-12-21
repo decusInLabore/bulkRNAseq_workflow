@@ -88,7 +88,7 @@ if (dir.exists("/Volumes/babs/working/boeings/")){
     hpc.mount <- ""
 }
 
-
+## Loading the BABS password ##
 FN <- paste0(hpc.mount, "Projects/reference_data/pwd_folder/babs.txt")
 dbTable <- read.delim(
   FN,
@@ -105,7 +105,16 @@ db.pwd <- as.vector(dbTable[1,1])
 ```
 
 
+<!-- (A_Setup) Create Obio object form design file -->
+<!-- Essential 1: (output required later): Set Parameters and directories and create Obio object Chapter/Module -->
+```{r child = 'src/modules/settings/set.parameters.Rmd', eval=FALSE}
+```
+
 <!-- (A_Setup) FASTQ-files to RSEM read-count matrix and TPM values -->
+```{r child = 'src/modules/part_A/A.1.alignment.and.RSEM.count.Rmd', eval=FALSE}
+```
+
+
 <!-- (B) RSEM read-count matrix to PCA and differential gene expression -->
 <!-- (C) Reporting
 
@@ -125,9 +134,7 @@ countMatrixFN: NULL or path to count matrix file
 <!-- Essential modules should be run in order. -->
 <!-- Optional modules create output only. -->
 
-<!-- Essential 1: (output required later): Set Parameters and directories and create Obio object Chapter/Module -->
-```{r child = 'src/modules/settings/set.parameters.Rmd', eval=FALSE}
-```
+
 
 <!-- Option A: Create or load design file -->
 ```{r child = 'src/modules/section_A/A.1A.1.create.design.file.Rmd', eval=FALSE}

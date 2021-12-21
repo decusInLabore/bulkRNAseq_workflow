@@ -1,0 +1,5 @@
+"comparison"	"comparisonID"	"test"	"type"	"model"	"reducedModel"	"normalizeAllSamplesTogether"	"betaPrior"
+"high_fat_diest_24h_vs_control_24h"	"comp_1"	"Wald"	"DGE"	"~ condition"	""	FALSE	"TRUE"
+"high_fat_diest_2h_vs_control_24h"	"comp_2"	"Wald"	"DGE"	"~ condition"	""	FALSE	"TRUE"
+"LRT_Sample_Treatment"	"LRT_Sample_Treatment"	"LRT"	"LRT"	"~condition"	"~1"	FALSE	""
+"LRT_timepoint"	"LRT_timepoint"	"LRT"	"LRT"	"~condition"	"~1"	FALSE	""

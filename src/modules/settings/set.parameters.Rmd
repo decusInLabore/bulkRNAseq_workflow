@@ -1,6 +1,6 @@
-<!-- Set PArameters Module -->
+<!-- Set Parameters Module -->
 <!-- Set the chnkPrefix to make all chunks unique in the overall folder -->
-```{r set_parameters_init, echo=TRUE, eval=TRUE, warning=FALSE}
+```{r, echo=TRUE, eval=TRUE, warning=FALSE}
 chnkPrefix <- "set.parameters."
 VersionPdfExt <- VersionPdfExt <- paste0(".",chnkPrefix,"V", gsub("-", "", Sys.Date()), ".pdf")
 
@@ -8,11 +8,11 @@ VersionPdfExt <- VersionPdfExt <- paste0(".",chnkPrefix,"V", gsub("-", "", Sys.D
 
 ## Data Preparation
 ### Load Design File
-```{r set_parameters_load_design, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
+```{r, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
 ###############################################################################
 ## Create biologic Metadata object                                           ##
 
-FN <- "design/bulk.design.file.csv"
+FN <- paste0(workdir, "/design/bulk.design.file.csv")
 
 if (file.exists(FN)){
     dfObio <- read.csv(FN, header = F, stringsAsFactors = F)
@@ -39,10 +39,7 @@ for (i in 1:ncol(dfObio)){
 
 ```
 
-```{r set_parameters_create_Obio_object, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
-
-
-
+```{r, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
 
 ###############################################################################
 ## dbDetailList                                                              ##
@@ -57,9 +54,39 @@ dbDetailList <- list(
 
 ###############################################################################
 ## Project detail list                                                       ##
+
+fastqFolders <- as.vector(dfObio$fastqFolders)
+fastqFolders <- fastqFolders[fastqFolders != ""]
+lastChr <- sapply(fastqFolders, function(x) substr(x, nchar(x), nchar(x)))
+
+fastqFolders <- ifelse(lastChr != "/", paste0(fastqFolders, "/"), fastqFolders)
+
+corGeneVec <- as.vector(dfObio$corGeneVec)
+
+if (!(is.null(corGeneVec))){
+    corGecorGeneVec <- corGeneVec[corGeneVec != ""]
+}
+
 projectDetailList <- list(
 
     "folder" = as.vector(dfObio$folder[1]),
+    
+    "paired.end" =  as.logical(dfObio$paired.end[1]),
+    "stranded" = as.logical(dfObio$stranded[1]),
+    "labname" = "Pachnis",
+    "read.length" =  as.vector(dfObio$read.length[1]),
+    
+    "baseDesignFN" = as.vector(dfObio$baseDesignFN[1]),
+    "DGEmodelFN" = as.vector(dfObio$DGEmodelFN[1]),
+    "DEseq2betaPrior" = as.logical(dfObio$DEseq2betaPrior[1]),
+    "AlignFASTQcolumn" = as.vector(dfObio$AlignFASTQcolumn[1]),
+    "NtopGenes" = as.vector(dfObio$NtopGenes[1]),
+    "designTScol" = as.vector(dfObio$designTScol[1]),
+    "corGeneVec" = corGeneVec,
+    
+    "ModuleTrimGalore" = as.vector(dfObio$ModuleTrimGalore[1]),
+    "TrimGaloreMinLength" = as.vector(dfObio$TrimGaloreMinLength[1]),
+    "TrimGaloreMinQuality" = as.vector(dfObio$TrimGaloreMinQuality[1]),
 
     "lab.categories.table" = as.vector(dfObio$lab.categories.table[1]), # default NULL
     "sra.id.vector" = as.vector(dfObio$sra.id.vector[1]),
@@ -75,7 +102,8 @@ projectDetailList <- list(
     "timecourse.units" = as.vector(dfObio$timecourse.units[1]),
     "count.table.headline" = as.vector(dfObio$count.table.headline[1]),
     "count.table.sidelabel" = as.vector(dfObio$count.table.headline[1]),
-    "heamap.headline.text" = as.vector(dfObio$count.table.headline[1])
+    "heamap.headline.text" = as.vector(dfObio$count.table.headline[1]),
+    "pathToSeqStorageFolder" = fastqFolders
 )
 ## End project detail list                                                   ##
 ###############################################################################
@@ -222,48 +250,50 @@ Obio = new(
     dbDetailList = dbDetailList,        
     projectDetailList = projectDetailList,
     referenceTableList = referenceTableList,
-    parameterList = list(
-        "lab.categories.table" = projectDetailList$lab.categories.table, # default NULL
-        "folder" = projectDetailList$folder,
-        "sra.id.vector" = "",
-        "gse.id.vector" = "",
-        "lims.id"= as.vector(dfObio$asf.id[1]),
-        "asf.id" = as.vector(dfObio$asf.id[1]),
-        "machine" = NULL,
-        "experiment.type" = projectDetailList$experiment.type,   
-        "species" = projectDetailList$species, 
-        "release" = projectDetailList$release, 
-        "project_id" = projectDetailList$project_id,
-        "labname" = projectDetailList$labname,
-        
-        ## Parameters for full analysis ##
-        "RSEMcountDataFile" = as.vector(dfObio$RSEMcountDataFile[1]),
-        "sampleID_fileName" = as.vector(dfObio$sampleID_fileName[1]),
-        
-        ## Parameters for partial analysis ##
-        "DESeq2_folder" = as.vector(dfObio$DESeq2_folder[1]),
-        "design_file" = as.vector(dfObio$design_file[1]),
-        "PCA_results" = as.vector(dfObio$PCA_results[1]),
-        "count_table" = as.vector(dfObio$count_table[1]),
-        "variable_features" = as.vector(dfObio$variable_features[1]),
-
-        
-        "db.user" =  dbDetailList$db.user,
-        "host" = dbDetailList$host,
-        "timecourse.units" = "hrs",
-        "count.table.headline" = "lg10 Expr for all Samples",
-        "count.table.sidelabel" = "lg10 Expr",
-        "heamap.headline.text" = "Heatmap: Row-averaged Expr",
-        "loadR" = "module purge;source /camp/stp/babs/working/software/modulepath_new_software_tree_2018-08-13;module load pandoc/2.2.3.2-foss-2016b;ml R/3.6.0-foss-2016b-BABS;R;",
-        "pathToSeqStorageFolder" = NULL,
-        "addFullTPMtable" = FALSE,
-        "hpcMount" = "",
-        "parallelProcessing" = FALSE,
-        "timeseries" = FALSE,
-        referenceTableList = referenceTableList
-       
-    )
+    parameterList = projectDetailList
 )
+    #     list(
+    #     "lab.categories.table" = projectDetailList$lab.categories.table, # default NULL
+    #     "folder" = projectDetailList$folder,
+    #     "sra.id.vector" = "",
+    #     "gse.id.vector" = "",
+    #     "lims.id"= as.vector(dfObio$asf.id[1]),
+    #     "asf.id" = as.vector(dfObio$asf.id[1]),
+    #     "machine" = NULL,
+    #     "experiment.type" = projectDetailList$experiment.type,   
+    #     "species" = projectDetailList$species, 
+    #     "release" = projectDetailList$release, 
+    #     "project_id" = projectDetailList$project_id,
+    #     "labname" = projectDetailList$labname,
+    #     
+    #     ## Parameters for full analysis ##
+    #     "RSEMcountDataFile" = as.vector(dfObio$RSEMcountDataFile[1]),
+    #     "sampleID_fileName" = as.vector(dfObio$sampleID_fileName[1]),
+    #     
+    #     ## Parameters for partial analysis ##
+    #     "DESeq2_folder" = as.vector(dfObio$DESeq2_folder[1]),
+    #     "design_file" = as.vector(dfObio$design_file[1]),
+    #     "PCA_results" = as.vector(dfObio$PCA_results[1]),
+    #     "count_table" = as.vector(dfObio$count_table[1]),
+    #     "variable_features" = as.vector(dfObio$variable_features[1]),
+    # 
+    #     
+    #     "db.user" =  dbDetailList$db.user,
+    #     "host" = dbDetailList$host,
+    #     "timecourse.units" = "hrs",
+    #     "count.table.headline" = "lg10 Expr for all Samples",
+    #     "count.table.sidelabel" = "lg10 Expr",
+    #     "heamap.headline.text" = "Heatmap: Row-averaged Expr",
+    #     "loadR" = "module purge;source /camp/stp/babs/working/software/modulepath_new_software_tree_2018-08-13;module load pandoc/2.2.3.2-foss-2016b;ml R/3.6.0-foss-2016b-BABS;R;",
+    #     "pathToSeqStorageFolder" = NULL,
+    #     "addFullTPMtable" = FALSE,
+    #     "hpcMount" = "",
+    #     "parallelProcessing" = FALSE,
+    #     "timeseries" = FALSE,
+    #     referenceTableList = referenceTableList
+    #    
+#    )
+#)
 
 Obio <- setMountingPoint(Obio)
 Obio <- setAnalysisPaths(Obio)
@@ -280,6 +310,8 @@ Obio <- addGeneAnnotation(Obio)
 
 ## Done adding annotation file                                               ##
 ###############################################################################
+
+
 
 ## Create html local
 ## Create outputfolders ##
