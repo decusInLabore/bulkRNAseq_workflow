@@ -44,11 +44,11 @@ if (!is.null(Obio@parameterList$GSEAtables)){
 
 # #
 dfRefGmt <- create.gmt.file.from.ref.data.table(
-     host = Obio@parameterList$host,
+     host = Obio@dbDetailList$host,
      dbname = "reference_categories_db_new",
      dataTable = tables,
      pwd = db.pwd,
-     user=Obio@parameterList$db.user,
+     user=Obio@dbDetailList$db.user,
      gene.id.column = "hgnc_symbol"
  )
 

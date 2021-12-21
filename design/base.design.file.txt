@@ -1,0 +1,61 @@
+sampleID	original.sample.id	sample.id	timepoint	LRT_Sample_Treatment	DGE_1	DGE_2
+FRA4505A1	control_0h_1	Ctrl_0h_1	0	control_0h		
+FRA4505A2	control_0h_2	Ctrl_0h_2	0	control_0h		
+FRA4505A3	control_0h_3	Ctrl_0h_3	0	control_0h		
+FRA4505A10	control_24h_1	Ctrl_24h_1	24	control_24h	2_control_24h	2_control_24h
+FRA4505A11	control_24h_2	Ctrl_24h_2	24	control_24h	2_control_24h	2_control_24h
+FRA4505A12	control_24h_3	Ctrl_24h_3	24	control_24h	2_control_24h	2_control_24h
+FRA4505A4	control_2h_1	Ctrl_2h_1	2	control_2h		
+FRA4505A5	control_2h_2	Ctrl_2h_2	2	control_2h		
+FRA4505A6	control_2h_3	Ctrl_2h_3	2	control_2h		
+FRA4505A7	control_6h_1	Ctrl_6h_1	6	control_6h		
+FRA4505A8	control_6h_2	Ctrl_6h_2	6	control_6h		
+FRA4505A9	control_6h_3	Ctrl_6h_3	6	control_6h		
+FRA4505A13	high_fat_diet_0h_1	HighFatDiet_0h_1	0	high_fat_diet_0h		
+FRA4505A14	high_fat_diet_0h_2	HighFatDiet_0h_2	0	high_fat_diet_0h		
+FRA4505A15	high_fat_diet_0h_3	HighFatDiet_0h_3	0	high_fat_diet_0h		
+FRA4505A22	high_fat_diet_24h_1	HighFatDiet_24h_1	24	high_fat_diet_24h	1_high_fat_diest_24h	
+FRA4505A23	high_fat_diet_24h_2	HighFatDiet_24h_2	24	high_fat_diet_24h	1_high_fat_diest_24h	
+FRA4505A24	high_fat_diet_24h_3	HighFatDiet_24h_3	24	high_fat_diet_24h	1_high_fat_diest_24h	
+FRA4505A16	high_fat_diet_2h_1	HighFatDiet_2h_1	2	high_fat_diet_2h		1_high_fat_diest_2h
+FRA4505A17	high_fat_diet_2h_2	HighFatDiet_2h_2	2	high_fat_diet_2h		1_high_fat_diest_2h
+FRA4505A18	high_fat_diet_2h_3	HighFatDiet_2h_3	2	high_fat_diet_2h		1_high_fat_diest_2h
+FRA4505A19	high_fat_diet_6h_1	HighFatDiet_6h_1	6	high_fat_diet_6h		
+FRA4505A20	high_fat_diet_6h_2	HighFatDiet_6h_2	6	high_fat_diet_6h		
+FRA4505A21	high_fat_diet_6h_3	HighFatDiet_6h_3	6	high_fat_diet_6h		
+FRA4505A1	control_0h_1	Hypoxia_0h_1	0	control_0h		
+FRA4505A2	control_0h_2	Hypoxia_0h_2	0	control_0h		
+FRA4505A3	control_0h_3	Hypoxia_0h_3	0	control_0h		
+FRA4505A40	Hypoxia_24h_1	Hypoxia_24h_1	24	Hypoxia_24h		
+FRA4505A41	Hypoxia_24h_2	Hypoxia_24h_2	24	Hypoxia_24h		
+FRA4505A42	Hypoxia_24h_3	Hypoxia_24h_3	24	Hypoxia_24h		
+FRA4505A34	Hypoxia_2h_1	Hypoxia_2h_1	2	Hypoxia_2h		
+FRA4505A35	Hypoxia_2h_2	Hypoxia_2h_2	2	Hypoxia_2h		
+FRA4505A36	Hypoxia_2h_3	Hypoxia_2h_3	2	Hypoxia_2h		
+FRA4505A37	Hypoxia_6h_1	Hypoxia_6h_1	6	Hypoxia_6h		
+FRA4505A38	Hypoxia_6h_2	Hypoxia_6h_2	6	Hypoxia_6h		
+FRA4505A39	Hypoxia_6h_3	Hypoxia_6h_3	6	Hypoxia_6h		
+FRA4505A1	control_0h_1	Irradiation_0h_1	0	control_0h		
+FRA4505A2	control_0h_2	Irradiation_0h_2	0	control_0h		
+FRA4505A3	control_0h_3	Irradiation_0h_3	0	control_0h		
+FRA4505A49	Irradiation_24h_1	Irradiation_24h_1	24	Irradiation_24h		
+FRA4505A50	Irradiation_24h_2	Irradiation_24h_2	24	Irradiation_24h		
+FRA4505A51	Irradiation_24h_3	Irradiation_24h_3	24	Irradiation_24h		
+FRA4505A43	Irradiation_2h_1	Irradiation_2h_1	2	Irradiation_2h		
+FRA4505A44	Irradiation_2h_2	Irradiation_2h_2	2	Irradiation_2h		
+FRA4505A45	Irradiation_2h_3	Irradiation_2h_3	2	Irradiation_2h		
+FRA4505A46	Irradiation_6h_1	Irradiation_6h_1	6	Irradiation_6h		
+FRA4505A47	Irradiation_6h_2	Irradiation_6h_2	6	Irradiation_6h		
+FRA4505A48	Irradiation_6h_3	Irradiation_6h_3	6	Irradiation_6h		
+FRA4505A1	control_0h_1	NR_0h_1	0	control_0h		
+FRA4505A2	control_0h_2	NR_0h_2	0	control_0h		
+FRA4505A3	control_0h_3	NR_0h_3	0	control_0h		
+FRA4505A31	NR_24h_1	NR_24h_1	24	NR_24h		
+FRA4505A32	NR_24h_2	NR_24h_2	24	NR_24h		
+FRA4505A33	NR_24h_3	NR_24h_3	24	NR_24h		
+FRA4505A25	NR_2h_1	NR_2h_1	2	NR_2h		
+FRA4505A26	NR_2h_2	NR_2h_2	2	NR_2h		
+FRA4505A27	NR_2h_3	NR_2h_3	2	NR_2h		
+FRA4505A28	NR_6h_1	NR_6h_1	6	NR_6h		
+FRA4505A29	NR_6h_2	NR_6h_2	6	NR_6h		
+FRA4505A30	NR_6h_3	NR_6h_3	6	NR_6h		

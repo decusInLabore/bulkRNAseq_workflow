@@ -1,12 +1,14 @@
 ## R-Data loading option for custom plotting
 
 ```{r create db user, echo=F, eval=T, warning=FALSE}
-FN <- paste0(hpc.mount, "Projects/reference_data/documentation/BC.parameters.txt")
+FN <- paste0(hpc.mount, "Projects/reference_data/pwd_folder/babs.txt")
 dbTable <- read.delim(
-    FN, 
-    sep = "\t",
-    stringsAsFactors = F
+  FN,
+  header = F,
+  sep = "\t",
+  stringsAsFactors = F
 )
+
 db.pwd <- as.vector(dbTable[1,1])
 #setwd(Obio@parameterList$workdir)
 

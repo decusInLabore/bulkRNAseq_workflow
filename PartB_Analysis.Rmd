@@ -13,8 +13,10 @@ output:
 always_allow_html: yes
 ---
 
-
 ```{r setup, include=FALSE}
+
+# In this chunk we set up the environment and define some required variables. 
+
 knitr::opts_chunk$set(
     tidy = F,
     tidy.opts = list(width.cutoff = 120),
@@ -22,25 +24,19 @@ knitr::opts_chunk$set(
     warning = FALSE
 )
 
-# Requirements for this part
-# Existence of a design file including contrasts/LRTs
-# Existence of a read-count matrix
-# 
 
-# do here
-# Run DEseq2 contrast/LRT - create contrast LRT table (A) or (B) load from file
+## Needed for RSEM
+# GCCcore/9.3.0
 
-# B.1.DEse2.create.object
-# B.2.DEseq2.normalization.and.PCA
-#       - Obio@dfPCA <- dfPCA
-# B.3.DEseq2.create.DGE.and.LRT.tables
-#       - Obio@DEseq2contrastTable <- dfContrastTable
-#       - Obio@dataTableList[["Ntop4pcaGeneSelection"]] <- rowSelVec
-#       - 
-# B.4.calculate pairwise correlation
-# 
+# This RSEM version works:
+# ml RSEM/1.2.29-foss-2016b
+# ml RSEM/1.3.0-foss-2016b
 
-if (!requireNamespace("remotes")){
+# module spider libjpeg-turbo/1.5.0-foss-2016b GCCcore/5.4.0 X11/20160819-foss-2016b bzip2/1.0.6-foss-2016b gompi/2016b
+
+# module purge;source /camp/stp/babs/working/software/modulepath_new_software_tree_2018-08-13;module load pandoc/2.2.3.2-foss-2016b;ml R/4.0.3-foss-2020a
+
+if (!require("remotes")){
   install.packages("remotes")
 }
 
@@ -52,78 +48,79 @@ if (!file.exists("renv.lock")){
     renv::restore()
 }
 
-
-library(tidyverse)
-library(dplyr)
-library(Seurat)
-library(ggplot2)
-library(tidyr)
-library(knitr)
-
-cwd <- paste0(here::here(),"/")
-tempWorkDir <- paste0(cwd, "../")
-
-## Load custom packages specific for this analysis ##
-#source("assets/R/scTools.r")
-#source("assets/R/SBwebtools.pckg.r")
-
-renv::install("decusInLabore/biologicSeqTools")
-renv::install("decusInLabore/biologicToolsSC")
-library(Seurat)
-library(biologicSeqTools)
-library(biologicToolsSC)
-
-## Make sure the correct future version (> 1.2) is installed
-renv::install("https://cran.r-project.org/src/contrib/Archive/future/future_1.19.1.tar.gz")
-## Doublet Finder
-renv::install("chris-mcginnis-ucsf/DoubletFinder")
-renv::install("bioc::clusterProfiler")
-renv::install("bioc::AUCell")
-renv::install("YuLab-SMU/ggtree")
-
-upload.results.to.database <- TRUE
-save.chunk.intermediates <- TRUE
-
-
-###############################################################################
-##                                                                           ##
+workdir <- getwd()
 figureCount <- 1
-
-## Load R module load R/3.5.1-foss-2018b ##
-#setwd(Obio@parameterList$localWorkDir)
+tableCount <- 1
 
 
-
-
-##                                                                           ##
-###############################################################################
 
 ###############################################################################
-## SB local libpaths                                                         ##
-## Set filename for temp pdf files ##
-
-# if (length(.libPaths()) > 2){
-#     .libPaths(.libPaths()[2:3])
+## An older version of the Matrix package is required                        ##
+# if (!requireNamespace("BiocManager", quietly = TRUE)){
+#     renv::install("BiocManager")
 # }
+
+renv::install("bioc::DESeq2")
+renv::install("bioc::clusterProfiler")
+renv::install("decusInLabore/biologicSeqTools")
+
+library(biologicSeqTools)
+
+
+###############################################################################
+## Set db access credentials                                                 ##
+# FN <- paste0(hpc.mount, "Projects/reference_data/documentation/BC.parameters.txt")
+# dbTable <- read.delim(
+#     FN, 
+#     sep = "\t",
+#     stringsAsFactors = F
+# )
+# 
+# db.pwd <- as.vector(dbTable[1,1])
+
 ## Done                                                                      ##
 ###############################################################################
 
+###############################################################################
+## Set database password                                                     ##
+# Get database password from file
 
+if (dir.exists("/Volumes/babs/working/boeings/")){
+    hpc.mount <- "/Volumes/babs/working/boeings/"
+} else if (dir.exists("Y:/working/boeings/")){
+    hpc.mount <- "Y:/working/boeings/"
+} else if (dir.exists("/camp/stp/babs/working/boeings/")){
+    hpc.mount <- "/camp/stp/babs/working/boeings/"
+} else {
+    hpc.mount <- ""
+}
+
+## Loading the BABS password ##
+FN <- paste0(hpc.mount, "Projects/reference_data/pwd_folder/babs.txt")
+dbTable <- read.delim(
+  FN,
+  header = F,
+  sep = "\t",
+  stringsAsFactors = F
+)
+
+db.pwd <- as.vector(dbTable[1,1])
+##                                                                           ##
+###############################################################################
+
+###############################################################################
+## Load biologic object from part A                                          ##
+FN <- paste0("../", list.files("..")[grep("bioLOGIC.Robj", list.files(".."))])
+load(FN)
+## Done                                                                      ##
+###############################################################################
 
 ```
 
 
-<!-- Running Individual Modules in R -->
-<!-- For example rmarkdown::render("src/modules/settings/partB.set.parameters.Rmd", output_dir = "..") -->
-
-
-<!-- Essential 1: Set Analysis Parameters Chapter/Module (output required later) -->
-```{r child = 'src/modules/part_B/B.1.set.parameters.Rmd', eval=TRUE}
-
-```
-
-<!-- Optional 2: Retrieve Reference Genes from Database or Gmt file -->
-```{r child = 'src/modules/section_B/B.2.retrieve.reference.gene.sets.Rmd', eval=TRUE}
+<!-- Essential: DEseq2 analysis -->
+<!-- Creates PCA, LRT and DGE analyses -->
+```{r child = 'src/modules/section_B/B.2.DEseq2.PCA.DGE.LRT.Rmd', eval=TRUE}
 ```
 
 <!-- Essential 3: (output required later): Create Integrated Seurat Object Chapter/Module -->

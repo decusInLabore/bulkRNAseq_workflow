@@ -11,11 +11,12 @@ VersionPdfExt <- VersionPdfExt <- paste0(".",chnkPrefix,"V", gsub("-", "", Sys.D
 ```{r Heatmaps_data_prep, echo=TRUE, eval=TRUE, warning=FALSE, results=F}
 ## Heatmap setup ##
 ## Select Heatmap samples ##
-FN <- paste0(hpc.mount, "Projects/reference_data/documentation/BC.parameters.txt")
+FN <- paste0(hpc.mount, "Projects/reference_data/pwd_folder/babs.txt")
 dbTable <- read.delim(
-    FN, 
-    sep = "\t",
-    stringsAsFactors = F
+  FN,
+  header = F,
+  sep = "\t",
+  stringsAsFactors = F
 )
 
 db.pwd <- as.vector(dbTable[1,1])
@@ -57,13 +58,13 @@ createProjectRefDbTables <- T
 
 if (createProjectRefDbTables){    
     ## Delete all previous entries ##
-    library(RMySQL)
-    dbDB <- dbConnect(
+    #library(RMySQL)
+    dbDB <- DBI::dbConnect(
         drv = RMySQL::MySQL(), 
-        user = Obio@parameterList$db.user, 
+        user = Obio@dbDetailList$db.user, 
         password = db.pwd, 
-        host = Obio@parameterList$host, 
-        dbname = Obio@parameterList$ref.cat.db
+        host = Obio@dbDetailList$host, 
+        dbname = Obio@dbDetailList$ref.cat.db
     )
     
     cat_type <- paste0("temp_", Obio@parameterList$project_id)
@@ -82,13 +83,13 @@ if (createProjectRefDbTables){
     
     ###########################################################################
     ## check if cat name exist and delete if it does                         ##
-    library(RMySQL)
-    dbDB <- dbConnect(
+    #library(RMySQL)
+    dbDB <- DBI::dbConnect(
         drv = RMySQL::MySQL(), 
-        user = Obio@parameterList$db.user, 
+        user = Obio@dbDetailList$db.user, 
         password = db.pwd, 
-        host = Obio@parameterList$host, 
-        dbname = Obio@parameterList$ref.cat.db
+        host = Obio@dbDetailList$host, 
+        dbname = Obio@dbDetailList$ref.cat.db
     )
     
     query <- paste0("SELECT cat_id, cat_name FROM ",Obio@parameterList$lab.categories.table, " WHERE cat_name = '",cat.name,"'")
@@ -102,9 +103,9 @@ if (createProjectRefDbTables){
     } else {
     
         catID <- add.category.to.lab.reference.table.hs(
-        host = Obio@parameterList$host,
+        host = Obio@dbDetailList$host,
         pwd = db.pwd,
-        user = Obio@parameterList$db.user,
+        user = Obio@dbDetailList$db.user,
         cat.ref.db = "reference_categories_db_new",
         cat.ref.db.table = Obio@parameterList$lab.categories.table,
         gene.vector = geneVec,
@@ -178,13 +179,13 @@ if (createProjectRefDbTables){
             
              ###########################################################################
     ## check if cat name exist and delete if it does                         ##
-    library(RMySQL)
-    dbDB <- dbConnect(
+    #library(RMySQL)
+    dbDB <- DBI::dbConnect(
         drv = RMySQL::MySQL(), 
-        user = Obio@parameterList$db.user, 
+        user = Obio@dbDetailList$db.user, 
         password = db.pwd, 
-        host = Obio@parameterList$host, 
-        dbname = Obio@parameterList$ref.cat.db
+        host = Obio@dbDetailList$host, 
+        dbname = Obio@dbDetailList$ref.cat.db
     )
     
     query <- paste0("SELECT cat_id, cat_name FROM ",Obio@parameterList$lab.categories.table, " WHERE cat_name = '",cat.name,"'")
@@ -197,9 +198,9 @@ if (createProjectRefDbTables){
         catID = as.vector(dfTest[1,"cat_id"])
     } else {
             catID <- add.category.to.lab.reference.table.hs(
-            host = Obio@parameterList$host,
+            host = Obio@dbDetailList$host,
             pwd = db.pwd,
-            user = Obio@parameterList$db.user,
+            user = Obio@dbDetailList$db.user,
             cat.ref.db = "reference_categories_db_new",
             cat.ref.db.table = Obio@parameterList$lab.categories.table,
             gene.vector = geneVec,
@@ -275,8 +276,8 @@ for (k in 1:length(Obio@parameterList$HmDisplayCatsFromDb)){
         cat_id = Obio@parameterList$HmDisplayCatsFromDb[[k]], 
         gene.symbol=geneSelCol, 
         password=db.pwd, 
-        host=Obio@parameterList$host, 
-        user=Obio@parameterList$db.user
+        host=Obio@dbDetailList$host, 
+        user=Obio@dbDetailList$db.user
     )
     
     geneSel <- unique(geneSel)
