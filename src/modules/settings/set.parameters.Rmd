@@ -83,6 +83,12 @@ projectDetailList <- list(
     "NtopGenes" = as.vector(dfObio$NtopGenes[1]),
     "designTScol" = as.vector(dfObio$designTScol[1]),
     "corGeneVec" = corGeneVec,
+    "batchMode" = as.logical(dfObio$batchMode[1]),
+    "parallelProcessing" = as.logical(dfObio$parallelProcessing[1]),
+    "ModuleFASTQC" = as.vector(dfObio$ModuleFASTQC[1]),
+    
+
+
     
     "ModuleTrimGalore" = as.vector(dfObio$ModuleTrimGalore[1]),
     "TrimGaloreMinLength" = as.vector(dfObio$TrimGaloreMinLength[1]),

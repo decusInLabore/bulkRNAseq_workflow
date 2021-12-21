@@ -108,17 +108,17 @@ dfDesign <- dfDesign[order(dfDesign$timepoint, decreasing = F),]
 #"WT_ColNonNeuron"
 
 
-dfDesign <- addDGEcomparisons2DesignFile(
-  dfDesign = dfDesign,
-  comparisonList = list(
-    "comp_1" = c("DIV11", "DIV4"),
-    "comp_2" = c("DIV20", "DIV4"),
-    "comp_3" = c("DIV20", "DIV11"),
-    "comp_4" = c("DIV4", "DIV0C"),
-    "comp_5" = c("DIV11", "DIV0C"),
-    "comp_6" = c("DIV20", "DIV0C")
-  )
-)
+# dfDesign <- addDGEcomparisons2DesignFile(
+#   dfDesign = dfDesign,
+#   comparisonList = list(
+#     "comp_1" = c("DIV11", "DIV4"),
+#     "comp_2" = c("DIV20", "DIV4"),
+#     "comp_3" = c("DIV20", "DIV11"),
+#     "comp_4" = c("DIV4", "DIV0C"),
+#     "comp_5" = c("DIV11", "DIV0C"),
+#     "comp_6" = c("DIV20", "DIV0C")
+#   )
+# )
 
 names(dfDesign) <- gsub("DGE_", "comp_", names(dfDesign))
 
@@ -447,6 +447,20 @@ sink()
 ###############################################################################
 
 ###############################################################################
+##                                                                           ##
+
+## Update RSEM path ##
+Obio@parameterList$RSEMcountDataFile <- paste0(
+    Obio@parameterList$localWorkDir,
+    "RSEM/",
+    Obio@parameterList$RSEMcountDataFile
+)
+
+
+##                                                                           ##
+###############################################################################
+
+###############################################################################
 ## Save Obio Object                                                          ##
 
 
@@ -462,6 +476,9 @@ print("R bioLOGIC single cell object initialized.")
 
 ##                                                                           ##
 ###############################################################################
+
+###############################################################################
+## Run alignment shell scripts                                               ##
 
 
 ```

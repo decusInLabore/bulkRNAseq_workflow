@@ -184,7 +184,7 @@ for (j in 1:length(DGEtagVec)){
             queryGS <- geneIDcolumn
         }
         
-        if (Obio@parameterList$host == "10.27.241.234"){
+        if (Obio@dbDetailList$host == "10.27.241.234"){
             urlString <- "biologic.thecrick.org"
         } else {
             urlString <- "biologic.crick.ac.uk"
