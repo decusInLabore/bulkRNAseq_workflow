@@ -10,7 +10,8 @@ VersionPdfExt <- VersionPdfExt <- paste0(".",chnkPrefix,"V", gsub("-", "", Sys.D
 ### Set Parameters
 ```{r B_set_directories, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
 ###############################################################################
-##                                                                           ##
+## Set database password                                                     ##
+# Get database password from file
 
 if (dir.exists("/Volumes/babs/working/boeings/")){
     hpc.mount <- "/Volumes/babs/working/boeings/"
@@ -22,34 +23,48 @@ if (dir.exists("/Volumes/babs/working/boeings/")){
     hpc.mount <- ""
 }
 
-
-
-## Set database parameters ##
+## Loading the BABS password ##
 if (upload.results.to.database){
-    FN <- paste0(hpc.mount, "Projects/reference_data/documentation/BC.parameters.txt")
+    FN <- paste0(hpc.mount, "Projects/reference_data/pwd_folder/babs.txt")
     dbTable <- read.delim(
-        FN, 
-        sep = "\t",
-        stringsAsFactors = F
+      FN,
+      header = F,
+      sep = "\t",
+      stringsAsFactors = F
     )
-
-    db.pwd <- as.vector(dbTable[1,1])
 }
 
+db.pwd <- as.vector(dbTable[1,1])
 ##                                                                           ##
 ###############################################################################
+
+
+###############################################################################
+## Set db access credentials                                                 ##
+# FN <- paste0(hpc.mount, "Projects/reference_data/documentation/BC.parameters.txt")
+# dbTable <- read.delim(
+#     FN,
+#     sep = "\t",
+#     stringsAsFactors = F
+# )
+# 
+# db.pwd <- as.vector(dbTable[1,1])
+
+## Done                                                                      ##
+###############################################################################
+
 
 ###############################################################################
 ## Load Obio object from step A                                              ##
 ObioFN <- paste0(
-    tempWorkDir, "/", 
-    list.files(tempWorkDir)[grep(".bioLOGIC.Robj", list.files(tempWorkDir))]
+    workdir, "/", 
+    list.files(workdir)[grep(".bioLOGIC.Robj", list.files(workdir))]
 )
 
+library(biologicSeqTools)
 load(ObioFN)
 
-## Activate debug mode on subset of cells < 1
-# Obio@parameterList$debugReduce <- 1
+
 
 ## Set project specific parameters ##
 Obio <- setMountingPoint(Obio)
@@ -59,20 +74,16 @@ Obio <- createAnalysisFolders(
     Obio
 )
 Obio <- setDataBaseParameters(Obio)
+
+## This can be upgraded to web retrieval of annotation data 
 Obio <- addGeneAnnotation(Obio)
 
-## Create Sample List ##
-if (Obio@parameterList$hpcMount != "/camp/stp/babs/working/boeings/"){
-    for (i in 1:length(Obio@sampleDetailList)){
-        Obio@sampleDetailList[[i]]$path <- gsub("/camp/stp/babs/working/boeings/",Obio@parameterList$hpcMount, Obio@sampleDetailList[[i]]$path)
-        
-    }
-}
-        
  
 ## Create shiny path for figure outputs ##           
 shinyURL <- paste0(
-    "https://shiny-bioinformatics.crick.ac.uk/shiny/boeings/",
+    "https://",
+    shinyBaseServerURL,
+    "/shiny/boeings/",
     Obio@parameterList$project_id,
     "_app/"
 )            
@@ -80,11 +91,9 @@ shinyURL <- paste0(
     
 
 ## Create outputfolders ##
-if (!dir.exists(paste0(Obio@parameterList$localWorkDir,Obio@parameterList$project_id))){
-    dir.create(paste0(Obio@parameterList$localWorkDir,Obio@parameterList$project_id))
-}
-
-
+# if (!dir.exists(paste0(Obio@parameterList$localWorkDir,Obio@parameterList$project_id))){
+#     dir.create(paste0(Obio@parameterList$localWorkDir,Obio@parameterList$project_id))
+# }
 
 Obio@parameterList[["html_local"]] <- paste0(Obio@parameterList$localWorkDir, "html_local/")
 
@@ -93,12 +102,17 @@ if (!dir.exists(Obio@parameterList[["html_local"]])){
 }
 
 Obio@parameterList[["reportFigDir"]] <- paste0(Obio@parameterList$html_local, "report_figures/")
-pdfTemp <- paste0(Obio@parameterList$reportFigDir, "temp.pdf")
-
-
 if (!dir.exists(Obio@parameterList$reportFigDir)){
     dir.create(Obio@parameterList$reportFigDir)
 }
+
+pdfTemp <- paste0(Obio@parameterList$reportFigDir, "temp.pdf")
+
+Obio@parameterList[["reportTableDir"]] <- paste0(Obio@parameterList$html_local, "report_tables/")
+if (!dir.exists(Obio@parameterList$reportTableDir)){
+    dir.create(Obio@parameterList$reportTableDir)
+}
+
 
 ## Create data dir
 Obio@parameterList[["data_dir"]] <- paste0(Obio@parameterList$localWorkDir, "data/")
@@ -108,13 +122,17 @@ if (!dir.exists(Obio@parameterList$data_dir)){
 }
 
 
-pos <- grep("^host$", names(Obio@parameterList))
+## Set default for database connections ##
+pos <- grep("^host$", names(Obio@dbDetailList))
 if (length(pos) ==0 ){
-    Obio@parameterList$host <- NULL
+    Obio@dbDetailList$host <- NULL
     
     if (is.null(Obio@dbDetailList)){
         Obio@dbDetailList = list("host" = NULL)
     }
+    
+    upload.results.to.database <- FALSE
+    print("No database server provided. upload.results.to.database set to FALSE")
     
 }
 
@@ -127,9 +145,6 @@ if (!is.null(Obio@parameterList$host)){
 } else {
     urlString <- ""
 }
-
-
-
 
 
 ##                                                                           ##

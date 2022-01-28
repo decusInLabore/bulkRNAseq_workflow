@@ -100,7 +100,7 @@ pcaTB <- Obio@parameterList$PCAdbTableName
 query4 <- paste0("GRANT SELECT on ",Obio@dbDetailList$primDataDB,".",pcaTB ," TO ",username,"@'10.%';")
 doQuery(Obio, query = query4)
 
-host <- Obio@parameterList$host
+host <- Obio@dbDetailList$host
 db <- Obio@dbDetailList$primDataDB
 
 designString <- designTB
