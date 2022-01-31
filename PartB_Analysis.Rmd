@@ -63,51 +63,15 @@ knitr::opts_chunk$set(
 ###############################################################################
 ## Set global variables                                                      ##
 
+cDir <- getwd()
+setwd("..")
 workdir <- getwd()
+setwd(cDir)
+
 figureCount <- 1
 tableCount <- 1
-
-## Done                                                                      ##
-###############################################################################
-
-
-###############################################################################
-## Set database password                                                     ##
-# Get database password from file
-
-if (dir.exists("/Volumes/babs/working/boeings/")){
-    hpc.mount <- "/Volumes/babs/working/boeings/"
-} else if (dir.exists("Y:/working/boeings/")){
-    hpc.mount <- "Y:/working/boeings/"
-} else if (dir.exists("/camp/stp/babs/working/boeings/")){
-    hpc.mount <- "/camp/stp/babs/working/boeings/"
-} else {
-    hpc.mount <- ""
-}
-
-## Loading the BABS password ##
-FN <- paste0(hpc.mount, "Projects/reference_data/pwd_folder/babs.txt")
-dbTable <- read.delim(
-  FN,
-  header = F,
-  sep = "\t",
-  stringsAsFactors = F
-)
-
-db.pwd <- as.vector(dbTable[1,1])
-##                                                                           ##
-###############################################################################
-
-###############################################################################
-## Set db access credentials                                                 ##
-# FN <- paste0(hpc.mount, "Projects/reference_data/documentation/BC.parameters.txt")
-# dbTable <- read.delim(
-#     FN,
-#     sep = "\t",
-#     stringsAsFactors = F
-# )
-# 
-# db.pwd <- as.vector(dbTable[1,1])
+upload.results.to.database <- TRUE
+shinyBaseServerURL <- "shiny-bioinformatics.crick.ac.uk"
 
 ## Done                                                                      ##
 ###############################################################################
@@ -124,10 +88,20 @@ load(FN)
 
 
 <!-- Essential: Load Obio Data Object ---------------------------------------->
-
 ```{r child = 'src/modules/part_B/B.1.set.parameters.Rmd', eval=TRUE}
 ```
 
+<!-- Optional: Retrieve reference gene sets----------------------------------->
+```{r child = 'src/modules/part_B/B.2.retrieve.reference.gene.sets.Rmd', eval=TRUE}
+```
+
+<!-- Optional: Add alignment summary to report-------------------------------->
+```{r child = 'src/modules/part_B/B.3.alignment.summary.Rmd', eval=TRUE}
+```
+
+<!-- Optional 4: (creates output only): Analysis Guide -->
+```{r child = 'src/modules/part_B/B.4.analysis.guide.Rmd', eval=TRUE}
+```
 
 <!-- Essential: DEseq2 analysis -->
 <!-- Creates PCA, LRT and DGE analyses -->
