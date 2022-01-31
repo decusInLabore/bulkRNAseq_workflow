@@ -245,6 +245,8 @@ df.summary <- merge(
 )
 df.summary[is.na(df.summary)] <- 0
 
+df.summary[df.summary[,Obio@parameterList$geneIDcolumn] == 0, Obio@parameterList$geneIDcolumn] <- df.summary[df.summary[,Obio@parameterList$geneIDcolumn] == 0, Obio@parameterList$primaryAlignmentGeneID]
+
 ## Done creating dfSummary                                                   ##
 ###############################################################################
 
@@ -396,87 +398,6 @@ dfDat[["CoVarOrder"]] <- 1:nrow(dfDat)
 ## Done adding additional plot columns                                       ##
 ###############################################################################
 
-###################################
-# Upload pca table to database    #
-###################################
-
-upload.pca.table.to.db(
-    df.pca = Obio@dfPCA,
-    host =Obio@dbDetailList$host,
-    prim.data.db = Obio@dbDetailList$primDataDB,
-    password = db.pwd,
-    db.user = Obio@dbDetailList$db.user,
-    PCAdbTableName = Obio@parameterList$PCAdbTableName
-)
-
-# Finished creating pca database table
-
-###############################################################################
-# Upload design file to database                                              #
-###############################################################################
-Obio@parameterList$designdbTableName <- paste0(
-  Obio@parameterList$project_id, 
-    "_designTable"
-)
-dfDesign4upload <- Obio@dfDesign
-selVec <- c(
-    "sampleID",
-    "sample.id",
-    "sample.group",
-    "dataseries",
-    names(dfDesign4upload)[grep("^f_",names(dfDesign4upload))],
-    names(dfDesign4upload)[grep("^LRT_",names(dfDesign4upload))],
-    names(dfDesign4upload)[grep("^comp_",names(dfDesign4upload))],
-    names(dfDesign4upload)[grep("_color$",names(dfDesign4upload))]
-)
-
-pos <- grep("designTScol", names(Obio@parameterList))
-if (length(pos) > 0 & !is.null(Obio@parameterList$designTScol)){
-    selVec <- c(
-        selVec,
-        Obio@parameterList$designTScol
-    )
-}
-
-selVec <- unique(selVec[selVec %in% names(dfDesign4upload)])
-
-dfDesign4upload <- unique(dfDesign4upload[,selVec])
-names(dfDesign4upload) <- gsub("\\.", "_", names(dfDesign4upload))
-
-cmd.vec <- biologicSeqTools2::upload.datatable.to.database(
-  host = Obio@dbDetailList$host,
-  user = Obio@dbDetailList$db.user,
-  password = db.pwd,
-  prim.data.db = Obio@dbDetailList$primDataDB,
-  dbTableName = Obio@parameterList$designdbTableName,
-  df.data = dfDesign4upload,
-  db.col.parameter.list = biologicSeqTools2::inferDBcategories(
-      dfDesign4upload
-  ),
-    
-  new.table = TRUE
-)
-
-killDbConnections()
-
-
-###############################################################################
-# Upload to database                                                          #
-###############################################################################
-Obio@databaseTable$Gene_description <- NULL
-
-cmd.vec <- upload.datatable.to.database(
-    host = Obio@dbDetailList$host,
-    user = Obio@dbDetailList$db.user,
-    password = db.pwd,
-    prim.data.db = Obio@dbDetailList$primDataDB,
-    dbTableName = Obio@parameterList$rnaseqdbTableName,
-    df.data = Obio@databaseTable[Obio@databaseTable$count_cut_off > 1, ],
-    db.col.parameter.list = biologicSeqTools2::inferDBcategories(Obio@databaseTable[Obio@databaseTable$count_cut_off > 1, ]),
-    new.table = TRUE
-)
-
-killDbConnections()
 
 
 ###############################################################################

@@ -91,6 +91,10 @@ load(FN)
 ```{r child = 'src/modules/part_B/B.1.set.parameters.Rmd', eval=TRUE}
 ```
 
+<!-- Optional set data access parameters for R-users ------------------------->
+```{r child = 'src/modules/part_B/B.1.2.set.data.access.parameters.Rmd', eval=TRUE}
+```
+
 <!-- Optional: Retrieve reference gene sets----------------------------------->
 ```{r child = 'src/modules/part_B/B.2.retrieve.reference.gene.sets.Rmd', eval=TRUE}
 ```
