@@ -103,96 +103,60 @@ load(FN)
 ```{r child = 'src/modules/part_B/B.4.analysis.guide.Rmd', eval=TRUE}
 ```
 
+<!-- Optional 5: (creates output only): Display design table -->
+```{r child = 'src/modules/part_B/B.5.display.design.table.and.formula.table.Rmd', eval=TRUE}
+```
+
 <!-- Essential: DEseq2 analysis -->
-<!-- Creates PCA, LRT and DGE analyses -->
-```{r child = 'src/modules/section_B/B.2.DEseq2.PCA.DGE.LRT.Rmd', eval=TRUE}
+<!-- Creates PCA -->
+```{r child = 'src/modules/part_B/B.6.DEseq2.PCA.Rmd', eval=TRUE}
 ```
 
-<!-- Essential 3: (output required later): Create Integrated Seurat Object Chapter/Module -->
-```{r child = 'src/modules/section_B/B.3.create.integrated.seurat.object.Rmd', eval=TRUE}
+<!-- Essential: DEseq2 analysis -->
+<!-- Creates LRT and DGE analyses -->
+```{r child = 'src/modules/part_B/B.7.DEseq2.LRT.DGE.Rmd', eval=TRUE}
 ```
 
-<!-- Optional 4: (creates output only): Create variation plots Chapter/Module -->
-```{r child = 'src/modules/section_B/B.4.create.variation.plots.Rmd', eval=TRUE}
+<!-- Optional 8: (creates output only): Sample Characterization -->
+<!-- Coefficient of variation and cluster dendrogram -->
+```{r child = 'src/modules/part_B/B.8.sample.characterization.Rmd', eval=TRUE}
 ```
 
-<!-- Essential 6: (output required later): 
-DGE Marker gene upload Chapter/Module -->
-```{r child = 'src/modules/section_B/B.6.create.pca.plots.Rmd', eval=TRUE}
+<!-- Optional 9: (output only): PCA sample characterization Chapter/Module -->
+```{r child = 'src/modules/part_B/B.9.pca.characterization.Rmd', eval=TRUE}
 ```
 
-
-<!-- Essential 7: (output required later): Create variation plots Chapter/Module -->
-```{r child = 'src/modules/section_B/B7.calculate.average.expression.Rmd', eval=TRUE}
+<!-- Optional 10: (output only): Gene Category Heatmaps Chapter/Module -->
+```{r child = 'src/modules/part_B/B.10.heatmaps.Rmd', eval=TRUE}
 ```
 
-<!-- Optional 8: (Output only): Create pca plots Chapter/Module -->
-```{r child = 'src/modules/section_B/B8.plot.pca.and.tsne.results.Rmd', eval=TRUE}
+<!-- Optional 11: (output only): MA- and Volcanoplot Chapter/Module -->
+```{r child = 'src/modules/part_B/B.11.volcanoplots.ma.plots.Rmd', eval=TRUE}
 ```
 
-<!-- Optional 9: (Output only): Create pca plots Chapter/Module -->
-```{r child = 'src/modules/section_B/B9.euclidian.distances.figure.Rmd', eval=TRUE}
+<!-- Optional 12: (output only): Category Enrichment Hypergeometric Test Chapter/Module -->
+```{r child = 'src/modules/part_B/B.12.cat.enrichment.HG.Rmd', eval=TRUE}
 ```
 
-
-<!-- Optional 10: (Output only): Doublet Estimate Chapter/Module -->
-```{r child = 'src/modules/section_B/B10.doublet.estimation.plots.Rmd', eval=TRUE}
-```
-
-<!-- Optional 11: (Output only): Doublet Estimate Chapter/Module -->
-```{r child = 'src/modules/section_B/B11.cell.cycle.phase.plots.Rmd', eval=TRUE}
-```
-
-<!-- Optional 12: (Output only): Cell Distribution Barchart Chapter/Module -->
-```{r child = 'src/modules/section_B/B12.Ncell.barchart.plots.Rmd', eval=TRUE}
-```
-
-<!-- Optional 13: (Output only):Category Enrichments Chapter/Module -->
-```{r child = 'src/modules/section_B/B13.AUC.cat.enrichments.Rmd', eval=TRUE}
-```
-
-<!-- Essential 14: (output required later):Category Linear Regression Marker Gene Data Prep Chapter/Module -->
-```{r child = 'src/modules/section_B/B14.linear.regression.data.prep.Rmd', eval=TRUE}
-```
-
-<!-- Essential 15: (output required later):Category Linear Regression Marker Gene Data Prep Chapter/Module -->
-```{r child = 'src/modules/section_B/B15.heatmaps.and.dotplots.Rmd', eval=TRUE}
-```
-
-<!-- Essential 16: (output required later):Category Make cluster table Data Prep Chapter/Module -->
-```{r child = 'src/modules/section_B/B16.make.cluster.table.Rmd', eval=TRUE}
-```
-
-<!-- Essential 17: (output required later):Category Make cluster table Data Prep Chapter/Module -->
-```{r child = 'src/modules/section_B/B17.cell.type.estimate.Rmd', eval=TRUE}
-```
-
-<!-- Essential 18: (output required later):Category Make cluster table Data Prep Chapter/Module -->
-```{r child = 'src/modules/section_B/B18.gene.set.heatmaps.Rmd', eval=TRUE}
+<!-- Optional 13: (output only): Category Enrichment fGSEA Method Chapter/Module -->
+```{r child = 'src/modules/part_B/B.13.cat.enrichment.fGSEA.Rmd', eval=TRUE}
 ```
 
 
-<!-- Essential 19: (output required later):Category Make cluster table Data Prep Chapter/Module -->
-```{r child = 'src/modules/section_B/B19.example.feature.plots.Rmd', eval=TRUE}
+<!-- Optional 12: (output only): LRT Analysis Chapter/Module -->
+```{r child = 'src/modules/part_B/B.14.LRT.plots.Rmd', eval=FALSE}
 ```
 
-<!-- Essential 20: (output required later):Category Make cluster table Data Prep Chapter/Module -->
-```{r child = 'src/modules/section_B/B20.pca.cell.and.loading.plots.Rmd', eval=TRUE}
+<!-- Optional 13: (output only): Documentation Chapter/Module -->
+```{r child = 'src/modules/part_B/B.15.bulkRNAseq.documentation.Rmd', eval=TRUE}
 ```
 
-<!-- Optional 21: (output required later):Category Make cluster table Data Prep Chapter/Module -->
-```{r child = 'src/modules/section_B/B21.pseudotime.Rmd', eval=TRUE}
-```
-
-<!-- Optional 22: (output required later): Add extra tables Chapter/Module -->
-```{r child = 'src/modules/section_B/B22.add.extra.tables.Rmd', eval=TRUE}
-```
+```{r, echo=TRUE, eval=TRUE, warning=FALSE, results="hide"}
+###############################################################################
+## Save Obio Object                                                          ##
 
 
-
-```{r saveobject, eval=TRUE, echo=T, results=F}
-### Will save Obio object here, so it can be re-used with different parameters
-save(Obio, 
+save(Obio,
      file = paste0(
          Obio@parameterList$localWorkDir,
          Obio@parameterList$project_id,
@@ -200,19 +164,16 @@ save(Obio,
      )
 )
 
-print("Obio Object saved.")
+print("R bioLOGIC object saved.")
 
-save(OsC,
-    file = paste0(
-         Obio@parameterList$localWorkDir,
-         Obio@parameterList$project_id,
-        ".Seurat.Robj"
-     )
-)
+##                                                                           ##
+###############################################################################
 
-renv::snapshot()
 
 ```
+
+
+
 
 
 
@@ -291,7 +252,9 @@ projectParams <- lapply(
 
 
 ## Documentation
-```{r documentation, eval=TRUE, echo=T, results=T}
+```{r documentation, eval=TRUE, echo=F, results=T}
+#renv::snapshot()
+
 sessionInfo()
 ```
 
