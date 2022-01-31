@@ -61,7 +61,7 @@ ObioFN <- paste0(
     list.files(workdir)[grep(".bioLOGIC.Robj", list.files(workdir))]
 )
 
-library(biologicSeqTools)
+library(biologicSeqTools2)
 load(ObioFN)
 
 

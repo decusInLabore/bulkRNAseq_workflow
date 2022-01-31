@@ -11,7 +11,7 @@ VersionPdfExt <- VersionPdfExt <- paste0(".",chnkPrefix,"V", gsub("-", "", Sys.D
 ###############################################################################
 ## Create and attach DDS object                                              ##
 # This is done in the previous section B6 already
-# Obio <- biologicSeqTools::createDdsObject(Obio)
+# Obio <- biologicSeqTools2::createDdsObject(Obio)
 
 ## Done creating and attaching DDS objecs                                    ##
 ###############################################################################
@@ -314,7 +314,7 @@ df.summary[df.summary[, Obio@parameterList$primaryAlignmentGeneID] %in% rowSelVe
 ###############################################################################
 ## Create main database table                                                ##
 
-Obio@databaseTable <- biologicSeqTools::datatable.to.website.ptm(
+Obio@databaseTable <- biologicSeqTools2::datatable.to.website.ptm(
     df.data = df.summary,
     gene.id.column = Obio@parameterList$primaryAlignmentGeneID,
     heatmap.genes = "",
@@ -372,20 +372,20 @@ dfDat <- dfDat[order(dfDat$Var, decreasing = TRUE),]
 dfDat <- dfDat[dfDat$Var > 0, ]
 dfDat[["CoVarOrder"]] <- 1:nrow(dfDat)
 
-Obio@plotCollection[["CoVar"]] <- ggplot(
-    data=dfDat,
-    aes(x=CoVarOrder, y=Var)
-) + geom_line( ) + geom_vline(xintercept = Obio@parameterList$NtopGene, col="red"
-) +  theme(
-    axis.text.y   = element_text(size=8),
-    axis.text.x   = element_text(size=8),
-    axis.title.y  = element_text(size=8),
-    axis.title.x  = element_text(size=8),
-    axis.line = element_line(colour = "black"),
-    panel.border = element_rect(colour = "black", fill=NA, size=1),
-    plot.title = element_text(hjust = 0.5, size = 12)
-) + labs(title = paste0("Variation Seen Across all Genes")
-)
+# Obio@plotCollection[["CoVar"]] <- ggplot(
+#     data=dfDat,
+#     aes(x=CoVarOrder, y=Var)
+# ) + geom_line( ) + geom_vline(xintercept = Obio@parameterList$NtopGene, col="red"
+# ) +  theme(
+#     axis.text.y   = element_text(size=8),
+#     axis.text.x   = element_text(size=8),
+#     axis.title.y  = element_text(size=8),
+#     axis.title.x  = element_text(size=8),
+#     axis.line = element_line(colour = "black"),
+#     panel.border = element_rect(colour = "black", fill=NA, size=1),
+#     plot.title = element_text(hjust = 0.5, size = 12)
+# ) + labs(title = paste0("Variation Seen Across all Genes")
+# )
 
 ## Done adding Covar figure                                                  ##
 ###############################################################################
@@ -443,14 +443,14 @@ selVec <- unique(selVec[selVec %in% names(dfDesign4upload)])
 dfDesign4upload <- unique(dfDesign4upload[,selVec])
 names(dfDesign4upload) <- gsub("\\.", "_", names(dfDesign4upload))
 
-cmd.vec <- biologicSeqTools::upload.datatable.to.database(
+cmd.vec <- biologicSeqTools2::upload.datatable.to.database(
   host = Obio@dbDetailList$host,
   user = Obio@dbDetailList$db.user,
   password = db.pwd,
   prim.data.db = Obio@dbDetailList$primDataDB,
   dbTableName = Obio@parameterList$designdbTableName,
   df.data = dfDesign4upload,
-  db.col.parameter.list = biologicSeqTools::inferDBcategories(
+  db.col.parameter.list = biologicSeqTools2::inferDBcategories(
       dfDesign4upload
   ),
     
@@ -472,7 +472,7 @@ cmd.vec <- upload.datatable.to.database(
     prim.data.db = Obio@dbDetailList$primDataDB,
     dbTableName = Obio@parameterList$rnaseqdbTableName,
     df.data = Obio@databaseTable[Obio@databaseTable$count_cut_off > 1, ],
-    db.col.parameter.list = biologicSeqTools::inferDBcategories(Obio@databaseTable[Obio@databaseTable$count_cut_off > 1, ]),
+    db.col.parameter.list = biologicSeqTools2::inferDBcategories(Obio@databaseTable[Obio@databaseTable$count_cut_off > 1, ]),
     new.table = TRUE
 )
 
@@ -505,7 +505,7 @@ if (length(rmVec) > 0){
 # ## Remove unnecessary columns, if needed ##
 # #
 # ## Create GSEA rank files ##
-biologicSeqTools::create.gsea.rnk.files(
+biologicSeqTools2::create.gsea.rnk.files(
      Obio@parameterList$localWorkDir,
      df.dataTable = database.table2,
      GSEA.colum.type = "_logFC_",

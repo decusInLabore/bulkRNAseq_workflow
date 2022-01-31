@@ -41,7 +41,7 @@ if (!file.exists("renv.lock")){
 
 renv::install("bioc::DESeq2")
 renv::install("bioc::clusterProfiler")
-renv::install("decusInLabore/biologicSeqTools")
+renv::install("decusInLabore/biologicSeqTools2")
 
 ## Done                                                                      ##
 ###############################################################################
