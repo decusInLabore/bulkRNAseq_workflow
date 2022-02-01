@@ -13,12 +13,12 @@ library(ggplot2)
 ```
 
 
-```{r, echo=F, eval=TRUE, warning=FALSE, results=F}
+```{r, echo=F, eval=TRUE, warning=FALSE, results="hide"}
 dfPCA <- Obio@dfPCA
 ```
 
 
-```{r pca_data_prep, echo=TRUE, eval=TRUE, warning=FALSE, results=F}
+```{r pca_data_prep, echo=TRUE, eval=TRUE, warning=FALSE, results="hide"}
 
 ###############################################################################
 ## Add PCA plot                                                              ##
@@ -36,40 +36,39 @@ if (exists("Obio")){
     PCApercentVar <- NULL
 }
 
-plotList[[tag]] <- ggplot(
+plotList[[tag]] <- ggplot2::ggplot(
         data = dfPCA,
-        aes(x=PC1, y=PC2, fill = sample_group)
-    ) + geom_vline(xintercept = 0, color = "grey", size=0.5
-    ) + geom_hline(yintercept = 0, color = "grey", size=0.5
-    ) + geom_point(
+        ggplot2::aes(x=PC1, y=PC2, fill = sample_group)
+    ) + ggplot2::geom_vline(xintercept = 0, color = "grey", size=0.5
+    ) + ggplot2::geom_hline(yintercept = 0, color = "grey", size=0.5
+    ) + ggplot2::geom_point(
         size=2,
         shape = 21
     ) 
 
 if (!is.null(PCApercentVar)){
-    plotList[[tag]] <- plotList[[tag]] + labs(
+    plotList[[tag]] <- plotList[[tag]] + ggplot2::labs(
         title = "PCA Plot", 
         x = paste0("PC1 \n ",round(100* Obio@PCApercentVar[1]),"% variability explained"),
         y = paste0("PC2 \n ",round(100* Obio@PCApercentVar[2]),"% variability explained")
     )
 } else {
-    plotList[[tag]] <- plotList[[tag]] + labs(
+    plotList[[tag]] <- plotList[[tag]] + ggplot2::labs(
         title = "PCA Plot", 
         x = paste0("PC1"),
         y = paste0("PC2")
     )
 }
 
-plotList[[tag]] <- plotList[[tag]] +  theme_bw() + theme(
-        axis.text.y   = element_text(size=8),
-        axis.text.x   = element_text(size=8),
-        axis.title.y  = element_text(size=12),
-        axis.title.x  = element_text(size=12),
-        axis.line = element_line(colour = "black"),
-        panel.border = element_rect(colour = "black", fill=NA, size=1),
-        plot.title = element_text(hjust = 0.5, size = 12)
-        #) + scale_fill_manual(values=c("#999999", "#E69F00")
-    )
+plotList[[tag]] <- plotList[[tag]] +  ggplot2::theme_bw() + ggplot2::theme(
+        axis.text.y   = ggplot2::element_text(size=8),
+        axis.text.x   = ggplot2::element_text(size=8),
+        axis.title.y  = ggplot2::element_text(size=12),
+        axis.title.x  = ggplot2::element_text(size=12),
+        axis.line = ggplot2::element_line(colour = "black"),
+        panel.border = ggplot2::element_rect(colour = "black", fill=NA, size=1),
+        plot.title = ggplot2::element_text(hjust = 0.5, size = 12)
+)
 
 
 ###########################################################################
@@ -121,13 +120,10 @@ chnkVec <- c(
 ```
 
 
-```{r variation_data_prep, echo=TRUE, eval=TRUE, warning=FALSE, results=F}
+```{r, echo=TRUE, eval=TRUE, warning=FALSE, results="hide"}
 
 ###############################################################################
 ## Add Variation estimate plot                                               ##
-
-
-
 
 if (length(unique(dfDesign$dataseries)) > 1){
     independentDesignColSector <- c(

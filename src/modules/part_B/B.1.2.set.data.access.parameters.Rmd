@@ -23,6 +23,7 @@ if (file.exists(projectAccessFile)){
     username <- df$username
     pass <- df$pass
     
+    
 } else {
     username <- paste0(Obio@parameterList$project_id,"_da")
     sPwd <-c(2:9,letters,LETTERS)
@@ -34,7 +35,8 @@ if (file.exists(projectAccessFile)){
     write.table(df, projectAccessFile, row.names=F, sep="\t")
 }
     
-    
+Obio@dbDetailList[["RaccessUsername"]] <- username
+Obio@dbDetailList[["RaccessPass"]] <- pass
 
 ## Assign project tables ##
 ## Design
