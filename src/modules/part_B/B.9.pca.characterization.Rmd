@@ -120,7 +120,7 @@ chnkVec <- c(
 ```
 
 
-```{r, echo=TRUE, eval=TRUE, warning=FALSE, results="hide"}
+```{r, echo=TRUE, eval=TRUE, warning=FALSE, results="asis", message=F}
 
 ###############################################################################
 ## Add Variation estimate plot                                               ##
@@ -316,6 +316,7 @@ gSvec <- dfSel[dfSel[,selXY[1]] >  twoSD, geneIDcolumn]
    
     
     NewChnk <- paste0(
+        "### PCA_Loadings \n",
         "\n```{r PCA_gene_level , results='asis', echo=F, eval=TRUE, warning=FALSE, fig.cap='",
         figCap,"'}\n",
         "\n",
