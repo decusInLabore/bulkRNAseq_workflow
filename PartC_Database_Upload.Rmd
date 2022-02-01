@@ -91,15 +91,31 @@ load(FN)
 ```{r , echo=TRUE, eval=T, warning=FALSE}
 
 
+###############################################################################
+##                                                                           ##
 
-FN <- paste0(hpc.mount, "Projects/reference_data/documentation/BC.parameters.txt")
-dbTable <- read.delim(
-    FN, 
-    sep = "\t",
-    stringsAsFactors = F
-)
+# FN <- paste0(hpc.mount, "Projects/reference_data/documentation/BC.parameters.txt")
+# dbTable <- read.delim(
+#     FN, 
+#     sep = "\t",
+#     stringsAsFactors = F
+# )
+# db.pwd <- as.vector(dbTable[1,1])
+
+## Loading the BABS password ##
+if (upload.results.to.database){
+    FN <- paste0(hpc.mount, "Projects/reference_data/pwd_folder/babs.txt")
+    dbTable <- read.delim(
+      FN,
+      header = F,
+      sep = "\t",
+      stringsAsFactors = F
+    )
+}
+
 db.pwd <- as.vector(dbTable[1,1])
-
+##                                                                           ##
+###############################################################################
 
 ###################################
 # Upload pca table to database    #
@@ -176,8 +192,10 @@ cmd.vec <- biologicSeqTools2::upload.datatable.to.database(
     password = db.pwd,
     prim.data.db = Obio@dbDetailList$primDataDB,
     dbTableName = Obio@parameterList$rnaseqdbTableName,
-    df.data = Obio@databaseTable[Obio@databaseTable$count_cut_off > 1, ],
-    db.col.parameter.list = biologicSeqTools2::inferDBcategories(Obio@databaseTable[Obio@databaseTable$count_cut_off > 1, ]),
+    # df.data = Obio@databaseTable[Obio@databaseTable$count_cut_off > 1, ], Use this option to filter reads
+    df.data = Obio@databaseTable,
+    # db.col.parameter.list = biologicSeqTools2::inferDBcategories(Obio@databaseTable[Obio@databaseTable$count_cut_off > 1, ]),
+    db.col.parameter.list = biologicSeqTools2::inferDBcategories(Obio@databaseTable),
     new.table = TRUE
 )
 
@@ -212,22 +230,19 @@ doQuery <- function(
 ## Create user in db
 query0 <- paste0("SELECT User, Host FROM mysql.user WHERE User = '",username,"' AND Host = '10.%';")
 res <- doQuery(Obio, query = query0, resOut=TRUE)
-if (nrow(res) > 0){
-    query0a <- paste0("DROP USER '",username,"'@'10.%';")   
-    doQuery(Obio, query = query0a)
-}
-
-query1 <- paste0(
-    "CREATE USER '",
-    username, 
-    "'@'10.%' IDENTIFIED BY '",
-    pass,
-    "';"
-)
-
-doQuery(Obio, query = query1)
-# mysql -h 10.27.241.82 -u boeingS -p
-# 5+3f4nB04042018
+if (nrow(res) == 0){
+    query1 <- paste0(
+        "CREATE USER '",
+        username, 
+        "'@'10.%' IDENTIFIED BY '",
+        pass,
+        "';"
+    )
+  
+    doQuery(Obio, query = query1)
+    #query0a <- paste0("DROP USER '",username,"'@'10.%';")   
+    #doQuery(Obio, query = query0a)
+} 
 
 
 query2 <- paste0("GRANT SELECT on ",Obio@dbDetailList$primDataDB,".",designTB ," TO ",username,"@'10.%';")
