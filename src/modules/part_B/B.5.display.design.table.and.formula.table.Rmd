@@ -1,7 +1,7 @@
 <!-- Set PArameters Module -->
 <!-- Set the chnkPrefix to make all chunks unique in the overall folder -->
 ```{r partC_design_model_init, echo=TRUE, eval=TRUE, warning=FALSE}
-chnkPrefix <- "C5.design.and.formula.table."
+chnkPrefix <- "B5.design.and.formula.table."
 VersionPdfExt <- VersionPdfExt <- paste0(".",chnkPrefix,"V", gsub("-", "", Sys.Date()), ".pdf")
 
 ```
@@ -9,7 +9,9 @@ VersionPdfExt <- VersionPdfExt <- paste0(".",chnkPrefix,"V", gsub("-", "", Sys.D
 
 ## Display Design File
 ```{r designFile, echo=TRUE, eval=TRUE, warning=FALSE, fig.cap="**Table 1:** Design table for this experiment outlining original file names, sample names and group definitions for differential gene expression analysis"}
-#dfDesign <- Obio@dfDesign
+dfDesign <- Obio@dfDesign
+dfModel <- Obio@dfModel
+
 selVec <- c(
     names(dfDesign)[grep('sampleID', names(dfDesign))],
     names(dfDesign)[grep('original.sample.name', names(dfDesign))],

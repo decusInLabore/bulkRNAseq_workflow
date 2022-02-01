@@ -1,7 +1,7 @@
 <!-- Set PArameters Module -->
 <!-- Set the chnkPrefix to make all chunks unique in the overall folder -->
-```{r partC_C9_pca_init, echo=TRUE, eval=TRUE, warning=FALSE}
-chnkPrefix <- "C9.DGE."
+```{r, echo=TRUE, eval=TRUE, warning=FALSE}
+chnkPrefix <- "B11.DGE."
 VersionPdfExt <- VersionPdfExt <- paste0(".",chnkPrefix,"V", gsub("-", "", Sys.Date()), ".pdf")
 
 ```

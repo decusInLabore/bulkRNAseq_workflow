@@ -1,0 +1,242 @@
+---
+output: 
+    html_document:
+        code_folding: hide
+        df_print: tibble
+        highlight: default
+        theme: paper
+        toc: true
+        toc_depth: 5
+        toc_float: true
+        css: src/assets/style/style.css
+
+always_allow_html: yes
+---
+
+```{r setup, include=FALSE}
+###############################################################################
+## Recommended R-version                                                     ##
+
+# module purge;source /camp/stp/babs/working/software/modulepath_new_software_tree_2018-08-13;module load pandoc/2.2.3.2-foss-2016b;ml R/4.0.3-foss-2020a
+
+## Done                                                                      ##
+###############################################################################
+
+
+###############################################################################
+## Set the environment                                                       ##
+
+if (!require("remotes")){
+  install.packages("remotes")
+}
+
+remotes::install_github("rstudio/renv")
+
+if (!file.exists("renv.lock")){
+    renv::init()
+} else {
+    renv::restore(prompt=FALSE)
+}
+
+
+renv::install("bioc::DESeq2")
+renv::install("bioc::clusterProfiler")
+renv::install("decusInLabore/biologicSeqTools2")
+
+## Done                                                                      ##
+###############################################################################
+
+
+###############################################################################
+## Set knitr options                                                         ##
+
+knitr::opts_chunk$set(
+    tidy = F,
+    tidy.opts = list(width.cutoff = 120),
+    message = FALSE,
+    warning = FALSE
+)
+
+##                                                                           ##
+###############################################################################
+
+###############################################################################
+## Set global variables                                                      ##
+
+cDir <- getwd()
+setwd("..")
+workdir <- getwd()
+setwd(cDir)
+
+figureCount <- 1
+tableCount <- 1
+upload.results.to.database <- TRUE
+shinyBaseServerURL <- "shiny-bioinformatics.crick.ac.uk"
+
+## Done                                                                      ##
+###############################################################################
+
+
+###############################################################################
+## Load biologic object from part A                                          ##
+library(biologicSeqTools2)
+FN <- paste0("../", list.files("..")[grep("bioLOGIC.Robj", list.files(".."))])
+load(FN)
+## Done                                                                      ##
+###############################################################################
+
+```
+
+
+```{r , echo=TRUE, eval=T, warning=FALSE}
+
+
+
+FN <- paste0(hpc.mount, "Projects/reference_data/documentation/BC.parameters.txt")
+dbTable <- read.delim(
+    FN, 
+    sep = "\t",
+    stringsAsFactors = F
+)
+db.pwd <- as.vector(dbTable[1,1])
+
+
+###################################
+# Upload pca table to database    #
+###################################
+
+biologicSeqTools2::upload.pca.table.to.db(
+    df.pca = Obio@dfPCA,
+    host =Obio@dbDetailList$host,
+    prim.data.db = Obio@dbDetailList$primDataDB,
+    password = db.pwd,
+    db.user = Obio@dbDetailList$db.user,
+    PCAdbTableName = Obio@parameterList$PCAdbTableName
+)
+
+# Finished creating pca database table
+
+###############################################################################
+# Upload design file to database                                              #
+###############################################################################
+# Obio@parameterList$designdbTableName <- paste0(
+#   Obio@parameterList$project_id, 
+#     "_designTable"
+# )
+dfDesign4upload <- Obio@dfDesign
+selVec <- c(
+    "sampleID",
+    "sample.id",
+    "sample.group",
+    "dataseries",
+    names(dfDesign4upload)[grep("^f_",names(dfDesign4upload))],
+    names(dfDesign4upload)[grep("^LRT_",names(dfDesign4upload))],
+    names(dfDesign4upload)[grep("^comp_",names(dfDesign4upload))],
+    names(dfDesign4upload)[grep("_color$",names(dfDesign4upload))]
+)
+
+pos <- grep("designTScol", names(Obio@parameterList))
+if (length(pos) > 0 & !is.null(Obio@parameterList$designTScol)){
+    selVec <- c(
+        selVec,
+        Obio@parameterList$designTScol
+    )
+}
+
+selVec <- unique(selVec[selVec %in% names(dfDesign4upload)])
+
+dfDesign4upload <- unique(dfDesign4upload[,selVec])
+names(dfDesign4upload) <- gsub("\\.", "_", names(dfDesign4upload))
+
+cmd.vec <- biologicSeqTools2::upload.datatable.to.database(
+  host = Obio@dbDetailList$host,
+  user = Obio@dbDetailList$db.user,
+  password = db.pwd,
+  prim.data.db = Obio@dbDetailList$primDataDB,
+  dbTableName = Obio@parameterList$designdbTableName,
+  df.data = dfDesign4upload,
+  db.col.parameter.list = biologicSeqTools2::inferDBcategories(
+      dfDesign4upload
+  ),
+    
+  new.table = TRUE
+)
+
+killDbConnections()
+
+
+###############################################################################
+# Upload to database                                                          #
+###############################################################################
+Obio@databaseTable$Gene_description <- NULL
+
+cmd.vec <- biologicSeqTools2::upload.datatable.to.database(
+    host = Obio@dbDetailList$host,
+    user = Obio@dbDetailList$db.user,
+    password = db.pwd,
+    prim.data.db = Obio@dbDetailList$primDataDB,
+    dbTableName = Obio@parameterList$rnaseqdbTableName,
+    df.data = Obio@databaseTable[Obio@databaseTable$count_cut_off > 1, ],
+    db.col.parameter.list = biologicSeqTools2::inferDBcategories(Obio@databaseTable[Obio@databaseTable$count_cut_off > 1, ]),
+    new.table = TRUE
+)
+
+killDbConnections()
+
+
+#setwd(Obio@parameterList$workdir)
+doQuery <- function(
+    Obio, 
+    query,
+    resOut = FALSE
+){
+    library(RMySQL)
+    res <- NULL
+    dbDB <- dbConnect(
+        drv = RMySQL::MySQL(), 
+        user = Obio@dbDetailList$db.user, 
+        password = db.pwd, 
+        host = Obio@dbDetailList$host,
+        dbname = Obio@dbDetailList$primDataDB
+    ) 
+    tryCatch(res <- dbGetQuery(dbDB, query), error = function(c) {
+        c$message <- stop(paste0("Error in ", query, "."))
+    })
+    dbDisconnect(dbDB)
+    if (resOut){
+        return(res)
+    }
+}
+
+
+## Create user in db
+query0 <- paste0("SELECT User, Host FROM mysql.user WHERE User = '",username,"' AND Host = '10.%';")
+res <- doQuery(Obio, query = query0, resOut=TRUE)
+if (nrow(res) > 0){
+    query0a <- paste0("DROP USER '",username,"'@'10.%';")   
+    doQuery(Obio, query = query0a)
+}
+
+query1 <- paste0(
+    "CREATE USER '",
+    username, 
+    "'@'10.%' IDENTIFIED BY '",
+    pass,
+    "';"
+)
+
+doQuery(Obio, query = query1)
+# mysql -h 10.27.241.82 -u boeingS -p
+# 5+3f4nB04042018
+
+
+query2 <- paste0("GRANT SELECT on ",Obio@dbDetailList$primDataDB,".",designTB ," TO ",username,"@'10.%';")
+doQuery(Obio, query = query2)
+
+query3 <- paste0("GRANT SELECT on ",Obio@dbDetailList$primDataDB,".",mainTB ," TO ",username,"@'10.%';")
+doQuery(Obio, query = query3)
+
+query4 <- paste0("GRANT SELECT on ",Obio@dbDetailList$primDataDB,".",pcaTB ," TO ",username,"@'10.%';")
+doQuery(Obio, query = query4)
+```
+

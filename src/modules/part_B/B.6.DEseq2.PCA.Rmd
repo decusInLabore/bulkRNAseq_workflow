@@ -1,0 +1,246 @@
+<!-- Set Parameters Module -->
+<!-- Set the chnkPrefix to make all chunks unique in the overall folder -->
+```{r, echo=TRUE, eval=TRUE, warning=FALSE}
+chnkPrefix <- "edit.RSEM.tpm."
+VersionPdfExt <- VersionPdfExt <- paste0(".",chnkPrefix,"V", gsub("-", "", Sys.Date()), ".pdf")
+
+```
+
+## DESeq2 Analysis
+### Create DESeq2 object
+```{r, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
+###############################################################################
+## Create and attach DDS object                                              ##
+
+Obio <- biologicSeqTools2::createDdsObject(Obio)
+
+## Done creating and attaching DDS objecs                                    ##
+###############################################################################
+```
+
+### Variation and PCA
+```{r, echo=TRUE, eval=TRUE, warning=FALSE, results="hide", message=FALSE}
+###############################################################################
+## Determine variation in the data set                                       ##
+
+## This is a tempory fix until the PCA function has been fully equipped for
+## batch correction
+saveMode <- Obio@parameterList$batchMode
+Obio@parameterList$batchMode <- FALSE
+
+Obio <- addCoVar(
+    obj = Obio,
+    avgCountCutOffperSample = 1,
+    selectionColName = "aboveCutOff",
+    dfBaseData = Obio@DESeqNormReadCountsTable,
+    rowNameID = Obio@parameterList$primaryAlignmentGeneID
+    #options: "DEseq2RV" or "CoVar"
+)
+
+## Results are in slot Obio@dataTableList$dfRowVar ##
+
+## Diagnostic plot ##
+# library(ggplot2)
+# countCutOff <- 0
+# pCoVar <- ggplot(
+#     data=Obio@dataTableList$dfRowVar[Obio@dataTableList$dfRowVar$avgCountsPerGenePerSample > countCutOff ,],
+#     aes(
+#         x=CoVar,
+#         y=DEseq2RV
+#     )) + geom_point(
+#     )  + labs(title = "Variation" ,x = "CoVar", y = "DeSeq2Var"
+#     ) +  theme(
+#         axis.text.y   = element_text(size=8),
+#         axis.text.x   = element_text(size=8),
+#         axis.title.y  = element_text(size=8),
+#         axis.title.x  = element_text(size=8),
+#         axis.line = element_line(colour = "black"),
+#         panel.border = element_rect(colour = "black", fill=NA, size=1),
+#         plot.title = element_text(hjust = 0.5, size = 12)
+#     )
+
+## Done determine variation in the data set                                  ##
+###############################################################################
+
+###############################################################################
+## Perform PCA, MV-analysis, and Clusterdendrogram                           ##
+
+## Select elements for PCA explicityly ##
+dfSel <- Obio@dataTableList$dfRowVar
+
+## Remove low count values ##
+dfSel <- dfSel[dfSel$avgCountsPerGenePerSample >= 1, ]
+
+## Order by variation
+dfSel <- dfSel[order(dfSel$DEseq2RV, decreasing = TRUE),]
+# dfSel <- dfSel[order(dfSel$CoVar, decreasing = TRUE),]
+
+rowSelVec <- as.vector(
+    dfSel[1:Obio@parameterList$NtopGenes,Obio@parameterList$primaryAlignmentGeneID]
+)
+
+Obio@dataTableList[["Ntop4pcaGeneSelection"]] <- rowSelVec
+
+
+
+Obio <- doPCA(
+    obj = Obio,
+    pcaDimensionsToInvestigate = c(1:5),
+    Ntop4pca = Obio@parameterList$NtopGenes, #500,
+    avgCountCutOffperSample = 0,
+    pcaSelectionVec = rowSelVec
+)
+
+Obio@parameterList$batchMode <- saveMode
+## Do linear fittings to available dimensions ##
+
+
+# depdendent Variation mode: Variables can be dependent (individual fits)
+
+
+if (length(unique(Obio@dfDesign$dataseries)) > 1){
+    independentDesignColSector <- c(
+        "dataseries"
+    )
+} else {
+    independentDesignColSector <- as.vector(NULL, mode = "character")
+}
+
+if (length(Obio@dfDesign$sample.group) > 1){
+    independentDesignColSector <- c(
+        independentDesignColSector,
+        "sample.group"
+    )
+}
+
+if (length(Obio@dfDesign$replicate) > 1){
+    independentDesignColSector <- c(
+        independentDesignColSector,
+        "replicate"
+    )
+}
+
+pos <- grep("^f_", names(Obio@dfDesign))
+if (length(pos) > 0){
+  independentDesignColSector <- c(
+    names(Obio@dfDesign)[grep("^f_", names(Obio@dfDesign))]
+  )
+
+} else if (length(unique(Obio@dfDesign$dataseries)) > 1){
+    independentDesignColSector <- c(
+      "dataseries"
+    )
+}
+
+
+# indedendentVariation mode: Variables are required to be independent
+## Do linear variable fittings to PCA ##
+# variables need to be independent > culmulative fit #
+Obio <- doLinearFittings(
+    obj = Obio,
+    designColSelector = independentDesignColSector,
+    mode = "independentVariation", ## "independentVariation" or "dependentVariation"
+    Ntop4pca = Obio@parameterList$NtopGenes,
+    plotname = "P2_independentVariables"
+)
+
+
+
+## Do linear variable fittings to PCA ##
+
+# individual fit
+LRTvec <- names(Obio@dfDesign)[grep("f_", names(Obio@dfDesign))]
+#LRTvec <- LRTvec[LRTvec != "LRT_replicate"]
+#LRTvec <- "LRT_timepoint"
+
+dependentDesignColSelector<- c(
+    independentDesignColSector,
+    LRTvec,
+    names(Obio@dfDesign)[grep("comp_", names(Obio@dfDesign))],
+    names(Obio@dfDesign)[grep("LRT_", names(Obio@dfDesign))]
+)
+Obio <- doLinearFittings(
+    obj = Obio,
+    designColSelector = dependentDesignColSelector,
+    mode = "dependentVariation", ## "independentVariation" or "dependentVariation"
+    Ntop4pca = Obio@parameterList$NtopGenes,
+    plotname = "P2_dependentVariables"
+)
+
+
+## Create Plot dendrogram ##
+Obio <- createSampleDendrogram(
+    obj = Obio,
+    Ntop4pca = Obio@parameterList$NtopGenes,
+    plotname = "dendrogram10000"
+)
+
+###############################################################################
+## Do differential gene expression analysis                                  ##
+#Obio@parameterList$batchMode <- F
+## LRT tests for multiple sample groups ##
+
+dfDGE <- Obio@dfModel
+dfDGE <- dfDGE[dfDGE$test == "LRT",]
+
+if (nrow(dfDGE) > 0){
+  Obio <- LRTanalysis(
+      obj = Obio,
+      createNewResultTable = TRUE
+  )
+}
+
+## Pairwise differential gene expression ##
+## If working on projects prior to fall 2018, make sure
+## Obio@parameterList$DEseq2betaPrior is set to true.
+dfDGE <- Obio@dfModel
+dfDGE <- dfDGE[dfDGE$test == "Wald",]
+
+if (nrow(dfDGE) > 0){
+  Obio <- DGEanalysis(
+    obj = Obio,
+    createNewResultTable = TRUE
+  )
+}
+
+# Obio <- doDGEanalysis(
+#     obj = Obio,
+#     DGEdesignCols = names(Obio@dfDesign)[grep("comp_", names(Obio@dfDesign)) ],
+#     normaliseAllSamplesTogether = TRUE
+# )
+
+
+
+
+# ## Save workspace ##
+# objectFN <- paste0(
+#     Obio@parameterList$localWorkDir,
+#     Obio@parameterList$project_id,
+#     ".bioLOGIC.Robj"
+# )
+# 
+# save(Obio, file = objectFN)
+
+
+## Done differential gene expresison analysis                                ##
+###############################################################################
+
+###############################################################################
+## Prepare documentation                                                     ##
+
+## To be added ##
+## consider using spin on the written out scriptVec
+#Obio <- createRMDscript(Obio)
+
+## Done with documentation                                                   ##
+###############################################################################
+
+###############################################################################
+## Add plots
+
+
+## Done 
+###############################################################################
+```
+
+

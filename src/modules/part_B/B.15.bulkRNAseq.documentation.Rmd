@@ -1,7 +1,7 @@
 <!-- Set Parameters Module -->
 <!-- Set the chnkPrefix to make all chunks unique in the overall folder -->
 ```{r docu_module, echo=TRUE, eval=TRUE, warning=FALSE}
-chnkPrefix <- "C13.Documentation."
+chnkPrefix <- "B15.Documentation."
 VersionPdfExt <- VersionPdfExt <- paste0(".",chnkPrefix,"V", gsub("-", "", Sys.Date()), ".pdf")
 
 ```

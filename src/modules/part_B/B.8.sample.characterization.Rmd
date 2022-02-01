@@ -1,16 +1,21 @@
 <!-- Set PArameters Module -->
 <!-- Set the chnkPrefix to make all chunks unique in the overall folder -->
-```{r partC_C6_sample_characterization_init, echo=TRUE, eval=TRUE, warning=FALSE}
-chnkPrefix <- "C6."
+```{r, echo=TRUE, eval=TRUE, warning=FALSE}
+chnkPrefix <- "B8."
 VersionPdfExt <- VersionPdfExt <- paste0(".",chnkPrefix,"V", gsub("-", "", Sys.Date()), ".pdf")
 
 ```
 
+```{r, echo=F, eval=TRUE, warning=FALSE, results=F}
+dfMainData <- Obio@databaseTable
+geneIDcolumn <- Obio@parameterList$geneIDcolumn
+mostVarIDs <- Obio@dataTableList[["Ntop4pcaGeneSelection"]]
+alignmentGeneID <- Obio@parameterList$primaryAlignmentGeneID
+
+```
 
 
-
-```{r sample_characterization_data_prep, echo=F, eval=TRUE, warning=FALSE, results=F}
-
+```{r, echo=T, eval=TRUE, warning=FALSE, results=F}
 chnkVec <- as.vector(NULL, mode = "character")
 plotList <- list()
 
@@ -24,7 +29,7 @@ colSelVec <- c(
     names(dfMainData)[grep("norm_counts", names(dfMainData))]
 )
 
-geneSelVec <- mostVarIDs
+geneSelVec <- Obio@dataTableList[["Ntop4pcaGeneSelection"]]
 geneSelVec <- geneSelVec[geneSelVec != duplicated(geneSelVec)]
 
 dfData <- unique(dfMainData[, colSelVec])

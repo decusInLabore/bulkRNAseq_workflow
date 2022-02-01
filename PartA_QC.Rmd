@@ -54,7 +54,7 @@ renv::install("bioc::DESeq2")
 renv::install("bioc::clusterProfiler")
 renv::install("decusInLabore/biologicSeqTools")
 
-library(biologicSeqTools)
+library(biologicSeqTools2)
 
 
 ###############################################################################

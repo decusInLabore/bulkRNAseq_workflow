@@ -1,7 +1,7 @@
 <!-- Set PArameters Module -->
 <!-- Set the chnkPrefix to make all chunks unique in the overall folder -->
-```{r partC_C7_pca_init, echo=TRUE, eval=TRUE, warning=FALSE}
-chnkPrefix <- "C7.pca."
+```{r, echo=TRUE, eval=TRUE, warning=FALSE}
+chnkPrefix <- "B.9.pca."
 VersionPdfExt <- VersionPdfExt <- paste0(".",chnkPrefix,"V", gsub("-", "", Sys.Date()), ".pdf")
 
 library(gplots)
@@ -13,7 +13,9 @@ library(ggplot2)
 ```
 
 
-
+```{r, echo=F, eval=TRUE, warning=FALSE, results=F}
+dfPCA <- Obio@dfPCA
+```
 
 
 ```{r pca_data_prep, echo=TRUE, eval=TRUE, warning=FALSE, results=F}
@@ -192,108 +194,231 @@ dfBase <- t(dfTemp)
 pcaGenes = prcomp(scale(dfBase))
 
 dfPcaGenes = data.frame(pcaGenes$x)
+
+if (ncol(dfPcaGenes) > 10){
+    dfPcaGenes <- dfPcaGenes[,1:10]
+}
+
 dfPcaGenes[[ alignmentGeneID]] <- row.names(dfPcaGenes)
-#         
-dfLoad <- pcaGenes$rotation
-dfLoad <- t(dfLoad)
-#         
-dfBase <- data.frame(dfBase)
-#         
-#######################################################################
-## helper function                                                   ##
 
-determinePCAloadings <- function(
-    lmFitDim = 'lmFitDim',
-    dfBase = 'dfBase',
-    primary.alignment.gene.id = 'primary.alignment.gene.id'
-){
-    for (i in 1:ncol(dfBase)){
-        corVar <- names(dfBase)[i]
-        regression_formula <- as.formula(paste0("pcaGenes$x[,",lmFitDim,"]~", corVar))
-        fit <- lm(regression_formula, data=dfBase)
-        #summary(fit)
-        p.value <- summary(fit)$coefficients[corVar,"Pr(>|t|)"]
-        estimate <- summary(fit)$coefficients[corVar,"Estimate"]
-        intercept <- summary(fit)$coefficients[grep("Intercept", row.names(summary(fit)$coefficients)),"Estimate"]
-        rsquared <- summary(fit)$r.squared
+Obio@dfPCAgenes <- dfPcaGenes
 
-        new.row <- data.frame(p.value, estimate, intercept, rsquared)
+## Add Gene Annotation
+dfAnno <- unique(Obio@dfGeneAnnotation[,c( alignmentGeneID, geneIDcolumn)])
+dfAnno <- dfAnno[dfAnno[,alignmentGeneID] %in% dfPcaGenes[,alignmentGeneID], ]
+dfLoad <- merge(
+    dfAnno, 
+    dfPcaGenes, 
+    by.x = alignmentGeneID, 
+    by.y = alignmentGeneID, 
+    all = TRUE
+)
 
-        row.names(new.row) <- corVar
-        if (i!=1){
-            dfRes <- rbind(dfRes, new.row)
-        } else {
-            dfRes <- new.row
-        }
-    }
+dfLoad[is.na(dfLoad)] <- 0
+dfLoad[dfLoad[,geneIDcolumn] == 0, geneIDcolumn] <- dfLoad[dfLoad[,geneIDcolumn] == 0, alignmentGeneID]
 
-    dfRes <- dfRes[order(dfRes$p.value, decreasing = FALSE),]
-    dfRes[["padj"]] <- p.adjust(dfRes$p.value, method = "BH")
-    #names(dfRes) <- paste0(names(dfRes), ".PCA", lmFitDim)
-    dfRes[[primary.alignment.gene.id]] <- row.names(dfRes)
+## Make Loadings Plot ##
+## Plot ##
+selXY <- c("PC1", "PC2", geneIDcolumn)
+dfSel <- unique(dfLoad[,selXY])
+#row.names(dfSel) <- dfSel$gene
+dfSel[["highlight"]] <- ""
+dfSel[["cat"]] <- ""
+dfSel[["selX"]] <- ""
+dfSel[["selY"]] <- ""
+dfSel <- dfSel[order(dfSel[,selXY[1]], decreasing = FALSE), ]
+dfSel[1:15, "highlight"] <- "+"
+    
+## Use two standard deviations for enrichment ##
+twoSD <- 2*sd(dfSel[,selXY[1]])
+twoSDxLine <- 2*sd(dfSel[,selXY[1]])
+gSvec <- dfSel[dfSel[,selXY[1]] < -1* twoSD, geneIDcolumn]
+    
 
-
-    ## Add log10p column ##
-    padj  <- names(dfRes)[grep("padj", names(dfRes))]
-    lg10p <- gsub("padj", "lg10p", padj)
-
-    for (z in 1:length(padj)){
-        preprocess <- as.numeric(dfRes[,padj[z]])
-
-        if (length(grep("padj", padj[i])) > 0){
-            preprocess <- as.numeric(res[,padj[z]])
-            minNum <- min(preprocess[preprocess != 0])
-            preprocess[preprocess == 0] <- minNum
-        } else {
-            preprocess <- as.numeric(dfRes[,padj[z]])
-        }
-
-        temp <- -1*log10(preprocess)
-        #temp[temp >= 50] = 50
-        dfRes[,lg10p[z]] <- temp
-    }
-    dfRes[["PCAdimension"]] <- paste0("PCA", lmFitDim)
-    ## Done adding log10p ##
-
-    return(dfRes)
-}
-
-## helper function                                                   ##
-#######################################################################
-
-pcaDimensionsToInvestigate = c(1:6)
-
-for (l in 1:length(pcaDimensionsToInvestigate)){
-    dfTemp <- determinePCAloadings(
-        lmFitDim = pcaDimensionsToInvestigate[l],
-        dfBase = dfBase,
-        primary.alignment.gene.id = alignmentGeneID
+dfSel <- dfSel[order(dfSel[,selXY[1]], decreasing = TRUE), ]
+dfSel[1:15, "highlight"] <- "+"
+gSvec <- dfSel[dfSel[,selXY[1]] >  twoSD, geneIDcolumn]
+    
+    
+    
+    ## Now dim 2
+    dfSel <- dfSel[order(dfSel[,selXY[2]], decreasing = FALSE), ]
+    dfSel[1:15, "highlight"] <- "+"
+    
+    twoSD <- 2*sd(dfSel[,selXY[2]])
+    twoSDyLine <- 2*sd(dfSel[,selXY[2]])
+    gSvec <- dfSel[dfSel[,selXY[2]] < -1* twoSD, geneIDcolumn]
+    
+    
+    
+    
+    dfSel <- dfSel[order(dfSel[,selXY[2]], decreasing = TRUE), ]
+    dfSel[1:15, "highlight"] <- "+"
+    gSvec <- dfSel[dfSel[,selXY[2]] >  twoSD, geneIDcolumn]
+    
+    dfSel[["label"]] <- ""
+    dfSel[dfSel$highlight == "+", "label"] <- dfSel[dfSel$highlight == "+", geneIDcolumn]
+    
+    ## Done
+    tag <- "PCA_Loadings"
+    
+    colVec <- c("grey", "black")
+    names(colVec) <- c("", "Selected")
+    
+    plotList[[tag]] <- ggplot2::ggplot(data=dfSel, aes_string(x=selXY[1],y=selXY[2], label="label")
+    ) + geom_vline(xintercept = 0, color = "grey", size=0.5
+    ) + geom_hline(yintercept = 0, color = "grey", size=0.5
+    ) + geom_vline(xintercept = c(twoSDxLine, -1* twoSDxLine), color = "red", lty=2,size=0.5
+    ) + geom_hline(yintercept = c(twoSDyLine, -1* twoSDyLine), color = "red", lty=2,size=0.5
+    ) + geom_hline(yintercept = 0, color = "grey", size=0.5
+    ) + geom_point(col="black") + scale_color_manual(values=colVec
+    #) + ggtitle(paste0("PCA - Cell Level")
+    ) + theme_bw(
+    ) +  theme(
+        #axis.text.y   = element_blank(), # element_text(size=8),
+        #axis.text.x   = element_blank(), #element_text(size=8),
+        #axis.title.y  = element_blank(), #element_text(size=8),
+        #axis.title.x  = element_blank(), #element_text(size=8),
+        axis.line = element_line(colour = "black"),
+        legend.position = "none",
+        panel.border = element_rect(colour = "black", fill=NA, size=1),
+        #plot.title = element_text(hjust = 0.5, size = 12)
+    )  #+ guides(col = guide_legend(override.aes = list(shape = 16, size = legendDotSize)))
+    
+    #points <-  as.vector(unique(dfSel[dfSel$highlight=="+", geneIDcolumn]))
+    #plotListGene[[tag]] <- LabelPoints(plot = plotListGene[[tag]], points =points, repel = TRUE, xnudge = 0, ynudge = 0)
+    
+    plotList[[tag]] <-  plotList[[tag]]  + ggrepel::geom_text_repel(size = 3)
+    
+    
+    ## Save to file ##
+    FNbase <- paste0(tag, ".", selXY[1],".", selXY[2], VersionPdfExt)
+    FN <- paste0(Obio@parameterList$reportFigDir, FNbase)
+    FNrel <- paste0("report_figures/", FNbase)
+    
+    pdf(FN)
+        plot(plotList[[tag]])
+    dev.off()
+    
+    # dim1 <- gsub("PC_", "", xVec[i])
+    # dim2 <- gsub("PC_", "", yVec[i])
+    # link <- paste0(
+    #     '<a href="https://',urlString,'/',
+    #     Obio@parameterList$project_id, 
+    #     '/scatterplot?x_axis=add_counts_PCA_Dim_',
+    #     dim1, 
+    #     '_Loadings&y_axis=add_counts_PCA_Dim_',
+    #     dim2,
+    #     '_Loadings&highlight_gene=&cat_id=ag_lab_categories__10',
+    #     '" target="_blank">here</a>'
+    # )
+    
+    figCap <- paste0(
+        "**Figure, " ,figureCount,":**Gene-level PCA plot for dimensions ", selXY[1], " and ", selXY[2], ". "
+        #". An interactive version of this figure can be found ", link, ". "
     )
+   
+    
+    NewChnk <- paste0(
+        "\n```{r PCA_gene_level , results='asis', echo=F, eval=TRUE, warning=FALSE, fig.cap='",
+        figCap,"'}\n",
+        "\n",
+        "\n print(plotList[['",tag,"']])",
+        "\n cat(  '\n')",
+        "\n\n\n```\n"   
+    )
+    
+    chnkVec <- c(
+        chnkVec,
+        NewChnk
+    )
+    
+    ## Done with genes                                                       ##
+    ###########################################################################
+    figureCount <- figureCount + 1
 
-    if (l ==1){
-        dfAll <- dfTemp
-    } else {
-        dfAll <- rbind(
-            dfAll,
-            dfTemp
-        )
-    }
-    print(paste0(l, " dimensions out of ", length(pcaDimensionsToInvestigate), " processed."))
+
+###############################################################################
+## Add percent variaton per dimension plot                                   ##
+
+tag <- "Variation_Per_PCA_Dimension"
+    
+## Add percent variation plot ##
+PercentVariation <- round(100*Obio@PCApercentVar,1)
+PCdimension <- paste0("PC", 1:length(PercentVariation))  
+    
+df <- data.frame(
+    PercentVariation,
+    PCdimension
+)
+
+legendString <- ""
+if (nrow(df) > 20){
+    legendString <- paste0("Only the first 20 principal components out of ",nrow(df)," are shown in the figure. ")
+    df <- df[1:20,]
+    PCdimension <- PCdimension[1:20]
+    
 }
 
-names(dfAll) <- gsub("intercept.PCA", "intercept_PCA", names(dfAll))
-names(dfAll) <- gsub("estimate.PCA", "contrast_P_PCA_estimatePCA", names(dfAll))
-names(dfAll) <- gsub("padj.PCA", "contrast_P_padj_PCA", names(dfAll))
-names(dfAll) <- gsub("lg10p.PCA", "contrast_P_lg10p_PCA", names(dfAll))
-names(dfAll) <- gsub("rsquared.PCA", "r2_PCA", names(dfAll))
+df <- df[df$PercentVariation > 0,]
 
-Obio@dfPCAgenes <- dfAll
-#         
-#         ## Adding plots ##
-#         obj <- createPCAloadingPlots(obj)
+plotList[[tag]] <- ggplot(
+    df, 
+    aes(PCdimension, PercentVariation)
+) + geom_col(
+) + scale_x_discrete(limits=PCdimension) +  theme(
+    axis.text.y   = element_text(size=8),
+    axis.text.x   = element_text(size=8),
+    axis.title.y  = element_text(size=8),
+    axis.title.x  = element_text(size=8),
+    axis.line = element_line(colour = "black"),
+    panel.border = element_rect(colour = "black", fill=NA, size=1),
+    plot.title = element_text(hjust = 0.5, size = 12)
+)
+   
+###########################################################################
+## Save plot to file                                                     ##
+FNbase <- paste0(tag, VersionPdfExt)
+FN <- paste0(Obio@parameterList$reportFigDir, FNbase)
+FNrel <- paste0("report_figures/", FNbase)
+    
+pdf(FN)
+    plotList[[tag]]
+dev.off()
+##                                                                       ##
+###########################################################################
+    
+figCap <- paste0(
+    '**Figure ',
+    figureCount,
+    ':** Percent of variaton explained by each principal component. ',
+    legendString,
+    'Download a pdf of this figure <a href="',FNrel,'" target="_blank">here</a>. '
+)
+ 
+figureCount <- figureCount + 1
+   
+NewChnk <- paste0(
+    "### Amount of variation explained by each PCA Dimension ",
+    "\n```{r, results='asis', echo=F, eval=TRUE, warning=FALSE, fig.cap='",figCap,"'}\n",
+    "\n",
+    "\n print(plotList[['",tag,"']])",
+    "\n cat(  '\n')",
+    "\n\n\n```\n"   
+)
 
-## Doen get PCA loadings                                                     ##
+chnkVec <- c(
+        chnkVec,
+        NewChnk
+)
+       
+    
+     
+## Done                                                                      ##
 ###############################################################################
+
+
+
 
 
 covar_PC_frame <- rbind(
@@ -478,7 +603,7 @@ mode <- "dependentVariation"
    
     NewChnk <- paste0(
             "### Dependent-tolerant Source of Variation Per PCA Component ",
-            "\n```{r var-per-pca-dependent-tolerant, results='asis', echo=F, eval=TRUE, warning=FALSE, fig.cap='",figCap,"'}\n",
+            "\n```{r, results='asis', echo=F, eval=TRUE, warning=FALSE, fig.cap='",figCap,"'}\n",
             "\n",
             "\n print(plotList[['",tag,"']])",
             "\n cat(  '\n')",
@@ -495,7 +620,6 @@ mode <- "dependentVariation"
 ## Done                                                                      ##
 ###############################################################################
         
-
 
 ## Add PCA loadings
 

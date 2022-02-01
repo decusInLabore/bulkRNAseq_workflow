@@ -61,7 +61,7 @@ sdCutOff <- 2
 # #.libPaths(myPaths)
 
 if (file.exists("renv.lock")){
-    renv::restore()
+    renv::restore(prompt=FALSE)
 } else {
     renv::init()
 }
@@ -104,7 +104,7 @@ save.chunk.intermediates <- TRUE
 ```
 
 <!-- Essential 1.2: Load Datasets for this report -->
-```{r child = 'src/modules/partC_Report/C.1.2.load.data.for.report.Rmd', eval=TRUE}
+```{r child = lib, eval=TRUE}
 ```
 
 <!-- Optional 2: Retrieve Reference Genes from Database or Gmt file -->
