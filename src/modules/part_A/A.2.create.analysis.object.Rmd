@@ -27,7 +27,19 @@ if (file.exists(Obio@parameterList$designFN)){
 }
 
 
-Obio@dfDesign <- dfDesign
+
+library(dplyr)
+dfDesign <- dfDesign %>%
+  mutate(timepoint = as.numeric(timepoint)) %>%
+  arrange(dataseries, timepoint, f_replicate, .by_group = TRUE)  
+
+dfDesign <- data.frame(dfDesign)
+
+## The order of samples in dfDesign will determine the display order in viewers ##
+## Arranging samples according to display order ##
+
+
+Obio@dfDesign <- data.frame(dfDesign)
 
 ##                                                                           ##
 ###############################################################################
@@ -40,14 +52,22 @@ Obio@dfDesign <- dfDesign
 ###############################################################################
 ## Load TPM/count file                                                       ##
 
-FNtpm <- paste0(hpc.mount, "Projects/swantonc/dhruva.biswas/361B_CSL_DB_bulkRNA_seq_traxerX_oxford_part2_9_lanes_subsampling/basedata/dfTPM.txt")
+Obio <- biologicSeqTools2::addTPMorFPKMtable(
+        obj = Obio,
+        addTPM = TRUE,
+        addFPKM = FALSE
+)
+
+Obio@parameterList$count_tableFN <- paste0("../data/",Obio@parameterList$project_id, ".count.table.txt")
+if (!dir.exists("../data")){
+    dir.create("../data")
+}
+
+write.table(Obio@dfTPM, Obio@parameterList$count_tableFN, row.names = F, sep = "\t")
 
 
-Obio@parameterList$count_table <- paste0(hpc.mount, "Projects/swantonc/dhruva.biswas/361B_CSL_DB_bulkRNA_seq_traxerX_oxford_part2_9_lanes_subsampling/basedata/dfTPM.txt")
 
-
-
-if (file.exists(Obio@parameterList$count_table)){
+if (file.exists(Obio@parameterList$count_tableFN)){
     dfTPM <- read.delim(
         Obio@parameterList$count_table, 
         sep = "\t",
@@ -83,15 +103,28 @@ if (sum(check) > 0){
 ### Load RSEM raw count matrix
 ```{r, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
 
-pathToRSEMoutputFiles <- paste0(hpc.mount, "Projects/swantonc/dhruva.biswas/361_CSL_DB_bulkRNA_seq_traxerX_oxford_part2_9_lanes/workdir/RSEM/Ensembl")
+if (!is.null(Obio@parameterList$RSEMcountDataFile)){
+    RSEMcountDataFile <- Obio@parameterList$RSEMcountDataFile
+} else {
+    RSEMcountDataFile <- paste0(
+            Obio@parameterList$localWorkDir,
+            "RSEM/",
+            Obio@parameterList$project_id, 
+            ".count.data.txt"
+)
+}
+
+ 
 
 #RSEMcountDataFile 
 
-dfRSEM <- readAndPrepareCountMatrix(
+dfRSEM <- biologicSeqTools2::readAndPrepareCountMatrix(
     count.data.fn = RSEMcountDataFile ,
     string.to.be.deleted.in.raw.counts.columns = "",
     df.design = Obio@dfDesign
 )
+
+df
 
 Obio@RSEMcountMatrix <- dfRSEM
 

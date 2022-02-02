@@ -41,7 +41,7 @@ if (!file.exists("renv.lock")){
 workdir <- getwd()
 figureCount <- 1
 tableCount <- 1
-
+upload.to.database <- TRUE
 
 
 ###############################################################################
@@ -85,16 +85,17 @@ if (dir.exists("/Volumes/babs/working/boeings/")){
     hpc.mount <- ""
 }
 
-
-FN <- paste0(hpc.mount, "Projects/reference_data/pwd_folder/babs.txt")
-dbTable <- read.delim(
-  FN,
-  header = F,
-  sep = "\t",
-  stringsAsFactors = F
-)
-
-db.pwd <- as.vector(dbTable[1,1])
+if (upload.to.database){
+    FN <- paste0(hpc.mount, "Projects/reference_data/pwd_folder/babs.txt")
+    dbTable <- read.delim(
+      FN,
+      header = F,
+      sep = "\t",
+      stringsAsFactors = F
+    )
+    
+    db.pwd <- as.vector(dbTable[1,1])
+}
 ##                                                                           ##
 ###############################################################################
 
@@ -110,7 +111,11 @@ db.pwd <- as.vector(dbTable[1,1])
 ```
 
 <!-- Option A: Create design file -->
-```{r child = 'src/modules/section_A/A.1A.1.create.design.file.Rmd', eval=FALSE}
+```{r child = 'src/modules/part_A/A.1.alignment.and.RSEM.count.Rmd', eval=FALSE}
+```
+
+<!-- Option B: Load preprocessed -->
+```{r child = 'src/modules/part_A/A.1B.load.input.files.Rmd', eval=FALSE}
 ```
 
 <!-- Option A: Setup biologic object for analysis -->
