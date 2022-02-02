@@ -19,7 +19,7 @@ baseMount <- gsub(
 
 
 
-returnList <- biologicSeqTools::organizeFastqFiles(
+returnList <- biologicSeqTools2::organizeFastqFiles(
     baseMount = "",
     pathToSeqStorageFolder = Obio@parameterList$pathToSeqStorageFolder,
     fastqOutputDir = Obio@parameterList$fastqDir,
@@ -27,9 +27,6 @@ returnList <- biologicSeqTools::organizeFastqFiles(
     checkFileExists = FALSE
 )
 
-## Temporary fix
-setwd("bulkRNAseq_workflow")
-## end
 
 shellscriptVec <- returnList$shellscriptVec
 concatenationRequired <- returnList$concatenationRequired
@@ -58,9 +55,14 @@ if (concatenationRequired){
 
 #################################################################################
 ## If concatenation required, generate new input files                         ##
+setwd(Obio@parameterList$localWorkDir)
 if (concatenationRequired){
-    system("concat.file.name")
+    system("concatFASTQfiles.sh ")
 }
+
+## Temporary fix
+setwd(paste0(Obio@parameterList$localWorkDir, "bulkRNAseq_workflow"))
+## end
 
 ## Done                                                                        ##
 #################################################################################
@@ -68,7 +70,7 @@ if (concatenationRequired){
 # ###############################################################################
 # ## Create Design File                                                        ##
 #
-dfDesign <- biologicSeqTools::createDesignFileCrickASFsamples(
+dfDesign <- biologicSeqTools2::createDesignFileCrickASFsamples(
     pathToSeqStorageFolder = pathToSeqStorageFolder,
     FNsampleAnnotation = Obio@parameterList$baseDesignFN,
     paired.end = Obio@parameterList$paired.end,
@@ -154,11 +156,39 @@ Obio@dfDesign[["f_replicate"]] <- sapply(
     function(x) unlist(strsplit(x, "_"))[3]
 )
 
-
+Obio@dfDesign[["f_timepoint"]] <- paste0("T", Obio@dfDesign$timepoint)
 
 
 
 Obio@dfDesign[["FASTQ"]] <- Obio@dfDesign$sample.id
+
+
+###############################################################################
+## Add sample group colors                                                   ##
+
+## Get relevant colors ##
+
+sample.group <- unique(Obio@dfDesign$sample.group)
+sample.group_color <- sample.group
+
+
+library(scales)
+sample.group_color = hue_pal()(length(sample.group_color))
+#sample.group_color = c("#990000", "#009900")
+
+dfGroupColors <- unique(data.frame(sample.group, sample.group_color))
+
+Obio@dfDesign <- merge(Obio@dfDesign, dfGroupColors, by.x = "sample.group", "sample.group")
+
+#setwd(Obio@parameterList$localWorkDir)
+#design.file <- paste0("design/design.file.txt")
+Obio@parameterList$designFN <- "design/experimental.design.file.txt"
+
+write.table(Obio@dfDesign , Obio@parameterList$designFN, row.names = FALSE, sep = "\t")
+
+## 
+###############################################################################
+
 ###############################################################################
 ## Create Formula Matrix                                                     ##
 
@@ -185,18 +215,27 @@ for (i in 1:length(comparisonID)){
 
 test <- rep("Wald", length(comparison))
 type <- rep("DGE", length(comparison))
-model <- rep("~ condition", length(comparison))
-# model <- c(
-#     "~ condition",
-#     "~ condition",
-#     "~ condition",
-#     "~ condition",
-#     "~ f_Tissue + condition",
-#     "~ f_Genotype + condition"
-# )
+
+#model <- rep("~ condition", length(comparison))
+model <- c(
+    "~ condition",
+    "~ condition",
+    "~ condition + f_timepoint + condition:f_timepoint",
+    "~ condition + f_timepoint + condition:f_timepoint",
+    "~ condition + f_timepoint + condition:f_timepoint",
+    "~ condition + f_timepoint + condition:f_timepoint"
+)
 reducedModel <- rep("", length(comparison))
 normalizeAllSamplesTogether <- rep(FALSE, length(comparison))
-betaPrior <- rep(Obio@parameterList$DEseq2betaPrior, length(comparison))
+# betaPrior <- rep(Obio@parameterList$DEseq2betaPrior, length(comparison))
+betaPrior <- c(
+    TRUE,
+    TRUE,
+    FALSE,
+    FALSE,
+    FALSE,
+    FALSE
+)
 
 dfModel <- data.frame(
   comparison,
@@ -223,12 +262,14 @@ comparison <- names(dfDesign)[grep("LRT_", names(dfDesign))]
 test <- rep("LRT", length(comparison))
 type <- rep("LRT", length(comparison))
 model <- c(
-  "~condition"
+  "~ f_timepoint",
+  "~ condition"
 )
 # 
 # 
 reducedModel <- c(
-  "~1"
+  "~ 1",
+  "~ 1"
 )
 # 
 normalizeAllSamplesTogether <- rep(FALSE, length(comparison))
@@ -253,50 +294,10 @@ dfModel <- rbind(
 
 Obio@dfModel <- dfModel
 
-## Done                                                                      ##
-###############################################################################
 
+#model.file <- paste0("design/dge.model.file.txt")
+model.file <- "design/dge.model.table.txt"
 
-
-
-#Obio@dfDesign[["LRT_Sox10_Neg"]] <- sapply(as.vector(Obio@dfDesign$sample.group), function(x) unlist(strsplit(x, "_"))[2])
-
-## Done creating design file                                                 ##
-###############################################################################
-
-
-
-#
-#
-
-
-
-## Add design file to the Obio object ##
-
-## Done creating design file                                                 ##
-###############################################################################
-
-###############################################################################
-## Add sample group colors                                                   ##
-
-## Get relevant colors ##
-
-sample.group <- unique(Obio@dfDesign$sample.group)
-sample.group_color <- sample.group
-
-
-library(scales)
-sample.group_color = hue_pal()(length(sample.group_color))
-#sample.group_color = c("#990000", "#009900")
-
-dfGroupColors <- unique(data.frame(sample.group, sample.group_color))
-
-Obio@dfDesign <- merge(Obio@dfDesign, dfGroupColors, by.x = "sample.group", "sample.group")
-
-#setwd(Obio@parameterList$localWorkDir)
-design.file <- paste0("design/design.file.txt")
-write.table(Obio@dfDesign , design.file, row.names = FALSE, sep = "\t")
-model.file <- paste0("design/dge.model.file.txt")
 write.table(Obio@dfModel , model.file, row.names = FALSE, sep = "\t")
 
 ## Done adding sample group colors                                           ##
@@ -313,7 +314,7 @@ write.table(Obio@dfModel , model.file, row.names = FALSE, sep = "\t")
 sDir <- getwd()
 setwd(Obio@parameterList$localWorkDir)
 
-Obio <- biologicSeqTools::createbulkRNASeqAnalysisBashScripts(
+Obio <- biologicSeqTools2::createbulkRNASeqAnalysisBashScripts(
     obj = Obio,
     scriptVecSlot = "scriptVec"
 )

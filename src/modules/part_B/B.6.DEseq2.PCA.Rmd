@@ -28,7 +28,7 @@ Obio <- biologicSeqTools2::createDdsObject(Obio)
 saveMode <- Obio@parameterList$batchMode
 Obio@parameterList$batchMode <- FALSE
 
-Obio <- addCoVar(
+Obio <- biologicSeqTools2::addCoVar(
     obj = Obio,
     avgCountCutOffperSample = 1,
     selectionColName = "aboveCutOff",
@@ -169,11 +169,11 @@ Obio <- doLinearFittings(
 
 
 ## Create Plot dendrogram ##
-Obio <- createSampleDendrogram(
-    obj = Obio,
-    Ntop4pca = Obio@parameterList$NtopGenes,
-    plotname = "dendrogram10000"
-)
+# Obio <- createSampleDendrogram(
+#     obj = Obio,
+#     Ntop4pca = Obio@parameterList$NtopGenes,
+#     plotname = "dendrogram10000"
+# )
 
 ###############################################################################
 ## Do differential gene expression analysis                                  ##
