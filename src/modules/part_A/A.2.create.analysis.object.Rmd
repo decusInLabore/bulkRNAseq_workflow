@@ -14,11 +14,11 @@ VersionPdfExt <- VersionPdfExt <- paste0(".",chnkPrefix,"V", gsub("-", "", Sys.D
 
 
 Obio@projectDetailList$designFN <- "design/experimental.design.file.txt"
+Obio@projectDetailList$designFN
 
-
-if (file.exists(Obio@parameterList$designFN)){
+if (file.exists(Obio@projectDetailList$designFN)){
     dfDesign <- read.delim(
-        Obio@parameterList$designFN, 
+        Obio@projectDetailList$designFN, 
         sep = "\t",
         stringsAsFactors = F
     )    
@@ -86,7 +86,7 @@ head(dfTPM)
 Obio@dfTPM <- dfTPM
 
 
-designSampleIDs <- c(Obio@parameterList$primaryAlignmentGeneID, unique(Obio@dfDesign$sample.id)
+designSampleIDs <- c(Obio@parameterList$primaryAlignmentGeneID, unique(Obio@dfDesign$sample.id))
 dfTPMSampleIDs <- unique(names(Obio@dfTPM))
 checkTPM <- gsub("_TPM", "", dfTPMSampleIDs[dfTPMSampleIDs != "gene_id"])
 check <- !(designSampleIDs %in% checkTPM)
