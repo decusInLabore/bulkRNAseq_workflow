@@ -74,6 +74,7 @@ projectDetailList <- list(
     "paired.end" =  as.logical(dfObio$paired.end[1]),
     "stranded" = as.logical(dfObio$stranded[1]),
     "labname" = "Pachnis",
+    "projectName" = as.vector(dfObio$project_name[1]),
     "read.length" =  as.vector(dfObio$read.length[1]),
     
     "baseDesignFN" = as.vector(dfObio$baseDesignFN[1]),
