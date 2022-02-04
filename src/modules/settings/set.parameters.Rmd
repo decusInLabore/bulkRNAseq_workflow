@@ -70,13 +70,14 @@ if (!(is.null(corGeneVec))){
 projectDetailList <- list(
 
     "folder" = as.vector(dfObio$folder[1]),
-    
+    "primaryAlignmentGeneID" = as.vector(dfObio$primaryAlignmentGeneID[1]),
     "paired.end" =  as.logical(dfObio$paired.end[1]),
     "stranded" = as.logical(dfObio$stranded[1]),
     "labname" = "Pachnis",
     "read.length" =  as.vector(dfObio$read.length[1]),
     
     "baseDesignFN" = as.vector(dfObio$baseDesignFN[1]),
+    "designFN" = as.vector(dfObio$designFN[1]),
     "DGEmodelFN" = as.vector(dfObio$DGEmodelFN[1]),
     "DEseq2betaPrior" = as.logical(dfObio$DEseq2betaPrior[1]),
     "AlignFASTQcolumn" = as.vector(dfObio$AlignFASTQcolumn[1]),
@@ -86,7 +87,7 @@ projectDetailList <- list(
     "batchMode" = as.logical(dfObio$batchMode[1]),
     "parallelProcessing" = as.logical(dfObio$parallelProcessing[1]),
     "ModuleFASTQC" = as.vector(dfObio$ModuleFASTQC[1]),
-    
+    "countTableFN" = as.vector(dfObio$countTableFN[1]),
 
 
     

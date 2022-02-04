@@ -79,7 +79,7 @@ dfDesign <- biologicSeqTools2::createDesignFileCrickASFsamples(
 
 )
 
-dfDesign <- dfDesign[order(dfDesign$timepoint, decreasing = F),]
+# dfDesign <- dfDesign[order(dfDesign$timepoint, decreasing = F),]
 
 # dfDesign <- read.delim(
 #     "/camp/stp/babs/working/boeings/Projects/pachnisv/song.chng/195A_RNAseq_enteric_neurons_DIV_timecourse/workdir/vpl195A.design.file.txt",
@@ -182,9 +182,9 @@ Obio@dfDesign <- merge(Obio@dfDesign, dfGroupColors, by.x = "sample.group", "sam
 
 #setwd(Obio@parameterList$localWorkDir)
 #design.file <- paste0("design/design.file.txt")
-Obio@parameterList$designFN <- "design/experimental.design.file.txt"
+Obio@projectDetailList$designFN <- "design/experimental.design.file.txt"
 
-write.table(Obio@dfDesign , Obio@parameterList$designFN, row.names = FALSE, sep = "\t")
+write.table(Obio@dfDesign , Obio@projectDetailList$designFN, row.names = FALSE, sep = "\t")
 
 ## 
 ###############################################################################
@@ -220,6 +220,8 @@ type <- rep("DGE", length(comparison))
 model <- c(
     "~ condition",
     "~ condition",
+    "~ condition",
+    "~ condition",
     "~ condition + f_timepoint + condition:f_timepoint",
     "~ condition + f_timepoint + condition:f_timepoint",
     "~ condition + f_timepoint + condition:f_timepoint",
@@ -229,6 +231,8 @@ reducedModel <- rep("", length(comparison))
 normalizeAllSamplesTogether <- rep(FALSE, length(comparison))
 # betaPrior <- rep(Obio@parameterList$DEseq2betaPrior, length(comparison))
 betaPrior <- c(
+    TRUE,
+    TRUE,
     TRUE,
     TRUE,
     FALSE,
@@ -450,12 +454,19 @@ sink()
 ###############################################################################
 ##                                                                           ##
 
+if (!is.null(Obio@projectDetailList$countDataFN) && file.exists(Obio@projectDetailList$countDataFN)){
+    Obio@parameterList$RSEMcountDataFile <- Obio@projectDetailList$countDataFN
+} else {
+    Obio@parameterList$RSEMcountDataFile <- paste0(
+        Obio@parameterList$localWorkDir,
+        "RSEM/",
+        Obio@projectDetailList$project_id,
+        ".count.data.txt"
+    )
+}
+
 ## Update RSEM path ##
-Obio@parameterList$RSEMcountDataFile <- paste0(
-    Obio@parameterList$localWorkDir,
-    "RSEM/",
-    Obio@parameterList$RSEMcountDataFile
-)
+
 
 
 ##                                                                           ##

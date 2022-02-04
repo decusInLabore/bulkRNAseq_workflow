@@ -13,7 +13,7 @@ VersionPdfExt <- VersionPdfExt <- paste0(".",chnkPrefix,"V", gsub("-", "", Sys.D
 ## Load design file                                                          ##
 
 
-Obio@parameterList$designFN <- "design/experimental.design.file.txt"
+Obio@projectDetailList$designFN <- "design/experimental.design.file.txt"
 
 
 if (file.exists(Obio@parameterList$designFN)){
@@ -58,16 +58,16 @@ Obio <- biologicSeqTools2::addTPMorFPKMtable(
         addFPKM = FALSE
 )
 
-Obio@parameterList$count_tableFN <- paste0("../data/",Obio@parameterList$project_id, ".count.table.txt")
+Obio@projectDetailList$TpmTableFN <- paste0("../data/",Obio@projectDetailList$project_id, ".TPM.table.txt")
 if (!dir.exists("../data")){
     dir.create("../data")
 }
 
-write.table(Obio@dfTPM, Obio@parameterList$count_tableFN, row.names = F, sep = "\t")
+write.table(Obio@dfTPM, Obio@projectDetailList$TpmTableFN, row.names = F, sep = "\t")
 
 
 
-if (file.exists(Obio@parameterList$count_tableFN)){
+if (!is.null(Obio@projectDetailList$TpmTableFN) && file.exists(Obio@projectDetailList$TpmTableFN)){
     dfTPM <- read.delim(
         Obio@parameterList$count_table, 
         sep = "\t",
@@ -78,6 +78,7 @@ if (file.exists(Obio@parameterList$count_tableFN)){
 }
 
 
+
 dfTPM <- dfTPM[rowSums(dfTPM[,2:ncol(dfTPM)]) != 0,]
 
 head(dfTPM)
@@ -85,13 +86,13 @@ head(dfTPM)
 Obio@dfTPM <- dfTPM
 
 
-designSampleIDs <- unique(Obio@dfDesign$sample.id)
+designSampleIDs <- c(Obio@parameterList$primaryAlignmentGeneID, unique(Obio@dfDesign$sample.id)
 dfTPMSampleIDs <- unique(names(Obio@dfTPM))
 checkTPM <- gsub("_TPM", "", dfTPMSampleIDs[dfTPMSampleIDs != "gene_id"])
 check <- !(designSampleIDs %in% checkTPM)
 
 if (sum(check) > 0){
-  stop("Sample IDs in dfDesign don't match the column names in the count file")
+  stop("Sample IDs in dfDesign don't match the column names in the count file or TPM file gene identifier column is not correct.")
 }
 
 ##                                                                           ##
@@ -124,7 +125,7 @@ dfRSEM <- biologicSeqTools2::readAndPrepareCountMatrix(
     df.design = Obio@dfDesign
 )
 
-df
+
 
 Obio@RSEMcountMatrix <- dfRSEM
 
