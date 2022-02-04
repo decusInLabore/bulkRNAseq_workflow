@@ -184,7 +184,7 @@ dfDGE <- Obio@dfModel
 dfDGE <- dfDGE[dfDGE$test == "LRT",]
 
 if (nrow(dfDGE) > 0){
-  Obio <- LRTanalysis(
+  Obio <- biologicSeqTools2::LRTanalysis(
       obj = Obio,
       createNewResultTable = TRUE
   )
@@ -197,7 +197,7 @@ dfDGE <- Obio@dfModel
 dfDGE <- dfDGE[dfDGE$test == "Wald",]
 
 if (nrow(dfDGE) > 0){
-  Obio <- DGEanalysis(
+  Obio <- biologicSeqTools2::DGEanalysis(
     obj = Obio,
     createNewResultTable = TRUE
   )
