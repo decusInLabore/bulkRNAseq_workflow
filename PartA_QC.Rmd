@@ -35,7 +35,7 @@ remotes::install_github("rstudio/renv")
 if (!file.exists("renv.lock")){
     renv::init()
 } else {
-    renv::restore()
+    renv::restore(prompt=FALSE)
 }
 
 workdir <- getwd()
@@ -120,7 +120,7 @@ if (upload.to.database){
 
 <!-- Option A: Setup biologic object for analysis -->
 <!-- Incorporate dfDesign, dfRSEM, dfTPM, dfModel -->
-```{r child = 'src/modules/section_A/A2.create.analysis.object.Rmd', eval=TRUE}
+```{r child = 'src/modules/part_A/A2.create.analysis.object.Rmd', eval=TRUE}
 ```
 
 
@@ -137,7 +137,7 @@ save(Obio,
 
 print("R bioLOGIC single cell object initialized.")
 
-renv::snapshot()
+# renv::snapshot()
 
 ```
 
