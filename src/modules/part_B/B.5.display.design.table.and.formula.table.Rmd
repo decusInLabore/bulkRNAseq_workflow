@@ -1,6 +1,6 @@
 <!-- Set PArameters Module -->
 <!-- Set the chnkPrefix to make all chunks unique in the overall folder -->
-```{r partC_design_model_init, echo=TRUE, eval=TRUE, warning=FALSE}
+```{r partC_design_model_init, echo=FALSE, eval=TRUE, warning=FALSE}
 chnkPrefix <- "B5.design.and.formula.table."
 VersionPdfExt <- VersionPdfExt <- paste0(".",chnkPrefix,"V", gsub("-", "", Sys.Date()), ".pdf")
 

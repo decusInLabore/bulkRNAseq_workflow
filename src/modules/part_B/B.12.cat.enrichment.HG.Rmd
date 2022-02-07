@@ -1,6 +1,6 @@
 <!-- Set PArameters Module -->
 <!-- Set the chnkPrefix to make all chunks unique in the overall folder -->
-```{r partC_C10_cat_init, echo=TRUE, eval=TRUE, warning=FALSE}
+```{r partC_C10_cat_init, echo=FALSE, eval=TRUE, warning=FALSE}
 chnkPrefix <- "C10.catEnrHG."
 VersionPdfExt <- VersionPdfExt <- paste0(".",chnkPrefix,"V", gsub("-", "", Sys.Date()), ".pdf")
 

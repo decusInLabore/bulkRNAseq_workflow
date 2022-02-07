@@ -1,12 +1,12 @@
 <!-- Set PArameters Module -->
 <!-- Set the chnkPrefix to make all chunks unique in the overall folder -->
-```{r partC_C8_hm_init, echo=TRUE, eval=TRUE, warning=FALSE}
+```{r partC_C8_hm_init, echo=FALSE, eval=TRUE, warning=FALSE}
 chnkPrefix <- "C8.Heatmap."
 VersionPdfExt <- VersionPdfExt <- paste0(".",chnkPrefix,"V", gsub("-", "", Sys.Date()), ".pdf")
 
 ```
 
-## Gene Expression Overview {.tabset .tabset-fade .tabset-pills}
+
 
 ```{r Heatmaps_data_prep, echo=TRUE, eval=TRUE, warning=FALSE, results=F}
 ## Heatmap setup ##
@@ -447,8 +447,15 @@ for (k in 1:length(Obio@parameterList$HmDisplayCatsFromDb)){
 ###############################################################################
 
 
+if (length(HMplotList) > 2){
+    tabVar <- ".tabset .tabset-fade .tabset-dropdown"
+} else {
+    tabVar <- ".tabset .tabset-fade .tabset-pills"
+}
+
 ```
 
+## Gene Expression Overview {`r tabVar`}
 
 ```{r Heatmap_plot, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
 cat(paste(knitr::knit(text = chnkVec, quiet = T), collapse = '\n'))
