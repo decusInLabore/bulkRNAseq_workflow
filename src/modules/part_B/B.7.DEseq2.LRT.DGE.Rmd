@@ -1,13 +1,13 @@
 <!-- Set Parameters Module -->
 <!-- Set the chnkPrefix to make all chunks unique in the overall folder -->
-```{r, echo=TRUE, eval=TRUE, warning=FALSE}
+```{r, echo=FALSE, eval=TRUE, warning=FALSE}
 chnkPrefix <- "edit.RSEM.tpm."
 VersionPdfExt <- VersionPdfExt <- paste0(".",chnkPrefix,"V", gsub("-", "", Sys.Date()), ".pdf")
 
 ```
 
 
-```{r, echo=TRUE, eval=TRUE, warning=FALSE, results="hide"}
+```{r, echo=FALSE, eval=TRUE, warning=FALSE, results="hide"}
 ###############################################################################
 ## Create and attach DDS object                                              ##
 # This is done in the previous section B6 already
@@ -585,7 +585,7 @@ sink()
 #
 ```
 
-```{r, echo=TRUE, eval=TRUE, warning=FALSE, results="hide"}
+```{r, echo=FALSE, eval=TRUE, warning=FALSE, results="hide"}
 ###############################################################################
 ## Save Obio Object                                                          ##
 

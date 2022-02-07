@@ -1,7 +1,7 @@
 ## Gene Set Enrichment Analysis (GSEA) {.tabset .tabset-fade .tabset-pills}
 <!-- Set PArameters Module -->
 <!-- Set the chnkPrefix to make all chunks unique in the overall folder -->
-```{r partC_C11B_pca_init, echo=TRUE, eval=TRUE, warning=FALSE}
+```{r partC_C11B_pca_init, echo=FALSE, eval=TRUE, warning=FALSE}
 chnkPrefix <- "C11.GSE."
 VersionPdfExt <- VersionPdfExt <- paste0(".",chnkPrefix,"V", gsub("-", "", Sys.Date()), ".pdf")
 

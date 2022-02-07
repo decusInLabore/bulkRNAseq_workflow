@@ -1,14 +1,14 @@
 <!-- Set Parameters Module -->
 <!-- Set the chnkPrefix to make all chunks unique in the overall folder -->
-```{r set_parameters_init, echo=TRUE, eval=TRUE, warning=FALSE}
+```{r set_parameters_init, echo=FALSE, eval=TRUE, warning=FALSE}
 chnkPrefix <- "partB.set.parameters."
 VersionPdfExt <- VersionPdfExt <- paste0(".",chnkPrefix,"V", gsub("-", "", Sys.Date()), ".pdf")
 
 ```
 
 ## Data Preparation
-### Set Parameters
-```{r B_set_directories, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
+
+```{r B_set_directories, echo=FALSE, eval=TRUE, warning=FALSE, results="asis"}
 ###############################################################################
 ## Set database password                                                     ##
 # Get database password from file

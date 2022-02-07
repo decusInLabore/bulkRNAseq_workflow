@@ -1,6 +1,6 @@
 <!-- Set Parameters Module -->
 <!-- Set the chnkPrefix to make all chunks unique in the overall folder -->
-```{r, echo=TRUE, eval=TRUE, warning=FALSE}
+```{r, echo=FALSE, eval=TRUE, warning=FALSE}
 chnkPrefix <- "partB.set.parameters."
 VersionPdfExt <- VersionPdfExt <- paste0(".",chnkPrefix,"V", gsub("-", "", Sys.Date()), ".pdf")
 
@@ -157,7 +157,7 @@ cat(threeString)
 
 Next, let's load your project data. We will need this as a basis for making the plots further down. 
 
-```{r, echo=TRUE, eval=F, warning=FALSE}
+```{r, echo=TRUE, eval=F, warning=FALSE, collapse=FALSE}
 #if (length(grep("bioLOGIC", as.vector(installed.packages()[,"Package"]))) ==0 ){
     devtools::install_github("decusinlabore/bioLOGIC")
 #}
