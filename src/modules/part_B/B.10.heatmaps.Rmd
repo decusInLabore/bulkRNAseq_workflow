@@ -53,6 +53,8 @@ if (!is.null(Obio@dataTableList$Ntop4pcaGeneSelection) |
     geneVec <- as.vector(unique(dfDataTable[dfDataTable[,Obio@parameterList$primaryAlignmentGeneID] %in% Obio@dataTableList$Ntop4pcaGeneSelection,geneSelCol]))
 }
 
+
+
 ## Insert gene set into database ##
 createProjectRefDbTables <- T
 

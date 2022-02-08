@@ -197,7 +197,11 @@ if (ncol(dfPcaGenes) > 10){
 
 dfPcaGenes[[ alignmentGeneID]] <- row.names(dfPcaGenes)
 
-Obio@dfPCAgenes <- dfPcaGenes
+#Obio@dfPCAgenes <- dfPcaGenes
+dfPcaGenes <- Obio@dfPCAgenes
+
+## Retrieve pca loadings from previous step
+
 
 ## Add Gene Annotation
 dfAnno <- unique(Obio@dfGeneAnnotation[,c( alignmentGeneID, geneIDcolumn)])
@@ -215,7 +219,7 @@ dfLoad[dfLoad[,geneIDcolumn] == 0, geneIDcolumn] <- dfLoad[dfLoad[,geneIDcolumn]
 
 ## Make Loadings Plot ##
 ## Plot ##
-selXY <- c("PC1", "PC2", geneIDcolumn)
+selXY <- c("contrast_P_PCA_estimatePCA1", "contrast_P_PCA_estimatePCA2", geneIDcolumn)
 dfSel <- unique(dfLoad[,selXY])
 #row.names(dfSel) <- dfSel$gene
 dfSel[["highlight"]] <- ""
@@ -298,20 +302,16 @@ gSvec <- dfSel[dfSel[,selXY[1]] >  twoSD, geneIDcolumn]
     
     # dim1 <- gsub("PC_", "", xVec[i])
     # dim2 <- gsub("PC_", "", yVec[i])
-    # link <- paste0(
-    #     '<a href="https://',urlString,'/',
-    #     Obio@parameterList$project_id, 
-    #     '/scatterplot?x_axis=add_counts_PCA_Dim_',
-    #     dim1, 
-    #     '_Loadings&y_axis=add_counts_PCA_Dim_',
-    #     dim2,
-    #     '_Loadings&highlight_gene=&cat_id=ag_lab_categories__10',
-    #     '" target="_blank">here</a>'
-    # )
+    link <- paste0(
+        '<a href="https://',urlString,'/',
+        Obio@parameterList$project_id,
+        '/scatterplot?x_axis=contrast_P_PCA_estimatePCA1&y_axis=contrast_P_PCA_estimatePCA2&highlight_gene=&cat_id=ag_lab_categories__10',
+        '" target="_blank">here</a>'
+    )
     
     figCap <- paste0(
-        "**Figure, " ,figureCount,":**Gene-level PCA plot for dimensions ", selXY[1], " and ", selXY[2], ". "
-        #". An interactive version of this figure can be found ", link, ". "
+        "**Figure, " ,figureCount,":**Gene-level PCA plot for dimensions ", selXY[1], " and ", selXY[2], ". ",
+        ". An interactive version of this figure can be found ", link, ". "
     )
    
     
@@ -371,7 +371,7 @@ plotList[[tag]] <- ggplot(
     axis.line = element_line(colour = "black"),
     panel.border = element_rect(colour = "black", fill=NA, size=1),
     plot.title = element_text(hjust = 0.5, size = 12)
-)
+) + theme_bw()
    
 ###########################################################################
 ## Save plot to file                                                     ##
