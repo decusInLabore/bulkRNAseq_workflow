@@ -34,6 +34,7 @@ dfDesign <- Obio@dfDesign
 ###############################################################################
 ## First heatmap: Most variable genes                                        ##
 HMplotList <- list()
+chnkVec <- as.vector(NULL, mode="character")
 
 if (geneIDcolumn == "mgi_symbol" | geneIDcolumn == "hgnc_symbol"){
     geneSelCol <- geneIDcolumn
@@ -41,9 +42,9 @@ if (geneIDcolumn == "mgi_symbol" | geneIDcolumn == "hgnc_symbol"){
     geneSelCol <- "hgnc_symbol"
 }
 
-if (is.null(HmDisplayCatsFromDb)){
+# if (is.null(HmDisplayCatsFromDb)){
     HmDisplayCatsFromDb <- list()
-}
+# }
 
 ref.cat.db.table = lab.categories.table
 
@@ -392,19 +393,25 @@ for (k in 1:length(HmDisplayCatsFromDb)){
         
         #library(scales)
         #hue_pal()(2)
-        df <- unique(data.frame(Obio@dfDesign[,c("sample.group", "sample.group_color")]))
+        df <- unique(data.frame(dfDesign[,c("sample.id", "sample.group", "sample.group_color")]))
+        df <- df[df$sample.id %in% colnames(mHmBase),]
+        df2 <- data.frame(df[,"sample.group"])
+        names(df2) <- "Group"
         
+                
         GroupVec <- as.vector(unique(df$sample.group_color))
         names(GroupVec) <- as.vector(unique(df$sample.group))
         
-        df2 <- unique(data.frame(Obio@dfDesign[,c("sample.id","sample.group", "sample.group_color")]))
-        df2 <- data.frame(df2[,c("sample.group")])
-        names(df2) <- "Group"
         
         
-        ha = HeatmapAnnotation(df = df2, col = list(Group = GroupVec))
+        #df2 <- unique(data.frame(Obio@dfDesign[,c("sample.id","sample.group", "sample.group_color")]))
+        #df2 <- data.frame(df2[,c("sample.group")])
+        
+        
+        
+        ha = ComplexHeatmap::HeatmapAnnotation(df = df2, col = list(Group = GroupVec))
     
-        ht_opt(
+        ComplexHeatmap::ht_opt(
             legend_border = "black",
             heatmap_border = TRUE,
             annotation_border = TRUE
@@ -422,7 +429,7 @@ for (k in 1:length(HmDisplayCatsFromDb)){
             column_title = gsub(
                     "_", 
                     " ", 
-                    paste0("Heatmap_", names(HmDisplayCatsFromDb)[k])
+                    hmTitle
             ),
             name = paste0("HM_", k), 
             #row_km = 5,
@@ -441,13 +448,13 @@ for (k in 1:length(HmDisplayCatsFromDb)){
             clustering_distance_rows="euclidean",
             clustering_method_rows="complete",
             row_dend_width=unit(10,"mm"),
-            #top_annotation = ha,
+            top_annotation = ha,
             show_heatmap_legend = TRUE
             #row_title = NULL,
             #show_row_dend = FALSE
         ) 
         
-    ht_opt(RESET = TRUE)
+    ComplexHeatmap::ht_opt(RESET = TRUE)
         
     if (! is.null(HmDisplayCatsFromDb[[k]]$cat_id)){
         link <- paste0(
@@ -485,7 +492,7 @@ for (k in 1:length(HmDisplayCatsFromDb)){
     
     NewChnk <- paste0(
             "### HM_", names(HmDisplayCatsFromDb)[k],
-            "\n```{r Heatmap_HM_",k,", results='asis', echo=F, eval=TRUE, warning=FALSE, fig.cap='",figCap,"'}\n",
+            "\n```{r, results='asis', echo=F, eval=TRUE, warning=FALSE, fig.cap='",figCap,"'}\n",
             "\n",
             "\n print(HMplotList[['",names(HmDisplayCatsFromDb)[k],"']])",
             "\n cat(  '\n')",
@@ -518,7 +525,7 @@ if (length(HMplotList) > 2){
 
 ## Gene Expression Overview {`r tabVar`}
 
-```{r Heatmap_plot, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
+```{r, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
 cat(paste(knitr::knit(text = chnkVec, quiet = T), collapse = '\n'))
 ```
 
