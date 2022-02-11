@@ -482,7 +482,7 @@ for (k in 1:length(HmDisplayCatsFromDb)){
             project_id,"/category-view/",
             HmDisplayCatsFromDb[[k]]$cat_id,'" target="_blank">here</a>.'
         )
-        link <- paste0("https://biologic.crick.ac.uk/",project_id,"/category-view/",HmDisplayCatsFromDb[[k]]$cat_id)
+        
     } else {
         link <- ""
     }
