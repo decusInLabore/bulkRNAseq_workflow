@@ -4,6 +4,7 @@
 chnkPrefix <- "B10.Heatmap."
 VersionPdfExt <- VersionPdfExt <- paste0(".",chnkPrefix,"V", gsub("-", "", Sys.Date()), ".pdf")
 
+
 ```
 
 ```{r, echo=FALSE, eval=TRUE, warning=FALSE, results=F}
@@ -28,8 +29,31 @@ dfDesign <- Obio@dfDesign
 ```
 
 
-```{r, echo=TRUE, eval=TRUE, warning=FALSE, results=F}
+```{r, echo=F, eval=TRUE, warning=FALSE, results="asis"}
 ## Make heatmap gene list
+logFCselections <- names(dfMainData)[grep("_logFC_", names(dfMainData))]
+padjSelections <- gsub("_logFC_", "_padj_", logFCselections)
+
+dfSelections <- data.frame(logFCselections, padjSelections)
+dfSelections <- dfSelections[dfSelections[,"padjSelections"] %in% names(dfMainData),]
+
+if (nrow(dfSelections) > 2){
+    tabVar <- ".tabset .tabset-fade .tabset-dropdown"
+} else {
+    tabVar <- ".tabset .tabset-fade .tabset-pills"
+}
+
+```
+
+## Gene Expression Overview {`r tabVar`}
+```{r, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
+## Make heatmap gene list
+logFCselections <- names(dfMainData)[grep("_logFC_", names(dfMainData))]
+padjSelections <- gsub("_logFC_", "_padj_", logFCselections)
+
+dfSelections <- data.frame(logFCselections, padjSelections)
+dfSelections <- dfSelections[dfSelections[,"padjSelections"] %in% names(dfMainData),]
+
 
 ###############################################################################
 ## First heatmap: Most variable genes                                        ##
@@ -80,11 +104,6 @@ HmDisplayCatsFromDb[[cat.name]] <- list(
 
 ###########################################################################
 ## Make one heatmap per comparison                                       ##
-logFCselections <- names(dfMainData)[grep("_logFC_", names(dfMainData))]
-padjSelections <- gsub("_logFC_", "_padj_", logFCselections)
-
-dfSelections <- data.frame(logFCselections, padjSelections)
-dfSelections <- dfSelections[dfSelections[,"padjSelections"] %in% names(dfMainData),]
 
 
     
@@ -515,17 +534,13 @@ for (k in 1:length(HmDisplayCatsFromDb)){
 ###############################################################################
 
 
-if (length(HMplotList) > 2){
-    tabVar <- ".tabset .tabset-fade .tabset-dropdown"
-} else {
-    tabVar <- ".tabset .tabset-fade .tabset-pills"
-}
+
 
 ```
 
-## Gene Expression Overview {`r tabVar`}
 
-```{r, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
+
+```{r, echo=FALSE, eval=TRUE, warning=FALSE, results="asis"}
 cat(paste(knitr::knit(text = chnkVec, quiet = T), collapse = '\n'))
 ```
 

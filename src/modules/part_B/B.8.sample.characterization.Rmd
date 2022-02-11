@@ -198,6 +198,6 @@ if (length(plotList) > 2){
 ```
 
 ## Sample Characterization {`r tabVar`}
-```{r sample_characterization_data_plot, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
+```{r, echo=FALSE, eval=TRUE, warning=FALSE, results="asis"}
 cat(paste(knitr::knit(text = chnkVec, quiet = T), collapse = '\n'))
 ```

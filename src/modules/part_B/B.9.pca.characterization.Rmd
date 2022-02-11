@@ -683,6 +683,6 @@ A birds eye view of your data can be obtained by looking at the results of the p
 
 A more detailed explanation on PCA is give in this [PCA video](https://www.youtube.com/watch?v=_UVHneBUBW0&feature=youtu.be).
 
-```{r pca_var_plot, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
+```{r, echo=FALSE, eval=TRUE, warning=FALSE, results="asis"}
 cat(paste(knitr::knit(text = chnkVec, quiet = T), collapse = '\n'))
 ```
