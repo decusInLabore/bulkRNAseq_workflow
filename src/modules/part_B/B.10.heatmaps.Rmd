@@ -23,6 +23,8 @@ HmDisplayCatsFromDb <- Obio@parameterList$HmDisplayCatsFromDb
 project_id <- Obio@parameterList$project_id
 alignmentGeneID <- Obio@parameterList$primaryAlignmentGeneID
 lab.categories.table <- Obio@parameterList$lab.categories.table
+ref.cat.db.table = lab.categories.table
+
 labname <- Obio@parameterList$labname
 dfDesign <- Obio@dfDesign
 
@@ -54,6 +56,13 @@ padjSelections <- gsub("_logFC_", "_padj_", logFCselections)
 dfSelections <- data.frame(logFCselections, padjSelections)
 dfSelections <- dfSelections[dfSelections[,"padjSelections"] %in% names(dfMainData),]
 
+if (!exists("project_id")){
+    project_id <- gsub("_designTable", "", designTB)
+}
+
+if (!exists("labname")){
+    labname <- "TBD"
+}
 
 ###############################################################################
 ## First heatmap: Most variable genes                                        ##
@@ -70,8 +79,12 @@ if (geneIDcolumn == "mgi_symbol" | geneIDcolumn == "hgnc_symbol"){
     HmDisplayCatsFromDb <- list()
 # }
 
-ref.cat.db.table = lab.categories.table
 
+##
+if (!exists("Ntop4pcaGeneSelection")){
+    Ntop4pcaGeneSelection <- 500
+}
+    
 ## Start with Nmost variable genes ##
 if (!is.null(Ntop4pcaGeneSelection) | 
     length(Ntop4pcaGeneSelection) > 3){
@@ -81,7 +94,7 @@ if (!is.null(Ntop4pcaGeneSelection) |
     geneVec <- as.vector(unique(dfDataTable[dfDataTable[,alignmentGeneID] %in% Ntop4pcaGeneSelection,geneIDcolumn]))
 }
 
-cat.name <- paste0("Experiment_",project_id, "_",Obio@parameterList$NtopGene,"_most_variable_genes")
+cat.name <- paste0("Experiment_",project_id, "_",Ntop4pcaGeneSelection,"_most_variable_genes")
 
 cat.description.text <- paste0(
     "In this gene set the ",
@@ -150,7 +163,7 @@ for (k in 1:nrow(dfSelections)){
         " in the differential gene expression comparsion ", 
         as.vector(dfSelections$logFCselections[k]),
         " in ",
-        Obio@parameterList$labname,
+        labname,
         " lab experiment \\<a href=\\'https:\\/\\/biologic.crick.ac.uk\\/",project_id,"\\'\\>",project_id, "\\<\\/a\\> are compiled."
       )
         
@@ -174,6 +187,9 @@ for (k in 1:nrow(dfSelections)){
 ## Done with making heatmap list                                         ##
 ###########################################################################
 
+```
+
+```{r, echo=F, eval=TRUE, warning=FALSE, results="asis"}
 
 ###########################################################################
 ## Upload to database                                                    ##
