@@ -24,7 +24,7 @@ project_id <- Obio@parameterList$project_id
 alignmentGeneID <- Obio@parameterList$primaryAlignmentGeneID
 lab.categories.table <- Obio@parameterList$lab.categories.table
 ref.cat.db.table = lab.categories.table
-reportFigDir <- reportFigDir
+reportFigDir <- Obio@parameterList$reportFigDir
 
 labname <- Obio@parameterList$labname
 dfDesign <- Obio@dfDesign
