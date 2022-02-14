@@ -8,7 +8,7 @@ VersionPdfExt <- VersionPdfExt <- paste0(".",chnkPrefix,"V", gsub("-", "", Sys.D
 
 
 ## R-Data loading option for custom plotting
-
+### Set for download into R
 ```{r, echo=F, eval=T, warning=FALSE}
 
 ## Check if project access file exists ##
@@ -153,11 +153,10 @@ cat(threeString)
 ```
 </div>
 
-## Loading relevant data into your R-session
-
+### Load Plotting Data into R
 Next, let's load your project data. We will need this as a basis for making the plots further down. 
 
-```{r, echo=TRUE, eval=F, warning=FALSE, collapse=FALSE}
+```{r, echo=TRUE, eval=F, warning=FALSE, class.source = 'fold-show'}
 #if (length(grep("bioLOGIC", as.vector(installed.packages()[,"Package"]))) ==0 ){
     devtools::install_github("decusinlabore/bioLOGIC")
 #}

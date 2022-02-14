@@ -136,8 +136,8 @@ if (length(pos) ==0 ){
     
 }
 
-if (!is.null(Obio@parameterList$host)){
-    if (Obio@parameterList$host == "10.27.241.234"){
+if (!is.null(Obio@dbDetailList$host)){
+    if (Obio@dbDetailList$host == "10.27.241.234"){
         urlString <- "biologic.thecrick.org"
     } else {
         urlString <- "biologic.crick.ac.uk"

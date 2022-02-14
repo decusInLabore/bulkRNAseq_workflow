@@ -703,6 +703,139 @@ if (nrow(dfTest) == 0){
 }
 
 
+###############################################################################
+## Upload gene categories creaed in this project                             ##
+
+createProjectRefDbTables <- T
+
+if (createProjectRefDbTables){
+    ## Assign category IDs ##
+    ## First check if categories exist already
+    ## if they do - delete those and re-assign cat id
+    ## if they don't find next available cat id
+    for (i in 1:length(HmDisplayCatsFromDb)){
+        dbDB <- DBI::dbConnect(
+            drv = RMySQL::MySQL(), 
+            user = Obio@dbDetailList$db.user, 
+            password = db.pwd, 
+            host = Obio@dbDetailList$host, 
+            dbname = Obio@dbDetailList$ref.cat.db
+        )
+        
+        query <- paste0("SELECT * FROM ",lab.categories.table," WHERE cat_name = '", names(HmDisplayCatsFromDb)[i], "' and cat_type = '", HmDisplayCatsFromDb[[i]]$cat_type, "';")
+        dfOut <-  dbGetQuery(dbDB, query)
+        dbDisconnect(dbDB)
+        
+        if (nrow(dfOut) == 1){
+            HmDisplayCatsFromDb[[i]][["cat_id"]] <- dfOut$cat_id
+        } else {
+          HmDisplayCatsFromDb[[i]][["cat_id"]] <- NULL
+        }
+        
+    }
+    
+    
+    
+    ## Delete all existing tables for this project ##
+    dbDB <- DBI::dbConnect(
+            drv = RMySQL::MySQL(), 
+            user = Obio@dbDetailList$db.user, 
+            password = db.pwd, 
+            host = Obio@dbDetailList$host, 
+            dbname = Obio@dbDetailList$ref.cat.db
+    )
+    
+    ## Insert categories ##
+    
+    UploadList <- HmDisplayCatsFromDb
+    
+    ## Translate geneIDs to human for non-standard species ##
+    rmVec <- as.vector(NULL, mode="numeric")
+    
+    if (geneIDcolumn != geneSelCol){
+        for (d in 1:length(UploadList)){
+            convertedGeneVec <- dfMainData[dfMainData[,geneIDcolumn] %in% UploadList[[d]]$geneVec ,geneSelCol]
+            convertedGeneVec <- unique(convertedGeneVec)
+            convertedGeneVec <- convertedGeneVec[convertedGeneVec != ""]
+            convertedGeneVec <- convertedGeneVec[convertedGeneVec != 0]
+            
+            if (length(convertedGeneVec > 0)){
+                UploadList[[d]]$geneVec <- convertedGeneVec
+            } else {
+                rmVec <- c(
+                  rmVec, 
+                  d
+                )
+            }
+            
+        }
+    }
+    
+    if (length(rmVec) > 0){
+        UploadList <- UploadList[-rmVec]
+    }
+    
+        
+    ## Upload to database ##
+    createProjectRefDbTables <- T
+    if (createProjectRefDbTables){  
+        for (i in 1:length(UploadList)){
+            ###########################################################################
+        ## check if cat name exist and delete if it does                         ##
+        #library(RMySQL)
+        dbDB <- DBI::dbConnect(
+            drv = RMySQL::MySQL(), 
+            user = Obio@dbDetailList$db.user, 
+            password = db.pwd, 
+            host = Obio@dbDetailList$host, 
+            dbname = Obio@dbDetailList$ref.cat.db
+        )
+        
+        query <- paste0("SELECT cat_id, cat_name FROM ",lab.categories.table, " WHERE cat_name = '",names(UploadList)[i],"'")
+        
+        dfTest <- dbGetQuery(dbDB, query)
+        dbDisconnect(dbDB)
+        ## Done                                                                  ##
+        ###########################################################################
+        if (nrow(dfTest) ==1){
+            catID = as.vector(dfTest[1,"cat_id"])
+        } else {
+        
+            catID <- biologicSeqTools2::add.category.to.lab.reference.table.hs(
+            host = Obio@dbDetailList$host,
+            pwd = db.pwd,
+            user = Obio@dbDetailList$db.user,
+            cat.ref.db = "reference_categories_db_new",
+            cat.ref.db.table = lab.categories.table,
+            gene.vector = UploadList[[i]]$geneVec,
+            gene.id = geneSelCol, #options hgnc_symbol, mgi_symbol
+            mm.hs.conversion.file =  paste0(hpc.mount, "Projects/reference_data/20160303.homologene.data.txt"),
+            cat_name = names(UploadList)[i],
+            cat_type = UploadList[[i]]$cat_type,
+            data_source = UploadList[[i]]$data_source,
+            comments_1 = "",
+            comments_2 = "",
+            new.lab.category.table = F,
+            cat.description.db  = "internal_categories",
+            cat.description.db.table = "category_description",
+            cat.description.text = UploadList[[i]]$cat.description.text,
+            lab.name = labname
+        )
+        }
+        
+        UploadList[[i]][["cat_id"]] <- catID
+        
+        ## Add cat id to main list
+        HmDisplayCatsFromDb[[names(UploadList)[i]]][["cat_id"]] <- catID
+      
+        }
+    }
+}
+
+
+## Done                                                                      ##
+###############################################################################
+
 
 ```
 

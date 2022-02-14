@@ -19,6 +19,9 @@ always_allow_html: yes
 
 # module purge;source /camp/stp/babs/working/software/modulepath_new_software_tree_2018-08-13;module load pandoc/2.2.3.2-foss-2016b;ml R/4.0.3-foss-2020a
 
+# Check processes 
+# lsof /dev/pts/*
+
 ## Done                                                                      ##
 ###############################################################################
 
@@ -56,7 +59,10 @@ knitr::opts_chunk$set(
     message = FALSE,
     warning = FALSE,
     #dev="png"
-    dev = "png", dev.args = list(type = "cairo-png")
+    dev = "png", dev.args = list(type = "cairo-png"),
+    fig.width=7,  # default setting is 7 
+    fig.height=5,  # default setting is 5
+    fig.retina=1  # default setting is 1
     #fig.path = "images/"
 )
 
@@ -75,6 +81,7 @@ figureCount <- 1
 tableCount <- 1
 upload.results.to.database <- TRUE
 shinyBaseServerURL <- "shiny-bioinformatics.crick.ac.uk"
+#urlString <- "biologic.crick.ac.uk"
 
 ## Done                                                                      ##
 ###############################################################################

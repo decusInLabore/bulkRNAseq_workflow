@@ -157,13 +157,13 @@ if (length(grep("CoVar", names(dfMainData))) > 0){
 
     link <- paste0(
               'An interactive version of this figure can be found ',
-              '<a href="https://',urlString,'/',Obio@parameterList$project_id,'/scatterplot?x_axis=CoVarOrder&y_axis=CoVar&headline=2D+Scatterplot" target="_blank">here</a>', '. ')  
+              '<a href="https://', urlString,'/',Obio@projectDetailList$project_id,'/scatterplot?x_axis=CoVarOrder&y_axis=CoVar&headline=2D+Scatterplot" target="_blank">here</a>', '. ')  
     
     figLegend <- paste0(
         '**Figure ', 
         figureCount, 
         ':** ',
-        ' Coefficient of variation per gene. The red line indicates the cut-off for the most variable genes in this experiment. The most variable genes are the basis for the PCA analysis and heatmap displays. Download a pdf of this figure <a href="',FNrel,'" target="_blank">here</a>.',
+        ' Coefficient of variation per gene. The red line indicates the cut-off for the most variable genes in this experiment. The most variable genes are the basis for the PCA analysis and heatmap displays. Download a pdf of this figure <a href="',FNrel,'" target="_blank">here</a>. ',
      link
 )
     
@@ -198,6 +198,6 @@ if (length(plotList) > 2){
 ```
 
 ## Sample Characterization {`r tabVar`}
-```{r sample_characterization_data_plot, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
+```{r, echo=FALSE, eval=TRUE, warning=FALSE, results="asis"}
 cat(paste(knitr::knit(text = chnkVec, quiet = T), collapse = '\n'))
 ```

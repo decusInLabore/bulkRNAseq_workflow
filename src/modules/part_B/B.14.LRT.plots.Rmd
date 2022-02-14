@@ -133,7 +133,7 @@ if (length(lrtVec) > 0){
 
 `r sectionDisplay`
 
-```{r lrt_plot, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
+```{r lrt_plot, echo=FALSE, eval=TRUE, warning=FALSE, results="asis"}
 cat(paste(knit(text = chnkVec, quiet = T), collapse = '\n'))
 ```
 

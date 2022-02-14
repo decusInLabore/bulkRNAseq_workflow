@@ -12,16 +12,54 @@ library(tidyr)
 library(ggplot2)
 ```
 
+```{r, echo=FALSE, eval=TRUE, warning=FALSE, results=F}
 
-```{r, echo=F, eval=TRUE, warning=FALSE, results="hide"}
+dfMainData <- Obio@databaseTable
+geneIDcolumn <- Obio@parameterList$geneIDcolumn
+
+if (geneIDcolumn != "hgnc_symbol" | geneIDcolumn != "mgi_symbol"){
+    geneSelCol <- "hgnc_symbol"
+} else {
+    geneSelCol <- geneIDColumn
+}
+
+Ntop4pcaGeneSelection <- Obio@dataTableList$Ntop4pcaGeneSelection
+HmDisplayCatsFromDb <- Obio@parameterList$HmDisplayCatsFromDb
+project_id <- Obio@parameterList$project_id
+alignmentGeneID <- Obio@parameterList$primaryAlignmentGeneID
+lab.categories.table <- Obio@parameterList$lab.categories.table
+ref.cat.db.table = lab.categories.table
+reportFigDir <- Obio@parameterList$reportFigDir
+
+labname <- Obio@parameterList$labname
+dfDesign <- Obio@dfDesign
 dfPCA <- Obio@dfPCA
+
+dds <- Obio@ObjDds
 ```
 
 
-```{r pca_data_prep, echo=TRUE, eval=TRUE, warning=FALSE, results="hide"}
 
+```{r, echo=TRUE, eval=TRUE, warning=FALSE, results="hide"}
 ###############################################################################
 ## Add PCA plot                                                              ##
+if (!exists("project_id")){
+    project_id <- gsub("_designTable", "", designTB)
+}
+
+
+if (!exists("VersionPdfExt")){
+    VersionPdfExt <- paste0(".V", gsub("-", "", Sys.Date()), ".pdf")
+}
+
+if (!exists("labname")){
+    labname <- "TBD"
+}
+
+if (!exists("reportFigDir") || is.null(reportFigDir)){
+    reportFigDir <- ""
+}
+
 chnkVec <- as.vector(NULL, mode = "character")
 plotList <- list()
 tag <- "PCAvariationPerDimension"
@@ -86,7 +124,7 @@ dev.off()
     
 
 
-link <- paste0('<a href="https://biologic.crick.ac.uk/',Obio@parameterList$project_id,'/pca?x_axis=PC1&y_axis=PC2', '" target="_blank">here</a>')
+link <- paste0('<a href="https://biologic.crick.ac.uk/',project_id,'/pca?x_axis=PC1&y_axis=PC2', '" target="_blank">here</a>')
 
 figCap <- paste0(
     "**Figure ",
@@ -165,9 +203,9 @@ if (length(pos) > 0){
 designColSelector = unique(c(independentDesignColSector, "sample.id"))    
 
 if (length(unique(dfDesign$sample.id)) > 42) {
-    rld <- vst(Obio@ObjDds)    
+    rld <- vst(dds)    
 } else {
-    rld <- rlog(Obio@ObjDds)    
+    rld <- rlog(dds)    
 }
 rv = rowVars(assay(rld))
 
@@ -304,7 +342,7 @@ gSvec <- dfSel[dfSel[,selXY[1]] >  twoSD, geneIDcolumn]
     # dim2 <- gsub("PC_", "", yVec[i])
     link <- paste0(
         '<a href="https://',urlString,'/',
-        Obio@parameterList$project_id,
+        project_id,
         '/scatterplot?x_axis=contrast_P_PCA_estimatePCA1&y_axis=contrast_P_PCA_estimatePCA2&highlight_gene=&cat_id=ag_lab_categories__10',
         '" target="_blank">here</a>'
     )
@@ -640,7 +678,7 @@ mode <- "dependentVariation"
 #         ###########################################################################
 #         link <- paste0(
 #             "https://biologic.crick.ac.uk/",
-#             Obio@parameterList$project_id,
+#             project_id,
 #             "/scatterplot?x_axis=contrast_P_PCA_estimatePCA1&y_axis=contrast_P_lg10p_PCA1&highlight_gene=&cat_id=ag_lab_categories__10")
 #     figCap <- paste0(
 #         "**Figure ",
@@ -683,6 +721,6 @@ A birds eye view of your data can be obtained by looking at the results of the p
 
 A more detailed explanation on PCA is give in this [PCA video](https://www.youtube.com/watch?v=_UVHneBUBW0&feature=youtu.be).
 
-```{r pca_var_plot, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
+```{r, echo=FALSE, eval=TRUE, warning=FALSE, results="asis"}
 cat(paste(knitr::knit(text = chnkVec, quiet = T), collapse = '\n'))
 ```
