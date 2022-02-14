@@ -80,18 +80,17 @@ if (geneIDcolumn == "mgi_symbol" | geneIDcolumn == "hgnc_symbol"){
 # }
 
 
-##
-if (!exists("Ntop4pcaGeneSelection")){
-    Ntop4pcaGeneSelection <- 500
-}
     
 ## Start with Nmost variable genes ##
-if (!is.null(Ntop4pcaGeneSelection) | 
+if (exists("Ntop4pcaGeneSelection") && !is.null(Ntop4pcaGeneSelection) | 
     length(Ntop4pcaGeneSelection) > 3){
 
     dfDataTable <- dfMainData
     
     geneVec <- as.vector(unique(dfDataTable[dfDataTable[,alignmentGeneID] %in% Ntop4pcaGeneSelection,geneIDcolumn]))
+} else {
+    geneVec <- unique(dfMainData[dfMainData$logFC_cut_off == 1, geneIDcolumn])
+    Ntop4pcaGeneSelection <- geneVec
 }
 
 cat.name <- paste0("Experiment_",project_id, "_",Ntop4pcaGeneSelection,"_most_variable_genes")
