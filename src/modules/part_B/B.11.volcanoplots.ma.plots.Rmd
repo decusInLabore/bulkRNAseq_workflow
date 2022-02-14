@@ -7,16 +7,68 @@ VersionPdfExt <- VersionPdfExt <- paste0(".",chnkPrefix,"V", gsub("-", "", Sys.D
 ```
 
 
-```{r MA_and_volcano_data_prep, echo=TRUE, eval=TRUE, warning=FALSE, results=F}
+```{r, echo=FALSE, eval=TRUE, warning=FALSE, results=F}
+
+dfMainData <- Obio@databaseTable
+geneIDcolumn <- Obio@parameterList$geneIDcolumn
+
+if (geneIDcolumn != "hgnc_symbol" | geneIDcolumn != "mgi_symbol"){
+    geneSelCol <- "hgnc_symbol"
+} else {
+    geneSelCol <- geneIDColumn
+}
+
+Ntop4pcaGeneSelection <- Obio@dataTableList$Ntop4pcaGeneSelection
+HmDisplayCatsFromDb <- Obio@parameterList$HmDisplayCatsFromDb
+project_id <- project_id
+alignmentGeneID <- Obio@parameterList$primaryAlignmentGeneID
+lab.categories.table <- Obio@parameterList$lab.categories.table
+ref.cat.db.table = lab.categories.table
+reportFigDir <- reportFigDir
+
+labname <- Obio@parameterList$labname
+dfDesign <- Obio@dfDesign
+
+```
+
+
+```{r, echo=T, eval=TRUE, warning=FALSE, results="asis"}
+## Make heatmap gene list
+logFCselections <- names(dfMainData)[grep("_logFC_", names(dfMainData))]
+padjSelections <- gsub("_logFC_", "_padj_", logFCselections)
+
+dfSelections <- data.frame(logFCselections, padjSelections)
+dfSelections <- dfSelections[dfSelections[,"padjSelections"] %in% names(dfMainData),]
+
+if (!exists("project_id")){
+    project_id <- gsub("_designTable", "", designTB)
+}
+
+if (!exists("labname")){
+    labname <- "TBD"
+}
+
+if (!exists("reportFigDir") || is.null(reportFigDir)){
+    reportFigDir <- ""
+}
+
+
+if (nrow(dfSelections) > 2){
+    tabVar <- ".tabset .tabset-fade .tabset-dropdown"
+} else {
+    tabVar <- ".tabset .tabset-fade .tabset-pills"
+}
+
+```
+
+## Differential Gene Expression Analysis (DGE) {`r tabVar`}
+```{r, echo=TRUE, eval=TRUE, warning=FALSE, results=F}
 
 if (!exists("sdCutOff")){
   sdCutOff <- 2  
 }
 
 chnkVec <- as.vector(NULL, mode = "character")
-
-MAplots <- names(Obio@plotCollection)[grep("MAplot_",names(Obio@plotCollection))]
-Vplots <- gsub("MAplot_", "Volcano_Plot_", MAplots)
 
 MAplotList <- list()
 VplotList <- list()
@@ -274,7 +326,7 @@ for (i in 1:length(contrastVec)){
     ###########################################################################
     ## Save plot to file                                                     ##
     FNbase <- paste0(contrastVec[i], ".MA.plot", VersionPdfExt)
-    FN <- paste0(Obio@parameterList$reportFigDir, FNbase)
+    FN <- paste0(reportFigDir, FNbase)
     FNrel <- paste0("report_figures/", FNbase)
     
     pdf(FN)
@@ -290,7 +342,7 @@ for (i in 1:length(contrastVec)){
     xAxis <- selLg2BM[grep(contrastVec[i], selLg2BM)]
     yAxis <- selLogFC[grep(contrastVec[i], selLogFC)]
     
-    link1 <- paste0('<a href="https://biologic.crick.ac.uk/',Obio@parameterList$project_id,'/scatterplot?x_axis=',xAxis,'&y_axis=',yAxis,'&cat_id=ag_lab_categories__10" target="_blank">here</a>.')
+    link1 <- paste0('<a href="https://biologic.crick.ac.uk/',project_id,'/scatterplot?x_axis=',xAxis,'&y_axis=',yAxis,'&cat_id=ag_lab_categories__10" target="_blank">here</a>.')
     
     
     figCap <- paste0(
@@ -333,7 +385,7 @@ for (i in 1:length(contrastVec)){
     ###########################################################################
     ## Save plot to file                                                     ##
     FNbase <- paste0(contrastVec[i], ".Volcano.plot", VersionPdfExt)
-    FN <- paste0(Obio@parameterList$reportFigDir, FNbase)
+    FN <- paste0(reportFigDir, FNbase)
     FNrel <- paste0("report_figures/", FNbase)
     
     pdf(FN)
@@ -349,7 +401,7 @@ for (i in 1:length(contrastVec)){
     xAxis <- selLogFC[grep(contrastVec[i], selLogFC)]
     yAxis <- selLg2BM[grep(contrastVec[i], selLg10p)]
     
-    link2 <- paste0('<a href="https://biologic.crick.ac.uk/',Obio@parameterList$project_id,'/scatterplot?x_axis=',xAxis,'&y_axis=',yAxis,'&cat_id=ag_lab_categories__10" target="_blank">here</a>.')
+    link2 <- paste0('<a href="https://biologic.crick.ac.uk/',project_id,'/scatterplot?x_axis=',xAxis,'&y_axis=',yAxis,'&cat_id=ag_lab_categories__10" target="_blank">here</a>.')
     
     
     figCap <- paste0(
@@ -384,7 +436,7 @@ if (length(contrastVec) > 2){
 
 ```
 
-## Differential Gene Expression Analysis (DGE) {`r tabVar`}
+
 
 ```{r, echo=FALSE, eval=TRUE, warning=FALSE, results="asis"}
 cat(paste(knitr::knit(text = chnkVec, quiet = T), collapse = '\n'))

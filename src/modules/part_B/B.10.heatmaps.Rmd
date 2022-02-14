@@ -24,6 +24,7 @@ project_id <- Obio@parameterList$project_id
 alignmentGeneID <- Obio@parameterList$primaryAlignmentGeneID
 lab.categories.table <- Obio@parameterList$lab.categories.table
 ref.cat.db.table = lab.categories.table
+reportFigDir <- reportFigDir
 
 labname <- Obio@parameterList$labname
 dfDesign <- Obio@dfDesign
@@ -31,7 +32,7 @@ dfDesign <- Obio@dfDesign
 ```
 
 
-```{r, echo=F, eval=TRUE, warning=FALSE, results="asis"}
+```{r, echo=T, eval=TRUE, warning=FALSE, results="asis"}
 ## Make heatmap gene list
 logFCselections <- names(dfMainData)[grep("_logFC_", names(dfMainData))]
 padjSelections <- gsub("_logFC_", "_padj_", logFCselections)
@@ -62,6 +63,10 @@ if (!exists("project_id")){
 
 if (!exists("labname")){
     labname <- "TBD"
+}
+
+if (!exists("reportFigDir") || is.null(reportFigDir)){
+    reportFigDir <- ""
 }
 
 ###############################################################################
@@ -516,7 +521,7 @@ for (k in 1:length(HmDisplayCatsFromDb)){
     ###########################################################################
     ## Save plot to file                                                     ##
     FNbase <- paste0("Heatmap.", names(HmDisplayCatsFromDb)[k],VersionPdfExt)
-    FN <- paste0(Obio@parameterList$reportFigDir, FNbase)
+    FN <- paste0(reportFigDir, FNbase)
     FNrel <- paste0("report_figures/", FNbase)
     
     pdf(FN)
