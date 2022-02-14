@@ -93,7 +93,7 @@ if (exists("Ntop4pcaGeneSelection") && !is.null(Ntop4pcaGeneSelection) |
     Ntop4pcaGeneSelection <- geneVec
 }
 
-cat.name <- paste0("Experiment_",project_id, "_",Ntop4pcaGeneSelection,"_most_variable_genes")
+cat.name <- paste0("Experiment_",project_id, "_",length(Ntop4pcaGeneSelection),"_most_variable_genes")
 
 cat.description.text <- paste0(
     "In this gene set the ",
