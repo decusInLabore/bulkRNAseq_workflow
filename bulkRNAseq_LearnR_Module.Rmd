@@ -22,6 +22,98 @@ knitr::opts_chunk$set(
 ```
 
 
+```{r setup, include=FALSE}
+###############################################################################
+## Recommended R-version                                                     ##
+
+# module purge;source /camp/stp/babs/working/software/modulepath_new_software_tree_2018-08-13;module load pandoc/2.2.3.2-foss-2016b;ml R/4.0.3-foss-2020a
+
+# Check processes 
+# lsof /dev/pts/*
+
+## Done                                                                      ##
+###############################################################################
+
+
+###############################################################################
+## Set the environment                                                       ##
+
+if (!require("remotes")){
+  install.packages("remotes")
+}
+
+remotes::install_github("rstudio/renv")
+
+if (!file.exists("renv.lock")){
+    renv::init()
+} else {
+    renv::restore(prompt=FALSE)
+}
+
+
+renv::install("bioc::DESeq2")
+renv::install("bioc::clusterProfiler")
+renv::install("decusInLabore/biologicSeqTools2")
+
+## Done                                                                      ##
+###############################################################################
+
+
+###############################################################################
+## Set knitr options                                                         ##
+
+knitr::opts_chunk$set(
+    tidy = F,
+    tidy.opts = list(width.cutoff = 120),
+    message = FALSE,
+    warning = FALSE,
+    #dev="png"
+    dev = "png", dev.args = list(type = "cairo-png"),
+    fig.width=7,  # default setting is 7 
+    fig.height=5,  # default setting is 5
+    fig.retina=1  # default setting is 1
+    #fig.path = "images/"
+)
+
+##                                                                           ##
+###############################################################################
+
+###############################################################################
+## Set global variables                                                      ##
+
+cDir <- getwd()
+setwd("..")
+workdir <- getwd()
+setwd(cDir)
+
+figureCount <- 1
+tableCount <- 1
+upload.results.to.database <- TRUE
+shinyBaseServerURL <- "shiny-bioinformatics.crick.ac.uk"
+#urlString <- "biologic.crick.ac.uk"
+
+## Done                                                                      ##
+###############################################################################
+
+
+###############################################################################
+## Load biologic object from part A                                          ##
+FN <- paste0("../", list.files("..")[grep("bioLOGIC.Robj", list.files(".."))])
+load(FN)
+## Done                                                                      ##
+###############################################################################
+
+```
+
+
+<!-- Essential: Load Obio Data Object ---------------------------------------->
+```{r child = 'src/modules/part_B/B.1.set.parameters.Rmd', eval=TRUE}
+```
+
+<!-- Optional set data access parameters for R-users ------------------------->
+```{r child = 'src/modules/part_B/B.1.2.set.data.access.parameters.Rmd', eval=TRUE}
+```
+
 
 ## Installing a required R-package
 ```{r load_packages, echo=TRUE, eval=T, warning=FALSE}
@@ -69,20 +161,46 @@ if (dir.exists("/Volumes/babs/working/boeings/")){
     hpc.mount <- ""
 }
 
-if (length(.libPaths()) > 2){
-    .libPaths(.libPaths()[2:3])
+if (!require("remotes")){
+  install.packages("remotes")
 }
 
-source("assets/SBwebtools.pckg.r")
+remotes::install_github("rstudio/renv")
+
+if (!file.exists("renv.lock")){
+    renv::init()
+} else {
+    renv::restore(prompt=FALSE)
+}
+
+
+renv::install("bioc::DESeq2")
+renv::install("bioc::clusterProfiler")
+renv::install("decusInLabore/biologicSeqTools2")
+
 ## Heatmap setup ##
 ## Select Heatmap samples ##
-FN <- paste0(hpc.mount, "Projects/reference_data/documentation/BC.parameters.txt")
-dbTable <- read.delim(
-    FN, 
-    sep = "\t",
-    stringsAsFactors = F
-)
+# FN <- paste0(hpc.mount, "Projects/reference_data/documentation/BC.parameters.txt")
+# dbTable <- read.delim(
+#     FN, 
+#     sep = "\t",
+#     stringsAsFactors = F
+# )
+# db.pwd <- as.vector(dbTable[1,1])
+
+## Loading the BABS password ##
+# if (upload.results.to.database){
+    FN <- paste0(hpc.mount, "Projects/reference_data/pwd_folder/babs.txt")
+    dbTable <- read.delim(
+      FN,
+      header = F,
+      sep = "\t",
+      stringsAsFactors = F
+    )
+#}
+
 db.pwd <- as.vector(dbTable[1,1])
+
 #setwd(Obio@parameterList$workdir)
 ObioFN <- paste0("../",list.files("..")[grep(".bioLOGIC.Robj", list.files(".."))])
 load(ObioFN)
