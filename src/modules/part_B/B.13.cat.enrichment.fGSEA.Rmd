@@ -5,34 +5,72 @@
 chnkPrefix <- "C11.GSE."
 VersionPdfExt <- VersionPdfExt <- paste0(".",chnkPrefix,"V", gsub("-", "", Sys.Date()), ".pdf")
 
-library(magrittr)
+#library(magrittr)
 
 ```
 
+```{r, echo=FALSE, eval=TRUE, warning=FALSE, results=F}
+workdir <- Obio@parameterList$workdir
+reportTableDir <- Obio@parameterList$reportTableDir
+reportFigDir <- Obio@parameterList$reportFigDir
+
+project_id <- project_id
+```
+
+```{r, echo=T, eval=TRUE, warning=FALSE, results="asis"}
+
+if (!exists("project_id")){
+    project_id <- gsub("_designTable", "", designTB)
+}
+
+if (!exists("labname")){
+    labname <- "TBD"
+}
+
+if (!exists("reportFigDir") || is.null(reportFigDir)){
+    reportFigDir <- ""
+}
+
+if (!exists("reportTableDir") || is.null(reportTableDir)){
+    reportTableDir <- ""
+}
+
+if (!exists("VersionPdfExt")){
+    VersionPdfExt <- paste0(".V", gsub("-", "", Sys.Date()), ".pdf")
+}
+```
 
 Find furter background information on the Gene Set Enrichment Analysis (GSEA) and the interpretation of results can be found [here](https://www.gsea-msigdb.org/gsea/doc/GSEAUserGuideFrame.html?_Interpreting_GSEA_Results). Here the improved [fgsea algorithm](https://bioinformatics.stackexchange.com/questions/149/are-fgsea-and-broad-institute-gsea-equivalent) will be used to calculate enrichment scores. 
 
 ```{r GSEA_section_1, echo=TRUE, eval=TRUE, warning=FALSE, results=F}
+if (!exists("VersionPdfExt")){
+    VersionPdfExt <- paste0(".V", gsub("-", "", Sys.Date()), ".pdf")
+}
+
+if (!exists("Obio") || is.null(Obio@parameterList$workdir)){
+    workdir <- getwd()
+}
+
 chnkVec <- as.vector(NULL, mode = "character")
 plotList <- list()
 
 plotListER <- list()
 chnkVecER <- list()
 
-print(
-  paste0(
-    "The following gene sets have been used in the GSEA analysis: ",   
-    sort(paste0(names(Obio@referenceTableList), collapse = ",")), 
-    "."
-  )
-)
 
 ###############################################################################
 ## Prepare GMT file                                                          ##
 
 ## Option A - from database ##
-if (!is.null(Obio@parameterList$GSEAtables)){
+if (exists("Obio") && !is.null(Obio@parameterList$GSEAtables)){
   tables <- Obio@parameterList$GSEAtables
+  print(
+      paste0(
+        "The following gene sets have been used in the GSEA analysis: ",   
+        sort(paste0(names(Obio@referenceTableList), collapse = ",")), 
+        "."
+      )
+    )
 } else {
   tables <- c(
     "mysigdb_h_hallmarks",
@@ -53,50 +91,6 @@ dfRefGmt <- create.gmt.file.from.ref.data.table(
  )
 
 
-###############################################################################
-## If dfRefGmt is very large, reduce to most variable genes                  ##
-## Define relevant genes for selection ##
-# relevant.genes <- as.vector(
-#   unique(
-#     Obio@databaseTable[Obio@databaseTable$cluster_order, "hgnc_symbol"]
-#   )
-# )
-# 
-# lr <- length(relevant.genes)
-# 
-# if (nrow(dfRefGmt) > 10000 & lr > 100){
-#   TF <- apply(dfRefGmt[,3:ncol(dfRefGmt)], 1, function(x) sum(as.vector(x) %in% relevant.genes) )
-#   selector <- 0
-#   selVec <- TF >= selector
-#   
-#   while(sum(selVec) > 10000){
-#     
-#     selVec <- TF > selector
-#     
-#     selector <- selector + 1
-#     
-#     
-#     if (selector > 199){
-#       stop()
-#     }
-#   }
-#   
-#   dfRefGmt <- dfRefGmt[selVec, ]
-#   print(paste0(selector, " gene cut-off set for dfRefGmt. ", sum(selVec), " categories used for GSEA per sample."))
-#   
-#   
-# }
-
-
-
-## Done                                                                      ##
-###############################################################################
-
-# #
-# # ###############################################################################
-# # ## Save gmt file                                                             ##
-# # #"/camp/stp/babs/working/boeings/Projects/reference_data/GSEA.gmt.files/20160508.rna.seq.txn.analysis.gmt"
-# #
 localGmtDir <- paste0(
     Obio@parameterList$workdir,
     "GSEA/"
@@ -113,7 +107,7 @@ gmtDir<- paste0(
 )
 
 gmtFileName <- paste0(
-    Obio@parameterList$project_id,
+    project_id,
     ".",
     "projectGmtFile.gmt"
 )
@@ -141,14 +135,19 @@ write.table(
     sep="\t",
     quote = F
 )
-# #
 
-## Option B - load from file ##
-# dfRefGmt <- read.delim(
-#     
-# )
-## Done                                                                      ##
+## Done creating project gmt. file                                           ##
 ###############################################################################
+
+## Option B: Load a gmt file created by other means
+# FN <- "/Volumes/babs/working/boeings/Projects/goulda/adrien.franchet/472_brains_from_drosophila_larvae_RN21220/workdir/GSEA/RN21220.projectGmtFile.gmt"
+# 
+# dfRefGmt <- read.delim(
+#     FN, 
+#     header = F,
+#     sep = "\t",
+#     stringsAsFactors = F
+# )
 
 ###############################################################################
 ## Run fGSEA on all log-fold changes                                         ##
@@ -164,9 +163,14 @@ dfGSEAdata <- dfGSEAdata[rowSums(dfGSEAdata[,2:ncol(dfGSEAdata)]) != 0,]
 
 
 ## Delete old rnk files ##
+if (!exists("localGmtDir")){
+  localGmtDir <- "GSEA/"
+}
+
 unlink(paste0(localGmtDir, "*.rnk"))
-create.gsea.rnk.files(
-     Obio@parameterList$workdir,
+
+biologicSeqTools2::create.gsea.rnk.files(
+     workdir,
      df.dataTable = dfGSEAdata,
      GSEA.colum.type = "logFC",
      gene.symbol.column.name = "hgnc_symbol",
@@ -179,8 +183,8 @@ plotList <- list()
 chnkVec <- as.vector(NULL, mode="character")
 
 ## Create Excel output ##
-fullOutFN <- paste0(Obio@parameterList$reportTableDir, Obio@parameterList$project_id, "_GSEA.xlsx")
-outFN <- paste0(Obio@parameterList$project_id, "_GSEA.xlsx")
+fullOutFN <- paste0(project_id, "_GSEA.xlsx")
+outFN <- paste0(project_id, "_GSEA.xlsx")
 wb <- openxlsx::createWorkbook()
 
 for (i in 1:length(rnkFileVec)){
@@ -204,10 +208,12 @@ for (i in 1:length(rnkFileVec)){
     pathways <- fgsea::gmtPathways(paste0(localGmtDir, gmtFileName))
     
     set.seed(42)
-    fgseaRes <- fgsea::fgsea(pathways = pathways, 
-                  stats    = GSEAranks,
-                  minSize  = 10,
-                  maxSize  = 2500)
+    fgseaRes <- fgsea::fgsea(
+        pathways = pathways, 
+        stats    = GSEAranks,
+        minSize  = 10,
+        maxSize  = 2500
+    )
     
     
     ###########################################################################
@@ -242,7 +248,7 @@ for (i in 1:length(rnkFileVec)){
    ###########################################################################
     ## Save plot to file                                                     ##
     FNbase <- paste0("GSEAsummary.", tag,VersionPdfExt)
-    FN <- paste0(Obio@parameterList$reportFigDir, FNbase)
+    FN <- paste0(reportFigDir, FNbase)
     FNrel <- paste0("report_figures/", FNbase)
     
     pdf(FN)
@@ -389,7 +395,7 @@ if (length(plotList) > 2){
    
 ## Top up-/down-regulated GSEA categories {`r tabVar`}
 
-```{r plot_top_up_down, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
+```{r, echo=F, eval=TRUE, warning=FALSE, results="asis"}
 cat(paste(knitr::knit(text = chnkVec, quiet = T), collapse = '\n'))
 ```
   

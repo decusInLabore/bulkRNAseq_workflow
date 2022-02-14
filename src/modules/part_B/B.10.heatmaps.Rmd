@@ -61,6 +61,10 @@ if (!exists("project_id")){
     project_id <- gsub("_designTable", "", designTB)
 }
 
+if (!exists("VersionPdfExt")){
+    VersionPdfExt <- paste0(".V", gsub("-", "", Sys.Date()), ".pdf")
+}
+
 if (!exists("labname")){
     labname <- "TBD"
 }

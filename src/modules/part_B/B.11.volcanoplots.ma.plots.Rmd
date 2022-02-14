@@ -20,7 +20,7 @@ if (geneIDcolumn != "hgnc_symbol" | geneIDcolumn != "mgi_symbol"){
 
 Ntop4pcaGeneSelection <- Obio@dataTableList$Ntop4pcaGeneSelection
 HmDisplayCatsFromDb <- Obio@parameterList$HmDisplayCatsFromDb
-project_id <- project_id
+project_id <- Obio@parameterList$project_id
 alignmentGeneID <- Obio@parameterList$primaryAlignmentGeneID
 lab.categories.table <- Obio@parameterList$lab.categories.table
 ref.cat.db.table = lab.categories.table
@@ -50,6 +50,10 @@ if (!exists("labname")){
 
 if (!exists("reportFigDir") || is.null(reportFigDir)){
     reportFigDir <- ""
+}
+
+if (!exists("VersionPdfExt")){
+    VersionPdfExt <- paste0(".V", gsub("-", "", Sys.Date()), ".pdf")
 }
 
 
