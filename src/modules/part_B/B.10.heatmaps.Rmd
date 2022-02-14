@@ -177,6 +177,17 @@ for (k in 1:nrow(dfSelections)){
 
 ###########################################################################
 ## Upload to database                                                    ##
+
+## New gene categories to upload list ##
+if (is.null(Obio@projectDetailList[["projectGeneCategories"]])){
+    Obio@projectDetailList[["projectGeneCategories"]] <- list()
+} 
+
+Obio@projectDetailList[["projectGeneCategories"]] <- c(
+    Obio@projectDetailList[["projectGeneCategories"]],
+    HmDisplayCatsFromDb
+)
+
 createProjectRefDbTables <- T
 
 if (createProjectRefDbTables){
