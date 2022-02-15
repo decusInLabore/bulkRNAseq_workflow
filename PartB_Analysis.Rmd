@@ -42,9 +42,10 @@ if (!file.exists("renv.lock")){
 }
 
 
-renv::install("bioc::DESeq2")
-renv::install("bioc::clusterProfiler")
-renv::install("decusInLabore/biologicSeqTools2")
+#renv::install("bioc::DESeq2")
+#renv::install("bioc::clusterProfiler")
+#renv::install("decusInLabore/biologicSeqTools2")
+#renv::install("jokergoo/ComplexHeatmap")
 
 ## Done                                                                      ##
 ###############################################################################
@@ -110,7 +111,7 @@ load(FN)
 ```
 
 <!-- Optional: Add alignment summary to report-------------------------------->
-```{r child = 'src/modules/part_B/B.3.alignment.summary.Rmd', eval=TRUE}
+```{r child = 'src/modules/part_B/B.3.alignment.summary.Rmd', eval=FALSE}
 ```
 
 <!-- Optional 4: (creates output only): Analysis Guide -->
