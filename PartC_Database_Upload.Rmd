@@ -39,9 +39,9 @@ if (!file.exists("renv.lock")){
 }
 
 
-renv::install("bioc::DESeq2")
-renv::install("bioc::clusterProfiler")
-renv::install("decusInLabore/biologicSeqTools2")
+#renv::install("bioc::DESeq2")
+#renv::install("bioc::clusterProfiler")
+#renv::install("decusInLabore/biologicSeqTools2")
 
 ## Done                                                                      ##
 ###############################################################################
@@ -93,6 +93,16 @@ load(FN)
 
 ###############################################################################
 ##                                                                           ##
+
+if (dir.exists("/Volumes/babs/working/boeings/")){
+    hpc.mount <- "/Volumes/babs/working/boeings/"
+} else if (dir.exists("Y:/working/boeings/")){
+    hpc.mount <- "Y:/working/boeings/"
+} else if (dir.exists("/camp/stp/babs/working/boeings/")){
+    hpc.mount <- "/camp/stp/babs/working/boeings/"
+} else {
+    hpc.mount <- ""
+}
 
 # FN <- paste0(hpc.mount, "Projects/reference_data/documentation/BC.parameters.txt")
 # dbTable <- read.delim(
@@ -208,16 +218,16 @@ doQuery <- function(
     query,
     resOut = FALSE
 ){
-    library(RMySQL)
+    #library(RMySQL)
     res <- NULL
-    dbDB <- dbConnect(
+    dbDB <- DBI::dbConnect(
         drv = RMySQL::MySQL(), 
         user = Obio@dbDetailList$db.user, 
         password = db.pwd, 
         host = Obio@dbDetailList$host,
         dbname = Obio@dbDetailList$primDataDB
     ) 
-    tryCatch(res <- dbGetQuery(dbDB, query), error = function(c) {
+    tryCatch(res <- DBI::dbGetQuery(dbDB, query), error = function(c) {
         c$message <- stop(paste0("Error in ", query, "."))
     })
     dbDisconnect(dbDB)
@@ -228,6 +238,9 @@ doQuery <- function(
 
 
 ## Create user in db
+username <- Obio@dbDetailList[["RaccessUsername"]] 
+pass <- Obio@dbDetailList[["RaccessPass"]] 
+
 query0 <- paste0("SELECT User, Host FROM mysql.user WHERE User = '",username,"' AND Host = '10.%';")
 res <- doQuery(Obio, query = query0, resOut=TRUE)
 if (nrow(res) == 0){
@@ -244,13 +257,15 @@ if (nrow(res) == 0){
     #doQuery(Obio, query = query0a)
 } 
 
-
+designTB <- Obio@parameterList$designdbTableName
 query2 <- paste0("GRANT SELECT on ",Obio@dbDetailList$primDataDB,".",designTB ," TO ",username,"@'10.%';")
 doQuery(Obio, query = query2)
 
+mainTB <- Obio@parameterList$rnaseqdbTableName
 query3 <- paste0("GRANT SELECT on ",Obio@dbDetailList$primDataDB,".",mainTB ," TO ",username,"@'10.%';")
 doQuery(Obio, query = query3)
 
+pcaTB <- Obio@parameterList$PCAdbTableName
 query4 <- paste0("GRANT SELECT on ",Obio@dbDetailList$primDataDB,".",pcaTB ," TO ",username,"@'10.%';")
 doQuery(Obio, query = query4)
 
@@ -262,10 +277,17 @@ doQuery(Obio, query = query4)
 
 ## Default sample order: Order in the design file
 
+# sample.order <- unique(paste0(
+#   "norm_counts_",
+#   Obio@dfDesign$sample.id,
+#   "_TPM"
+# ))
+
+
 sample.order <- unique(paste0(
   "norm_counts_",
-  Obio@dfDesign$sample.id,
-  "_TPM"
+  Obio@dfDesign$sample.id
+  #"_TPM"
 ))
 
 
@@ -695,16 +717,27 @@ if (nrow(dfTest) == 0){
         name = Obio@parameterList$projectName,
         project_id = Obio@parameterList$project_code,
         experiment_code = Obio@parameterList$project_id,
-        main_question = Obio@parameterList$main_question,
-        description = Obio@parameterList$description,
+        main_question =  "Project Question", #Obio@parameterList$main_question,
+        description = "Project Description",#Obio@parameterList$description,
         lab = paste0(Obio@parameterList$labname, " Lab"),
-        lead_scientist = 
+        lead_scientist = "Lead Scientist"
     ) 
 }
 
 
 ###############################################################################
 ## Upload gene categories creaed in this project                             ##
+HmDisplayCatsFromDb <- Obio@projectDetailList[["projectGeneCategories"]] 
+lab.categories.table <- Obio@parameterList$lab.categories.table
+geneIDcolumn <- Obio@parameterList$geneIDcolumn
+dfMainData <- Obio@databaseTable
+
+if (geneIDcolumn != "hgnc_symbol" | geneIDcolumn != "mgi_symbol"){
+    geneSelCol <- "hgnc_symbol"
+} else {
+    geneSelCol <- geneIDColumn
+}
+
 
 createProjectRefDbTables <- T
 
