@@ -42,7 +42,7 @@ if (is.null(Obio@projectDetailList$primaryAlignmentGeneID)){
 }
 
 
-if (!is.null(Obio@projectDetailList$DESeq2_folder)){
+if (!is.null(Obio@projectDetailList$DESeq2_result_folder)){
     DEseq2resultDir <- Obio@projectDetailList$DESeq2_folder
     allfiles <- paste0(DEseq2resultDir, "/", list.files(DEseq2resultDir))
     allfiles <- allfiles[grep(".txt", allfiles)]
@@ -75,6 +75,12 @@ if (!is.null(Obio@projectDetailList$DESeq2_folder)){
           by.x = "symbol",
           by.y = Obio@parameterList$geneIDcolumn
       )
+      
+      
+      selVec <- c("X", "baseMean", "log2FoldChange", "lfcSE", "stat", "pvalue", "padj")
+      res <- unique(res[,selVec])
+      names(res) <- gsub("^X$", primaryAlignmentGeneID, names(res))
+      
       res <- res[!(duplicated(res[,primaryAlignmentGeneID])),]
       res[is.na(res)] <- 0
       ## Done 
