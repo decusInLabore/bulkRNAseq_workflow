@@ -4,8 +4,8 @@ mode,pipeline,"# options babs_pipeline, alignment, rsem",,,,,
 ,,,,,,,
 ,,,,,,,
 ,,,,,,,
-,,,,,,,
-,,,,,,,
+DEseq2_DGE_result_folder,/camp/stp/babs/working/boeings/Projects/boeings/stefan.boeing/474_bulk_RNAseq_pipeline/basedata/biologic/inputs/DESeq2,,,,,,
+DEseq2_LRT_result_folder,,,,,,,
 modelFN,camp/stp/babs/working/boeings/Projects/boeings/stefan.boeing/474_bulk_RNAseq_pipeline/basedata/biologic/inputs/design.model.file.txt,,,,,,
 baseDesignFN,/camp/stp/babs/working/boeings/Projects/boeings/stefan.boeing/474_bulk_RNAseq_pipeline/basedata/biologic/inputs/design.dge.lrt.definition.file.txt,,,,,,# path to sampleID file name
 DGEmodelFN,/camp/stp/babs/working/boeings/Projects/boeings/stefan.boeing/474_bulk_RNAseq_pipeline/basedata/biologic/inputs/design.model.file.txt,,,,,,# path to model file

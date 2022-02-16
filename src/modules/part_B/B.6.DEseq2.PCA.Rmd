@@ -180,46 +180,207 @@ Obio <- doLinearFittings(
 #Obio@parameterList$batchMode <- F
 ## LRT tests for multiple sample groups ##
 
-dfDGE <- Obio@dfModel
-dfDGE <- dfDGE[dfDGE$test == "LRT",]
-
-if (nrow(dfDGE) > 0){
-  Obio <- biologicSeqTools2::LRTanalysis(
-      obj = Obio,
-      createNewResultTable = TRUE
-  )
+if (!is.null(Obio@projectDetailList$DEseq2_DGE_result_folder && bio@projectDetailList$DEseq2_DGE_result_folder != "")){
+    mode = "load_DGE_from_file"
+    Obio <- loadDESeq2outputFromFile(
+        Obio,
+        replace = TRUE
+    )
+} else {
+    mode = "calculate_LRT"
+ 
+    dfDGE <- Obio@dfModel
+    dfDGE <- dfDGE[dfDGE$test == "LRT",]
+  
+    if (nrow(dfDGE) > 0){
+        Obio <- biologicSeqTools2::LRTanalysis(
+            obj = Obio,
+            createNewResultTable = TRUE
+        )
+    }
 }
 
-## Pairwise differential gene expression ##
-## If working on projects prior to fall 2018, make sure
-## Obio@parameterList$DEseq2betaPrior is set to true.
-dfDGE <- Obio@dfModel
-dfDGE <- dfDGE[dfDGE$test == "Wald",]
 
-if (nrow(dfDGE) > 0){
-  Obio <- biologicSeqTools2::DGEanalysis(
-    obj = Obio,
-    createNewResultTable = TRUE
-  )
+############################################################
+## Function load DGE results from file
+loadDESeq2outputFromFile <- function(
+    Obio,
+    replace = TRUE
+){
+    DEseq2resultDir <- Obio@projectDetailList$DESeq2_result_folder
+    allfiles <- paste0(DEseq2resultDir, "/", list.files(DEseq2resultDir))
+    allfiles <- allfiles[grep(".txt", allfiles)]
+    contrastNames <- gsub(paste0(DEseq2resultDir, "/"), "", allfiles)
+    contrastNames <- gsub(".txt", "", contrastNames)
+
+
+
+
+
+    ###############################################################################
+    ## For this project only: Add ENSMUSG column                                 ##
+    dfAnno <- Obio@dfGeneAnnotation
+    dfAnno <- unique(
+      Obio@dfGeneAnnotation[,c(Obio@parameterList$primaryAlignmentGeneID, Obio@parameterList$geneIDcolumn)]
+    )
+    
+    ## Done adding ENSMUSG column                                                ##
+    ###############################################################################
+    for (i in 1:length(allfiles)){
+      colName <- contrastNames[i]
+      res <- read.delim(allfiles[i], header = T, sep="\t")
+      
+      ################################
+      ## This project only 
+      dfAdd <- unique(dfAnno[dfAnno[,Obio@parameterList$geneIDcolumn] %in% res$symbol,  ])
+      res <- merge(
+          res,
+          dfAdd,
+          by.x = "symbol",
+          by.y = Obio@parameterList$geneIDcolumn
+      )
+      
+      
+      selVec <- c("X", "baseMean", "log2FoldChange", "lfcSE", "stat", "pvalue", "padj")
+      if (!sum(selVec %in% names(res)) == length(selVec)){
+          stop(paste0("Check DESeq2 input files. Mandantory columns: ", paste0(selVec, collapse = ", ")))
+      }
+      
+      res <- unique(res[,selVec])
+      names(res) <- gsub("^X$", Obio@parameterList$primaryAlignmentGeneID, names(res))
+      
+      res <- res[!(duplicated(res[,Obio@parameterList$primaryAlignmentGeneID])),]
+      res[is.na(res)] <- 0
+      ## Done 
+      ################################
+      
+      
+      row.names(res) <- res[,Obio@parameterList$primaryAlignmentGeneID]
+      
+      names(res) = paste(names(res), colName, sep="_")
+      res[[Obio@parameterList$primaryAlignmentGeneID]] = rownames(res)
+      
+      
+      names(res) = gsub("log2FoldChange", "logFC", names(res))
+      names(res) = gsub(
+        "logFC",
+        paste("contrast_", i, "_logFC", sep=""),
+        names(res)
+      )
+      
+      names(res) = gsub(
+        "padj",
+        paste("contrast_", i, "_padj", sep=""),
+        names(res)
+      )
+      
+      names(res) = gsub(
+        "stat",
+        paste("contrast_", i, "_stat", sep=""),
+        names(res)
+      )
+      
+      res$baseMean <- log2(res$baseMean)
+      names(res) = gsub(
+        "baseMean",
+        paste("contrast_", i, "_lg2BaseMean", sep=""),
+        names(res)
+      )
+      
+      #Remove all rows without a padj
+      padj.col = grep("padj", names(res))[1]
+      res[,padj.col][is.na(res[,padj.col])] = ""
+      res = res[res[,padj.col] != "", ]
+      res[,padj.col] <- as.numeric(res[,padj.col])
+      
+      ## Add log10p column ##
+      padj  <- names(res)[grep("_padj_", names(res))]
+      lg10p <- gsub("padj", "lg10p", padj)
+      
+      for (z in 1:length(padj)){
+        preprocess <- as.numeric(res[,padj[z]])
+        minNum <- min(preprocess[preprocess != 0])
+        preprocess[preprocess == 0] <- minNum
+        
+        # if (length(grep("padj_LRT", padj[i])) > 0){
+        #     preprocess <- as.numeric(res[,padj[z]])
+        #     minNum <- min(preprocess[preprocess != 0])
+        #     preprocess[preprocess == 0] <- minNum
+        # } else {
+        #     preprocess <- as.numeric(res[,padj[z]])
+        # }
+        
+        temp <- -1*log10(preprocess)
+        #temp[temp >= 50] = 50
+        res[,lg10p[z]] <- temp
+      }
+      
+      col.vector = c(
+        Obio@parameterList$primaryAlignmentGeneID,
+        names(res)[grep("contrast", names(res))]
+      )
+      
+      res = res[,col.vector]
+      
+      ## Make all numeric columns numeric ##
+      res[,grep("contrast_", names(res))] <- apply(res[,grep("contrast_", names(res))], 2, as.numeric)
+      
+      if (i == 1){
+        dfContrastTable <- res
+      } else {
+        dfContrastTable <- merge(
+          dfContrastTable,
+          res,
+          by.x = Obio@parameterList$primaryAlignmentGeneID,
+          by.y = Obio@parameterList$primaryAlignmentGeneID,
+          all = TRUE
+        )
+        dfContrastTable[is.na(dfContrastTable)] <- 0
+      }
+    }
+    
+    
+    # head(dfContrastTable)
+    
+    dfContrastTable<- dfContrastTable[rowSums(dfContrastTable[,2:ncol(dfContrastTable)]) != 0, ]
+    
+    if (replace){
+        Obio@DEseq2contrastTable <- data.frame(NULL)
+    }
+    
+    Obio@DEseq2contrastTable <- dfContrastTable
+    print("DESeq2 results loaded into Obio@DEseq2contrastTable")
+    
+    return(Obio)
 }
 
-# Obio <- doDGEanalysis(
-#     obj = Obio,
-#     DGEdesignCols = names(Obio@dfDesign)[grep("comp_", names(Obio@dfDesign)) ],
-#     normaliseAllSamplesTogether = TRUE
-# )
+## Done 
+#############################################################
 
+## If mode is not calculate DGE, a dge table needs to be provided
+if (!is.null(Obio@projectDetailList$DEseq2_DGE_result_folder) && Obio@projectDetailList$DEseq2_DGE_result_folder != ""){
+    mode = "load_DGE_from_file"
+    Obio <- loadDESeq2outputFromFile(
+        Obio,
+        replace = TRUE
+    )
+} else {
+    mode = "calculate_DGE"
+    
+    ## Pairwise differential gene expression ##
+    ## If working on projects prior to fall 2018, make sure
+    ## Obio@parameterList$DEseq2betaPrior is set to true.
+    dfDGE <- Obio@dfModel
+    dfDGE <- dfDGE[dfDGE$test == "Wald",]
 
+    if (nrow(dfDGE) > 0){
+        Obio <- biologicSeqTools2::DGEanalysis(
+            obj = Obio,
+            createNewResultTable = TRUE
+        )
+    }
+}
 
-
-# ## Save workspace ##
-# objectFN <- paste0(
-#     Obio@parameterList$localWorkDir,
-#     Obio@parameterList$project_id,
-#     ".bioLOGIC.Robj"
-# )
-# 
-# save(Obio, file = objectFN)
 
 
 ## Done differential gene expresison analysis                                ##
