@@ -85,6 +85,7 @@ projectDetailList <- list(
     
     "modelFN" = as.vector(dfObio$modelFN[1]),
     "baseDesignFN" = as.vector(dfObio$baseDesignFN[1]),
+    "TpmTableFN" = as.vector(dfObio$TpmTableFN[1]),
     
     "DEseq2_DGE_result_folder" = as.vector(dfObio$DEseq2_DGE_result_folder[1]),
     "DEseq2_LRT_result_folder" = as.vector(dfObio$DEseq2_LRT_result_folder[1]),
@@ -314,18 +315,18 @@ Obio = new(
 #    )
 #)
 
-Obio <- setMountingPoint(Obio)
-Obio <- setAnalysisPaths(Obio)
-Obio <- setCrickGenomeAndGeneNameTable(Obio)
-Obio <- createAnalysisFolders(
+Obio <- biologicSeqTools2::setMountingPoint(Obio)
+Obio <- biologicSeqTools2::setAnalysisPaths(Obio)
+Obio <- biologicSeqTools2::setCrickGenomeAndGeneNameTable(Obio)
+Obio <- biologicSeqTools2::createAnalysisFolders(
     Obio
 )
-Obio <- setDataBaseParameters(Obio)
+Obio <- biologicSeqTools2::setDataBaseParameters(Obio)
 
 ###############################################################################
 ## Add annotation file                                                       ##
 
-Obio <- addGeneAnnotation(Obio)
+Obio <- biologicSeqTools2::addGeneAnnotation(Obio)
 
 ## Done adding annotation file                                               ##
 ###############################################################################
