@@ -54,7 +54,7 @@ upload.to.database <- TRUE
 #renv::install("bioc::clusterProfiler")
 #renv::install("decusInLabore/biologicSeqTools2")
 
-library(biologicSeqTools2)
+#library(biologicSeqTools2)
 
 
 ###############################################################################
@@ -102,33 +102,16 @@ library(biologicSeqTools2)
 
 ```
 
-<!-- Outputs/results from essential blocks will be required for subsequent modules. -->
-<!-- Essential modules should be run in order. -->
-<!-- Optional modules create output only. -->
+<!-- Essential 1: (output required later): Set Parameters and directories and create Obio object Chapter/Module -->
+```{r child = 'src/modules/part_A/A.1.create.pipeline.parameter.file.Rmd', eval=TRUE}
+```
 
 <!-- Essential 1: (output required later): Set Parameters and directories and create Obio object Chapter/Module -->
 ```{r child = 'src/modules/settings/set.parameters.Rmd', eval=TRUE}
 ```
 
-
-<!-- Optional: Setup alignment to create RSEM count table, TPM table -->
-<!-- Required inputs: design table, model table, filepaths -->
-```{r child = 'src/modules/part_A/A.1.alignment.and.RSEM.count.Rmd', eval=FALSE}
-```
-
-
-<!-- Option B: Load preprocessed -->
-```{r child = 'src/modules/part_A/A.1B.load.input.files.Rmd', eval=FALSE}
-```
-
-<!-- Option A: Setup biologic object for analysis -->
-<!-- Incorporate dfDesign, dfRSEM, dfTPM, dfModel -->
-```{r child = 'src/modules/part_A/A2.create.analysis.object.Rmd', eval=FALSE}
-```
-
-<!-- Option A: Setup biologic object for analysis -->
-<!-- Incorporate dfDesign, dfRSEM, dfTPM, dfModel -->
-```{r child = 'src/modules/part_A/A2.create.analysis.object.pipeline.Rmd', eval=TRUE}
+<!-- Essential 1: (output required later): Set Parameters and directories and create Obio object Chapter/Module -->
+```{r child = 'src/modules/part_A/A.2.create.pipeline.analysis.object.Rmd', eval=TRUE}
 ```
 
 

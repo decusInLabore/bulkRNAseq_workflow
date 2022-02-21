@@ -13,11 +13,11 @@ VersionPdfExt <- VersionPdfExt <- paste0(".",chnkPrefix,"V", gsub("-", "", Sys.D
 ##                                                                           ##
 #baseDesignFN <- "/camp/stp/babs/working/boeings/Projects/boeings/stefan.boeing/474_bulk_RNAseq_pipeline/basedata/biologic/inputs/design.dge.lrt.definition.file.txt"
  
-baseDesignFN <- Obio@projectDetailList$baseDesignFN
+designFN <- Obio@projectDetailList$designFN
 
-if (file.exists(baseDesignFN)){
+if (file.exists(designFN )){
     dfBaseDesign <- read.delim(
-        baseDesignFN, 
+        designFN , 
         sep = "\t",
         stringsAsFactors = F
     )    
@@ -25,10 +25,9 @@ if (file.exists(baseDesignFN)){
     stop("No design file specified")
 }
 
-pos <- grep("sample.group")
 
-dfDesign <- biologicSeqTools2::completeDesignBasedOnSampleID(dfBaseDesign)
-dfDesign$sample.group <- dfDesign$sample.groups
+#dfDesign <- biologicSeqTools2::completeDesignBasedOnSampleID(dfBaseDesign)
+#dfDesign$sample.group <- dfDesign$sample.groups
 dfDesign$sample.groups <- NULL
 
 ###############################################################################
@@ -78,9 +77,9 @@ Obio@dfDesign <- data.frame(dfDesign)
 # )
 
 
-rsemFN <- Obio@projectDetailList$RSEMcountDataFile
+rsemFN <- Obio@projectDetailList$countTableFN
 
-if (file.exists(baseDesignFN)){
+if (file.exists(rsemFN)){
     dfRSEM <- read.delim(
         rsemFN, 
         sep = "\t",
@@ -98,10 +97,10 @@ sampleNames <- gsub(
 )
 
 dfRename <- unique(
-    dfDesign[,c("original.sample.id", "sample.id")]
+    Obio@dfDesign[,c("sampleID", "sample.id")]
 )
 
-rownames(dfRename) <- dfDesign$original.sample.id
+rownames(dfRename) <- dfDesign$sampleID
 dfRename <- dfRename[sampleNames, ]
 dfRename[["rsem.sample.id"]] <- names(dfRSEM)[2:ncol(dfRSEM)]
 
@@ -127,7 +126,7 @@ Obio@RSEMcountMatrix <- round(data.matrix(dfRSEM))
 
 tpmFN <- Obio@projectDetailList$TpmTableFN
 
-if (file.exists(baseDesignFN)){
+if (file.exists(tpmFN)){
     dfTPM <- read.delim(
         tpmFN, 
         sep = "\t",
@@ -138,9 +137,28 @@ if (file.exists(baseDesignFN)){
 }
 
 
-dfTPM <- dfRSEM
-dfTPM[[Obio@parameterList$primaryAlignmentGeneID]] <- row.names(dfTPM)
-dfTPM <- dfTPM[,c(Obio@parameterList$primaryAlignmentGeneID, names(dfRSEM))]
+## Rename columns ##
+sampleNames <- gsub(
+    "^X",
+    "",
+    names(dfTPM)[2:ncol(dfTPM)]
+)
+
+dfRename <- unique(
+    Obio@dfDesign[,c("sampleID", "sample.id")]
+)
+
+rownames(dfRename) <- dfDesign$sampleID
+dfRename <- dfRename[sampleNames, ]
+dfRename[["sampleID"]] <- names(dfTPM)[2:ncol(dfTPM)]
+
+for (i in 1:nrow(dfRename)){
+    names(dfTPM) <- gsub(
+        paste0("^", as.vector(dfRename[i, "sampleID"]), "$"),
+        as.vector(dfRename[i, "sample.id"]),
+        names(dfTPM)
+    )
+}
 
 Obio@dfTPM <- dfTPM
 
@@ -173,8 +191,6 @@ Obio@dfTPM <- dfTPM
 ```{r, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
 
 #FN <- "design/dge.model.table.txt"
-modelFN <- "/camp/stp/babs/working/boeings/Projects/boeings/stefan.boeing/474_bulk_RNAseq_pipeline/basedata/biologic/inputs/design.model.file.txt"
-
 modelFN <- Obio@projectDetailList$modelFN
 
 if (file.exists(modelFN)){

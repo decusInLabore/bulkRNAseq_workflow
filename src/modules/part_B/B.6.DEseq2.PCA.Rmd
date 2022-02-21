@@ -12,6 +12,10 @@ VersionPdfExt <- VersionPdfExt <- paste0(".",chnkPrefix,"V", gsub("-", "", Sys.D
 ###############################################################################
 ## Create and attach DDS object                                              ##
 
+if (is.null( Obio@parameterList$parallelProcessing) || length(Obio@parameterList$parallelProcessing) == 0){
+     Obio@parameterList$parallelProcessing <- FALSE
+}
+
 Obio <- biologicSeqTools2::createDdsObject(Obio)
 
 ## Done creating and attaching DDS objecs                                    ##
@@ -180,7 +184,7 @@ Obio <- doLinearFittings(
 #Obio@parameterList$batchMode <- F
 ## LRT tests for multiple sample groups ##
 
-if (!is.null(Obio@projectDetailList$DEseq2_DGE_result_folder && bio@projectDetailList$DEseq2_DGE_result_folder != "")){
+if (!is.null(Obio@projectDetailList$DEseq2_DGE_result_folder) && Obio@projectDetailList$DEseq2_DGE_result_folder != ""){
     mode = "load_DGE_from_file"
     Obio <- loadDESeq2outputFromFile(
         Obio,

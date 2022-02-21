@@ -320,6 +320,9 @@ model.file <- "design/dge.model.table.txt"
 
 write.table(Obio@dfModel , model.file, row.names = FALSE, sep = "\t")
 
+Obio@projectDetailList$modelFN <- model.file
+
+
 ## Done adding sample group colors                                           ##
 ###############################################################################
 

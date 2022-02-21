@@ -84,6 +84,8 @@ if (length(pos) > 0){
     if (!is.null(Obio@parameterList$designTScol)){
         designTScol <- Obio@parameterList$designTScol
         timepointString <- paste0('designTScol <- "', designTScol,'"')
+    } else {
+        timepointString <- "" 
     }
 } else {
     timepointString <- ""   
