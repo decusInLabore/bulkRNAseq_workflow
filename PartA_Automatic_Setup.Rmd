@@ -172,9 +172,48 @@ names(dfDesign)
 # There should be no underscores, but the two in the above example. 
 # dfDesign <- biologicSeqTools2::completeDesignBasedOnSampleID(dfBaseDesign)
 
+## Make sure colors are specified
+dfDesign$sample.groups <- NULL
+
+###############################################################################
+## Add sample group colors
+pos <- grep("sample.group_color", names(Obio@dfDesign))
+        
+if (length(pos) == 0){
+    sample.group <- unique(dfDesign$sample.group)
+    sample.group_color <- sample.group
+
+
+            #library(scales)
+    sample.group_color = scales::hue_pal()(length(sample.group_color))
+            #sample.group_color = c("#990000", "#009900")
+
+    dfGroupColors <- unique(data.frame(sample.group, sample.group_color))
+
+    dfDesign <- merge(dfDesign, dfGroupColors, by.x = "sample.group", "sample.group")
+
+}
+##
+###############################################################################
+
+pos <- grep("^timepoint$", names(dfDesign))
+
+if (length(pos) == 1){
+    library(dplyr)
+    dfDesign <- dfDesign %>%
+        mutate(timepoint = as.numeric(timepoint)) %>%
+        arrange(dataseries, timepoint, f_replicate, .by_group = TRUE)  
+
+    dfDesign <- data.frame(dfDesign)
+}
+## Done with colors
+##
+###############################################################################
+
+
 
 # Location where the design file will be saved
-pipelineList[["designFN"]] <- paste0(pipelineList[["folder"]], "workdir/bulkRNAseq_workflow/design/", projectID,".design.table.txt")
+pipelineList[["designFN"]] <- paste0(pipelineList[["folder"]], "workdir/bulkRNAseq_workflow/design/", pipelineList[["project_id"]],".design.table.txt")
 
 ## ensure a replicate factor column is present
 # dfDesign[["f_replicate"]] <- paste0("R", sapply(dfDesign$sample.id, function(x) unlist(strsplit(x, "_"))[3]))
@@ -330,7 +369,7 @@ dfModel[is.na(dfModel)] <- ""
 
 
  
-pipelineList[["modelFN"]] <- paste0(pipelineList[["folder"]], "/workdir/bulkRNAseq_workflow/design/", projectID,".model.table.txt")
+pipelineList[["modelFN"]] <- paste0(pipelineList[["folder"]], "/workdir/bulkRNAseq_workflow/design/", pipelineList[["project_id"]],".model.table.txt")
 #model.file <- "design/dge.model.table.txt"
 
 ## Write model to file
@@ -527,10 +566,14 @@ write.table(dfObio, settingsFN , row.names=FALSE, col.names=FALSE, sep=",")
 ```{r child = 'src/modules/settings/set.parameters.Rmd', eval=TRUE}
 ```
 
+<!-- Essential 2: Load all available data into Obio object and check -->
+<!-- This part will move to part B -->
+```{r child = 'src/modules/part_A/A.1.add.data.to.analysis.object.Rmd', eval=FALSE}
+```
+
 <!-- Essential 1: (output required later): Set Parameters and directories and create Obio object Chapter/Module -->
 <!-- This part will move to part B -->
-```{r child = 'src/modules/part_A/A.2.create.analysis.object.pipeline.Rmd', eval=FALSE}
-```
+
 
 
 ```{r saveobject, eval=TRUE, echo=T, results=F}
@@ -543,7 +586,7 @@ save(Obio,
      )
 )
 
-print("R bioLOGIC single cell object initialized.")
+print("R bioLOGIC bulk RNAseq Object initialized.")
 
 # renv::snapshot()
 
