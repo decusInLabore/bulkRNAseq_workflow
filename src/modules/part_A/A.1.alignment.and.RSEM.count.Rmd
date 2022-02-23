@@ -182,7 +182,7 @@ Obio@dfDesign <- merge(Obio@dfDesign, dfGroupColors, by.x = "sample.group", "sam
 
 #setwd(Obio@parameterList$localWorkDir)
 #design.file <- paste0("design/design.file.txt")
-Obio@projectDetailList$designFN <- "design/experimental.design.file.txt"
+Obio@projectDetailList$designFN <- paste0(pipelineList[["folder"]], "bulkRNAseq_workflow/design/experimental.design.file.txt")
 
 write.table(Obio@dfDesign , Obio@projectDetailList$designFN, row.names = FALSE, sep = "\t")
 

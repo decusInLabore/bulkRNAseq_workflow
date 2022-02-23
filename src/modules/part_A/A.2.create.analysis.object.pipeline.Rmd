@@ -86,7 +86,7 @@ if (file.exists(rsemFN)){
         stringsAsFactors = F
     )    
 } else {
-    stop("No design file specified")
+    stop("No rsem file specified")
 }
 
 ## Rename columns ##
@@ -133,7 +133,7 @@ if (file.exists(tpmFN)){
         stringsAsFactors = F
     )    
 } else {
-    stop("No design file specified")
+    stop("No tpm file specified")
 }
 
 
@@ -200,7 +200,7 @@ if (file.exists(modelFN)){
         stringsAsFactors = F
     )    
 } else {
-    stop("No design file specified")
+    stop("No model file specified")
 }
 
 

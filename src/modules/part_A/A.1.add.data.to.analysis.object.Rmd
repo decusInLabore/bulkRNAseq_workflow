@@ -1,0 +1,125 @@
+<!-- Set PArameters Module -->
+<!-- Set the chnkPrefix to make all chunks unique in the overall folder -->
+```{r, echo=TRUE, eval=TRUE, warning=FALSE}
+chnkPrefix <- "add.data"
+VersionPdfExt <- VersionPdfExt <- paste0(".",chnkPrefix,"V", gsub("-", "", Sys.Date()), ".pdf")
+
+```
+
+
+## Add Available Data to Analysis Object
+
+```{r, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
+
+###############################################################################
+## Essential bits                                                            ##
+###############################################################################
+
+
+###############################################################################
+## Add Design file and check                                                 ##
+
+if (!is.null(Obio@projectDetailList$designFN)){
+    dfDesign <- read.delim(
+        Obio@projectDetailList$designFN, 
+        header =T, 
+        sep = "\t",
+        stringsAsFactors = F
+    )
+} else {
+    stop("Error: Now design file specified")
+}
+
+## Add: check for essential columns ##
+Obio@dfDesign <- dfDesign
+
+##                                                                           ##
+###############################################################################
+
+###############################################################################
+## Add model file and check                                                 ##
+if (!is.null(Obio@projectDetailList$modelFN)){
+    dfModel <- read.delim(
+        Obio@projectDetailList$modelFN, 
+        header =T, 
+        sep = "\t",
+        stringsAsFactors = F
+    )
+} else {
+    stop("Error: Now model file specified")
+}
+
+## Add: check for essential columns ##
+Obio@dfModel <- dfModel
+
+##                                                                           ##
+###############################################################################
+
+###############################################################################
+## Optional section - if available                                           ##
+###############################################################################
+
+###############################################################################
+## Add rsem file and check                                                   ##
+if (!is.null(Obio@projectDetailList$countTableFN)){
+    dfCount <- read.delim(
+        Obio@projectDetailList$countTableFN, 
+        header =T, 
+        sep = "\t",
+        stringsAsFactors = F
+    )
+} else {
+    print("Count file not found")
+}
+
+mRSEM <- biologicSeqTools2::readAndPrepareCountMatrix(
+    count.data.fn = Obio@projectDetailList$countTableFN,
+    string.to.be.deleted.in.raw.counts.columns = '',
+    df.design = Obio@dfDesign
+)
+
+Obio@RSEMcountMatrix <- mRSEM
+
+
+##                                                                           ##
+###############################################################################
+
+###############################################################################
+## Add tpm file if available                                                 ##
+if (!is.null(Obio@projectDetailList$TpmTableFN)){
+    dfTPM <- read.delim(
+        Obio@projectDetailList$countTableFN, 
+        header =T, 
+        sep = "\t",
+        stringsAsFactors = F
+    )
+    
+    dfTPM <- dfTPM[rowSums(dfTPM[,2:ncol(dfTPM)]) != 0,]
+
+    Obio@dfTPM <- dfTPM
+
+
+    designSampleIDs <- unique(Obio@dfDesign$sample.id)
+    dfTPMSampleIDs <- unique(names(Obio@dfTPM))
+    check <- !(designSampleIDs %in% dfTPMSampleIDs)
+
+    if (sum(check) > 0){
+      stop("Sample IDs in dfDesign don't match the column names in the count file")
+    }
+
+} else {
+    print("TPM file not specified")
+}
+
+
+## Done                                                                      ##
+###############################################################################
+
+###############################################################################
+## Add DGE files, if available                                               ##
+
+## Done                                                                      ##
+###############################################################################
+
+```
+

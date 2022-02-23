@@ -1,0 +1,5 @@
+comparison	comparisonID	test	type	model	reducedModel	normalizeAllSamplesTogether	betaPrior
+EnGliaCtrl_vs_EnNonGliaCtrl	comp_1	Wald	DGE	~ condition		FALSE	TRUE
+EnGliaInf_vs_enNonGliaInf	comp_2	Wald	DGE	~ condition		FALSE	TRUE
+EnGliaInf_vs_EnGliaCtrl	comp_3	Wald	DGE	~ condition		FALSE	TRUE
+EnNonGliaInf_vsEnNonGliaInf	comp_4	Wald	DGE	~ condition		FALSE	TRUE
