@@ -465,7 +465,9 @@ pipelineList[["RSEM_folder"]] <- paste0(pipelineList[["folder"]], "workdir/RSEM/
 
 ## TPM file ##
 ## The tpm file should contain the following columns:
-## first column: primary gene alignment ID, named either "X" or "ENSG|ENSMUSG|or whatever species"
+## first column: primary gene alignment ID, named either "X" or "ENSG|ENSMUSG|or whatever species
+## second to N-th column: one column for each sample as liste in Obio@dfDesign$sample.id. Can be extended by a
+## _TPM suffix. 
 pipelineList[["TpmTableFN"]] <- paste0(
         pipelineList[["folder"]],
         "basedata/",

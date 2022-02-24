@@ -446,10 +446,10 @@ for (k in 1:length(HmDisplayCatsFromDb)){
         ## Color sample groups in line with the designated sample group color ##
         #######################################################################
         ## Add sample group colors if needed
-        pos <- grep("sample.group_color", names(Obio@dfDesign))
+        pos <- grep("sample.group_color", names(dfDesign))
         
         if (length(pos) == 0){
-            sample.group <- unique(Obio@dfDesign$sample.group)
+            sample.group <- unique(dfDesign$sample.group)
             sample.group_color <- sample.group
 
 
@@ -459,8 +459,11 @@ for (k in 1:length(HmDisplayCatsFromDb)){
 
             dfGroupColors <- unique(data.frame(sample.group, sample.group_color))
 
-            Obio@dfDesign <- merge(Obio@dfDesign, dfGroupColors, by.x = "sample.group", "sample.group")
-
+            dfDesign <- merge(dfDesign, dfGroupColors, by.x = "sample.group", "sample.group")
+            if (exists("Obio")){
+                Obio@dfDesign <- dfDesign
+            }
+            
         }
         
         

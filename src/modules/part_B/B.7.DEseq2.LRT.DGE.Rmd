@@ -70,7 +70,16 @@ if (!is.null(Obio@parameterList$corGeneVec)){
 if (exists("dfAnnoCor")){
     if (nrow(dfAnnoCor) > 0){
         dfTPM <- Obio@dfTPM
-        
+        names(dfTPM) <- gsub("^X$", Obio@parameterList$primaryAlignmentGeneID, names(dfTPM))
+        names(dfTPM) <- gsub("^gene_id$", Obio@parameterList$primaryAlignmentGeneID, names(dfTPM))
+
+        names(dfTPM) <- paste0("norm_counts_", names(dfTPM ))
+        names(dfTPM) <- gsub(
+        paste0(
+          "norm_counts_", Obio@parameterList$primaryAlignmentGeneID),
+          Obio@parameterList$primaryAlignmentGeneID,
+          names(dfTPM)
+        )
         
         row.names(dfTPM) <- dfTPM[,Obio@parameterList$primaryAlignmentGeneID]
         dfTPM[,Obio@parameterList$primaryAlignmentGeneID] <- NULL
@@ -146,6 +155,11 @@ names(dfNormCounts) <- paste0("DEseq2NormalizedReadCounts_", names(dfNormCounts)
 dfNormCounts[[Obio@parameterList$primaryAlignmentGeneID]] <- row.names(dfNormCounts)
 
 dfTPM <- Obio@dfTPM
+
+## In case other names are used as col names
+names(dfTPM) <- gsub("^X$", Obio@parameterList$primaryAlignmentGeneID, names(dfTPM))
+names(dfTPM) <- gsub("^gene_id$", Obio@parameterList$primaryAlignmentGeneID, names(dfTPM))
+
 names(dfTPM) <- paste0("norm_counts_", names(dfTPM ))
 names(dfTPM) <- gsub(
     paste0("norm_counts_", Obio@parameterList$primaryAlignmentGeneID),
