@@ -3,21 +3,16 @@
 ```{r, echo=FALSE, eval=TRUE, warning=FALSE}
 chnkPrefix <- "B10.Heatmap."
 VersionPdfExt <- VersionPdfExt <- paste0(".",chnkPrefix,"V", gsub("-", "", Sys.Date()), ".pdf")
-
-
 ```
 
 ```{r, echo=FALSE, eval=TRUE, warning=FALSE, results=F}
-
 dfMainData <- Obio@databaseTable
 geneIDcolumn <- Obio@parameterList$geneIDcolumn
-
 if (geneIDcolumn != "hgnc_symbol" | geneIDcolumn != "mgi_symbol"){
     geneSelCol <- "hgnc_symbol"
 } else {
     geneSelCol <- geneIDColumn
 }
-
 Ntop4pcaGeneSelection <- Obio@dataTableList$Ntop4pcaGeneSelection
 HmDisplayCatsFromDb <- Obio@parameterList$HmDisplayCatsFromDb
 project_id <- Obio@parameterList$project_id
@@ -25,10 +20,8 @@ alignmentGeneID <- Obio@parameterList$primaryAlignmentGeneID
 lab.categories.table <- Obio@parameterList$lab.categories.table
 ref.cat.db.table = lab.categories.table
 reportFigDir <- Obio@parameterList$reportFigDir
-
 labname <- Obio@parameterList$labname
 dfDesign <- Obio@dfDesign
-
 ```
 
 
@@ -36,16 +29,13 @@ dfDesign <- Obio@dfDesign
 ## Make heatmap gene list
 logFCselections <- names(dfMainData)[grep("_logFC_", names(dfMainData))]
 padjSelections <- gsub("_logFC_", "_padj_", logFCselections)
-
 dfSelections <- data.frame(logFCselections, padjSelections)
 dfSelections <- dfSelections[dfSelections[,"padjSelections"] %in% names(dfMainData),]
-
 if (nrow(dfSelections) > 2){
     tabVar <- ".tabset .tabset-fade .tabset-dropdown"
 } else {
     tabVar <- ".tabset .tabset-fade .tabset-pills"
 }
-
 ```
 
 ## Gene Expression Overview {`r tabVar`}
@@ -53,47 +43,36 @@ if (nrow(dfSelections) > 2){
 ## Make heatmap gene list
 logFCselections <- names(dfMainData)[grep("_logFC_", names(dfMainData))]
 padjSelections <- gsub("_logFC_", "_padj_", logFCselections)
-
 dfSelections <- data.frame(logFCselections, padjSelections)
 dfSelections <- dfSelections[dfSelections[,"padjSelections"] %in% names(dfMainData),]
-
 if (!exists("project_id")){
     project_id <- gsub("_designTable", "", designTB)
 }
-
 if (!exists("VersionPdfExt")){
     VersionPdfExt <- paste0(".V", gsub("-", "", Sys.Date()), ".pdf")
 }
-
 if (!exists("labname")){
     labname <- "TBD"
 }
-
 if (!exists("reportFigDir") || is.null(reportFigDir)){
     reportFigDir <- ""
 }
-
 ###############################################################################
 ## First heatmap: Most variable genes                                        ##
 HMplotList <- list()
 chnkVec <- as.vector(NULL, mode="character")
-
 if (geneIDcolumn == "mgi_symbol" | geneIDcolumn == "hgnc_symbol"){
     geneSelCol <- geneIDcolumn
 } else {
     geneSelCol <- "hgnc_symbol"
 }
-
 # if (is.null(HmDisplayCatsFromDb)){
     HmDisplayCatsFromDb <- list()
 # }
-
-
     
 ## Start with Nmost variable genes ##
 if (exists("Ntop4pcaGeneSelection") && !is.null(Ntop4pcaGeneSelection) | 
     length(Ntop4pcaGeneSelection) > 3){
-
     dfDataTable <- dfMainData
     
     geneVec <- as.vector(unique(dfDataTable[dfDataTable[,alignmentGeneID] %in% Ntop4pcaGeneSelection,geneIDcolumn]))
@@ -101,9 +80,7 @@ if (exists("Ntop4pcaGeneSelection") && !is.null(Ntop4pcaGeneSelection) |
     geneVec <- unique(dfMainData[dfMainData$logFC_cut_off == 1, geneIDcolumn])
     Ntop4pcaGeneSelection <- geneVec
 }
-
 cat.name <- paste0("Experiment_",project_id, "_",length(Ntop4pcaGeneSelection),"_most_variable_genes")
-
 cat.description.text <- paste0(
     "In this gene set the ",
     length(geneVec),
@@ -112,7 +89,6 @@ cat.description.text <- paste0(
     " lab experiment \\<a href=\\'https:\\/\\/biologic.crick.ac.uk\\/",
     project_id,"\\'\\>",project_id, "\\<\\/a\\> are compiled."
 )
-
 HmDisplayCatsFromDb[[cat.name]] <- list(
       "cat_type" = paste0("temp_", project_id),
       "data_source" = paste0(labname, " Lab") ,
@@ -121,23 +97,16 @@ HmDisplayCatsFromDb[[cat.name]] <- list(
       "catID" = NULL,
       "comparisonID" = NULL
 )
-
-
 ###########################################################################
 ## Make one heatmap per comparison                                       ##
-
-
     
 numextract <- function(string){ 
     stringr::str_extract(string, "contrast_\\-*\\d+\\.*\\d*_")
 } 
-
 dfSelections[["designColumn"]] <- numextract(dfSelections$padjSelections)
 dfSelections[["designColumn"]] <- gsub("contrast_", "comp_", dfSelections[["designColumn"]] )
 dfSelections[["designColumn"]] <- gsub("_$", "", dfSelections[["designColumn"]] )
 dfSelections$designColumn[!(dfSelections$designColumn %in% names(dfDesign))] <- ""
-
-
 for (k in 1:nrow(dfSelections)){
     dfDataTable <- dfMainData
     padjCutOff <- 0.05
@@ -190,30 +159,22 @@ for (k in 1:nrow(dfSelections)){
       )
             
 }
-
-
 ## Done with making heatmap list                                         ##
 ###########################################################################
-
 ```
 
 ```{r, echo=F, eval=TRUE, warning=FALSE, results="asis"}
-
 ###########################################################################
 ## Upload to database                                                    ##
-
 ## New gene categories to upload list ##
 if (is.null(Obio@projectDetailList[["projectGeneCategories"]])){
     Obio@projectDetailList[["projectGeneCategories"]] <- list()
 } 
-
 Obio@projectDetailList[["projectGeneCategories"]] <- c(
     Obio@projectDetailList[["projectGeneCategories"]],
     HmDisplayCatsFromDb
 )
-
 createProjectRefDbTables <- T
-
 if (createProjectRefDbTables){
     ## Assign category IDs ##
     ## First check if categories exist already
@@ -339,19 +300,13 @@ if (createProjectRefDbTables){
 }
 ## Upload to database                                                        ##
 ###############################################################################
-
-
 ```
 
 ```{r, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
 ## Create Heatmaps ##
-
-
 ###############################################################################
 ## Reorder Obio@parameterList$HmDisplayCatsFromDb so that 500 var is on top  ##
-
 pos <- grep("most_variable_genes", names(HmDisplayCatsFromDb))
-
 if (length(pos) > 0){
   pos <- pos[1]
   newOrder <- c(
@@ -360,12 +315,8 @@ if (length(pos) > 0){
   )
   HmDisplayCatsFromDb <- HmDisplayCatsFromDb[newOrder]
 }
-
 ##                                                                           ##
 ###############################################################################
-
-
-
 ## Begin heatmap plotting loop ##
 for (k in 1:length(HmDisplayCatsFromDb)){
     
@@ -401,7 +352,6 @@ for (k in 1:length(HmDisplayCatsFromDb)){
         }
         
         row.names(dfHmBase) <- dfHmBase[, geneIDcolumn]
-
         dfHmBase[, geneIDcolumn] <- NULL
         
         ## calculate row-means ##
@@ -438,7 +388,6 @@ for (k in 1:length(HmDisplayCatsFromDb)){
        
         f1 = circlize::colorRamp2(seq(-4, 4, length = 3), c("#3060cf", "#fffbbc","#c4463a"))    
     
-
         anno <- as.data.frame(colnames(mHmBase))
         colnames(anno) <- "Sample"
         anno$Group <- sapply(as.vector(anno[,1]), function(x) paste0(unlist(strsplit(x, "_"))[1], "_",unlist(strsplit(x, "_"))[2]))
@@ -451,14 +400,10 @@ for (k in 1:length(HmDisplayCatsFromDb)){
         if (length(pos) == 0){
             sample.group <- unique(dfDesign$sample.group)
             sample.group_color <- sample.group
-
-
             #library(scales)
             sample.group_color = scales::hue_pal()(length(sample.group_color))
             #sample.group_color = c("#990000", "#009900")
-
             dfGroupColors <- unique(data.frame(sample.group, sample.group_color))
-
             dfDesign <- merge(dfDesign, dfGroupColors, by.x = "sample.group", "sample.group")
             if (exists("Obio")){
                 Obio@dfDesign <- dfDesign
@@ -587,13 +532,8 @@ for (k in 1:length(HmDisplayCatsFromDb)){
 ###############################################################################
 }
 ## End heatmap plotting loop
-
 ## Done                                                                      ##
 ###############################################################################
-
-
-
-
 ```
 
 
@@ -601,4 +541,3 @@ for (k in 1:length(HmDisplayCatsFromDb)){
 ```{r, echo=FALSE, eval=TRUE, warning=FALSE, results="asis"}
 cat(paste(knitr::knit(text = chnkVec, quiet = T), collapse = '\n'))
 ```
-
