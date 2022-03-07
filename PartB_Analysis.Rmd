@@ -267,8 +267,8 @@ projectParams <- lapply(
 
 
 ## Documentation
-```{r documentation, eval=TRUE, echo=F, results=T}
-renv::snapshot(prompt=FALSE)
+```{r documentation, eval=TRUE, echo=F, results=T, error=F}
+#renv::snapshot(prompt=FALSE)
 
 sessionInfo()
 ```

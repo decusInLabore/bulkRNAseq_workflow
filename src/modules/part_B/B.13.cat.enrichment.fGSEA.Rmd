@@ -347,7 +347,8 @@ for (i in 1:length(rnkFileVec)){
         
     
     
-    sn <- gsub("GSEA", "", substr( paste0(tag, "_GSEA"), 1, 30))
+    sn <- gsub("GSEA_", "", substr( paste0(tag, "_GSEA"), 1, 27))
+    sn <- paste0(i, "_", sn)
     openxlsx::addWorksheet(wb, sn)
     openxlsx::freezePane(wb, sn ,  firstActiveRow = 2)
     

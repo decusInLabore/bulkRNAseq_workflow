@@ -77,7 +77,7 @@ projectDetailList <- list(
     "primaryAlignmentGeneID" = as.vector(dfObio$primaryAlignmentGeneID[1]),
     "paired.end" =  as.logical(dfObio$paired.end[1]),
     "stranded" = as.logical(dfObio$stranded[1]),
-    "labname" = "Pachnis",
+    "labname" = as.logical(dfObio$labname[1]),
     "projectName" = as.vector(dfObio$project_name[1]),
     "read.length" =  as.vector(dfObio$read.length[1]),
     

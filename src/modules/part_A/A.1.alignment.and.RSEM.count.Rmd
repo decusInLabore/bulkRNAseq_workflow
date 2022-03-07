@@ -70,6 +70,10 @@ setwd(paste0(Obio@parameterList$localWorkDir, "bulkRNAseq_workflow"))
 # ###############################################################################
 # ## Create Design File                                                        ##
 #
+## this setup requires a file named sample.ids.txt in workir with two columns:
+sampleID (with the ASF id) and 
+sample.id with the experimental sample name. 
+
 dfDesign <- biologicSeqTools2::createDesignFileCrickASFsamples(
     pathToSeqStorageFolder = pathToSeqStorageFolder,
     FNsampleAnnotation = Obio@parameterList$baseDesignFN,
@@ -124,7 +128,7 @@ dfDesign <- biologicSeqTools2::createDesignFileCrickASFsamples(
 
 names(dfDesign) <- gsub("DGE_", "comp_", names(dfDesign))
 
-dfDesign[["LRT_timepoint"]] <- dfDesign$timepoint
+#dfDesign[["LRT_timepoint"]] <- dfDesign$timepoint
 
 dfDesign$dataseries_color <- NULL
 
@@ -149,18 +153,18 @@ dfDesign <- merge(
 #dfDesign[["ts_color"]] <- dfDesign$dataseries_color
 
 #
-Obio@dfDesign <- dfDesign
+#Obio@dfDesign <- dfDesign
 #
-Obio@dfDesign[["f_replicate"]] <- sapply(
-    Obio@dfDesign$sample.id,
+dfDesign[["f_replicate"]] <- sapply(
+    dfDesign$sample.id,
     function(x) unlist(strsplit(x, "_"))[3]
 )
 
-Obio@dfDesign[["f_timepoint"]] <- paste0("T", Obio@dfDesign$timepoint)
+#Obio@dfDesign[["f_timepoint"]] <- paste0("T", Obio@dfDesign$timepoint)
 
 
 
-Obio@dfDesign[["FASTQ"]] <- Obio@dfDesign$sample.id
+dfDesign[["FASTQ"]] <- dfDesign$sample.id
 
 
 ###############################################################################

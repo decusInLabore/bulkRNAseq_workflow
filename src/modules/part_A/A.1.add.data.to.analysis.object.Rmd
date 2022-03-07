@@ -45,6 +45,7 @@ if (!is.null(Obio@projectDetailList$modelFN)){
         sep = "\t",
         stringsAsFactors = F
     )
+    dfModel[is.na(dfModel)] <- ""
 } else {
     stop("Error: Now model file specified")
 }
