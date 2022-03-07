@@ -556,7 +556,7 @@ if (nrow(dfTest) ==1){
     ## Delete original row ##
     dbDB <- DBI::dbConnect(
         drv = RMySQL::MySQL(), 
-        user = Obio@parameterList$db.user, 
+        user = Obio@dbDetailList$db.user, 
         password = db.pwd, 
         host = Obio@dbDetailList$host, 
         dbname = "operational"
@@ -678,7 +678,9 @@ if (nrow(dfTest) == 0){
         addRowNamesColumn = FALSE
     )
     
-} 
+} else {
+  Obio@parameterList$project_code <- dfTest$project_code[1]
+}
 
 
 ##                                                                           ##
@@ -870,6 +872,165 @@ if (createProjectRefDbTables){
 ## Done                                                                      ##
 ###############################################################################
 
+###############################################################################
+## Select tables for reference listing                                       ##
+
+## Switch to mgi symbols ##
+
+
+## List all available reference tables ##
+availableTables <- biologicSeqTools2::list.db.tables.in.db(
+    dbname = "reference_categories_db_new",
+    password = db.pwd,
+    host=Obio@dbDetailList$host,
+    user=Obio@dbDetailList$db.user
+)
+
+labCatName <-  paste0(Obio@projectDetailList$labname, " Lab")
+
+if (length(Obio@referenceTableList) == 0){
+    Obio@referenceTableList <- list(
+        "Hallmark Signatures" = "mysigdb_h_hallmarks",
+        "Pathways" = "mysigdb_c2_1329_canonical_pathways",
+        "GO-BP" = "mysigdb_c5_BP",
+        "GO-MF" = "mysigdb_c5_MF",
+        "TF Motifs" = "TRANSFAC_and_JASPAR_PWMs",
+        "Protein Complexes" = "networkcategories",
+        "GO-BP" = "GO_Biological_Process_2017",
+        "mysigdb_c7_immunologic_signatures" = "Immunological Signatures"
+    )
+}
+
+
+
+Obio@referenceTableList[[labCatName]] <- Obio@parameterList$lab.categories.table
+
+## Define relevant genes for selection ##
+relevant.genes <- as.vector(
+    unique(
+        Obio@databaseTable[Obio@databaseTable$cluster_order, Obio@parameterList$geneIDcolumn]
+    )
+)
+
+length(relevant.genes)
+
+for (i in 1:length(Obio@referenceTableList)) {
+    df.ref <- import.db.table.from.db(
+        host = Obio@dbDetailList$host,
+        dbname = Obio@dbDetailList$ref.cat.db,
+        dbtable = Obio@referenceTableList[[i]],
+        user = Obio@dbDetailList$db.user,
+        password = db.pwd
+    )
+
+    ## Remove temp categories ##
+    # temPos <- grep("temp_", df.ref$cat_type)
+    #
+    # if (length(temPos) > 0) {
+    #     df.ref <- df.ref[-temPos,]
+    # }
+
+    df.temp <- add2labCatSelectionDBtable(
+        df.ref = df.ref,
+        cat_group_name = names(Obio@referenceTableList)[i],
+        reference.gene.vector = relevant.genes,
+        ref.gene.vec.id = Obio@parameterList$geneIDcolumn,
+        cat_views = NA
+    )
+
+    if (i == 1) {
+        df.db.table <- df.temp
+    } else {
+        df.db.table <- rbind(df.temp, df.db.table)
+    }
+}
+
+###############################################################################
+## Filter cat dataset                                                        ##
+###############################################################################
+## Remove all datasets with less than 5 proteins matched
+catIdGroupsExemptFromFiltering <- c(
+    Obio@parameterList$lab.categories.table,
+    "mysigdb_h_hallmarks",
+    "mysigdb_c2_1329_canonical_pathways",
+    "mysigdb_c5_BP"
+)
+
+dfUnfiltered <- df.db.table[as.vector(unlist(sapply(catIdGroupsExemptFromFiltering, function(x) grep(x, df.db.table$cat_id)))),]
+
+dim(df.db.table)
+df.db.table <- df.db.table[df.db.table$cat_count >= 5,]
+dim(df.db.table)
+
+## Add unfiltered categories ##
+if (exists("dfUnfiltered") & (nrow(dfUnfiltered) > 0)){
+    df.db.table <- unique(
+        rbind(
+            dfUnfiltered,
+            df.db.table
+        )
+    )
+}
+
+dim(df.db.table)
+
+#df.db.table <- df.db.table[df.db.table$cat_weight > 0.3,]
+#dim(df.db.table)
+
+
+###############################################################################
+## Add full temp categories associated with this project                     ##
+## Lab categories ##
+df.ref <- import.db.table.from.db(
+    dbname = Obio@dbDetailList$ref.cat.db,
+    dbtable = Obio@parameterList$lab.categories.table,
+    password = db.pwd,
+    host = Obio@dbDetailList$host,
+    user = Obio@dbDetailList$db.user
+)
+
+## Remove all project temp categories from df.ref
+df.ref <- df.ref[grep(paste0("temp_", Obio@parameterList$project_id), df.ref$cat_type),]
+
+if (exists("df.ref") & nrow(df.ref) > 0){
+    df.temp <- add2labCatSelectionDBtable(
+        df.ref = df.ref,
+        cat_group_name = "This project",
+        reference.gene.vector = reference.gene.vector,
+        ref.gene.vec.id = Obio@parameterList$geneIDcolumn,
+        cat_views = NA
+    )
+
+    df.db.table <- rbind(df.temp, df.db.table)
+}
+## Done adding temp categories associated with this project
+###############################################################################
+
+
+###############################################################################
+## Upload to database                                                        ##
+###############################################################################
+biologicSeqTools2::upload.datatable.to.database(
+    host = Obio@dbDetailList$host,
+    user = Obio@dbDetailList$db.user,
+    password = db.pwd,
+    prim.data.db = Obio@dbDetailList$primDataDB,
+    dbTableName = Obio@parameterList$cat.ref.db.table,
+    df.data = df.db.table,
+    db.col.parameter.list = list(
+        "VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci" = c("comments_1","cat_name"),
+        "VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_general_ci" = c("cat_id", "cat_group"),
+        "VARCHAR(1) CHARACTER SET utf8 COLLATE utf8_general_ci" = c("ppos", "amino_acid", "charge","known_site"),
+        "BIGINT(8) NULL DEFAULT NULL" = c("row_names"),
+        "INT(8) NULL DEFAULT NULL" = c("cat_item_size", "cat_count", "cat_views"),
+        "DECIMAL(6,3) NULL DEFAULT NULL" = c("cat_weight"),
+        "DECIMAL(6,5) NULL DEFAULT NULL" = c("padj", "pvalue","^pep$")
+    ),
+    new.table = TRUE
+)
+
+##  End creating reference category selection for this project               ##
+###############################################################################
 
 ```
 

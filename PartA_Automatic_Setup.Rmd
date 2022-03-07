@@ -54,16 +54,16 @@ upload.to.database <- TRUE
 pipelineList <- list()
 
 ## Set folder
-pipelineList[["folder"]] <- "/camp/stp/babs/working/boeings/Projects/pachnisv/franze.progatzky/209_vpl_fp_RNAseq_inflammatory_enteric_glia_cell_characterization/"
+pipelineList[["folder"]] <- "/camp/stp/babs/working/boeings/Projects/anastasioud/frederick.clasen/477_DAL_bulkRNASeq_RN21224/"
 
 ## Path were the biologic spec file will be kept:
 pipelineList[["biologicSettingsFN"]] <- paste0(pipelineList[["folder"]], "workdir/bulkRNAseq_workflow/design/biologic.settings.file.csv")
 
 ## Project parameters
-pipelineList[["project_id"]] <- "vpl209"
-pipelineList[["lims.id"]] <- "vpl209"
+pipelineList[["project_id"]] <- "RN21224"
+pipelineList[["lims.id"]] <- "RN21224"
 
-pipelineList[["labname"]] <- "Pachnis"
+pipelineList[["labname"]] <- "Anastasiou"
 
 pipelineList[["NtopGenes"]] <- 500
 
@@ -83,7 +83,7 @@ pipelineList[["heamap.headline.text"]] <- "Heatmap: Row-averaged Expr"
 pipelineList[["Database Parameters	"]] <- ""
 
 ## Enter lab database name here
-pipelineList[["primDataDB"]] <- "vpl_data"
+pipelineList[["primDataDB"]] <- "dal_data"
 
 ## These three can be left pre-set
 pipelineList[["ref.cat.db"]] <- "reference_categories_db_new"
@@ -91,7 +91,7 @@ pipelineList[["db.user"]] <- "babs"
 pipelineList[["host"]] <- "10.27.241.82"
 
 ## Add lab categories table, if available.
-pipelineList[["lab.categories.table"]] <- "vp_lab_categories"
+pipelineList[["lab.categories.table"]] <- "da_lab_categories"
 
 ## Set additional reference tables ##
 
@@ -135,7 +135,7 @@ pipelineList[["ReferenceTable"]] <- dfRef
 # is available via asf. 
 
 ## This is the project under which this experiment will be organised in the db
-pipelineList[["project_name"]] <- "Characterization of enteric glia cells related experiments"
+pipelineList[["project_name"]] <- "Dietary Effects on Liver Metabolism"
 
 pipelineList[["Documentation Parameter"]] <- ""
 pipelineList[["title"]] <- "Automatic"
@@ -146,6 +146,96 @@ pipelineList[["abstract"]] <- "Automatic"
 ###############################################################################
 
 ###############################################################################
+## Option: create design file for Crick experiment                           ##
+## Requirement: sample.ids.txt file with columns sampleID, sample.id
+
+if (dir.exists("/Volumes/babs/working/boeings/")){
+    hpc.mount <- "/Volumes/babs/working/boeings/"
+} else if (dir.exists("Y:/working/boeings/")){
+    hpc.mount <- "Y:/working/boeings/"
+} else if (dir.exists("/camp/stp/babs/working/boeings/")){
+    hpc.mount <- "/camp/stp/babs/working/boeings/"
+} else {
+    hpc.mount <- ""
+}
+
+baseMount <- gsub(
+    "boeings/",
+    "",
+    hpc.mount
+)
+
+pipelineList[["pathToSeqStorageFolder"]] <- "/camp/stp/sequencing/outputs/babs/data/anastasioud/jack.carruthers/RN21224/primary_data/220218_A01366_0146_BH757VDMXY/fastq/"
+
+pipelineList[["fastqDir"]] <- paste0(
+    pipelineList[["folder"]],
+    "FASTQ_files/"
+)
+
+pipelineList[["localWorkDir"]] <- paste0(
+    pipelineList[["folder"]],
+    "workdir/"
+)
+
+returnList <- biologicSeqTools2::organizeFastqFiles(
+    baseMount = "",
+    pathToSeqStorageFolder = pipelineList[["pathToSeqStorageFolder"]],
+    fastqOutputDir = pipelineList[["fastqDir"]],
+    localWorkDir = pipelineList[["localWorkDir"]],
+    checkFileExists = FALSE
+)
+
+shellscriptVec <- returnList$shellscriptVec
+concatenationRequired <- returnList$concatenationRequired
+
+if (concatenationRequired){
+    print("Concatenation script executed?")
+    pathToSeqStorageFolder <- pipelineList[["fastqDir"]]
+} else {
+    pathToSeqStorageFolder <- pipelineList[["pathToSeqStorageFolder"]]
+}
+
+#################################################################################
+## If concatenation required, generate new input files                         ##
+setwd(pipelineList[["localWorkDir"]])
+if (concatenationRequired){
+    system("concatFASTQfiles.sh ")
+}
+
+## Temporary fix
+setwd(paste0(pipelineList[["localWorkDir"]], "bulkRNAseq_workflow"))
+## end
+
+## Done                                                                        ##
+#################################################################################
+
+# ###############################################################################
+# ## Create Design File                                                        ##
+#
+## this setup requires a file named sample.ids.txt in workir with two columns:
+# sampleID (with the ASF id) and 
+# sample.id with the experimental sample name. 
+
+pipelineList[["paired.end"]] <- FALSE
+pipelineList[["baseDesignFN"]] <- paste0(
+  pipelineList[["localWorkDir"]],
+  "sample.ids.txt"
+) 
+
+dfDesign <- biologicSeqTools2::createDesignFileCrickASFsamples(
+    pathToSeqStorageFolder = pathToSeqStorageFolder,
+    FNsampleAnnotation = pipelineList[["baseDesignFN"]],
+    paired.end = pipelineList[["paired.end"]] ,
+    baseMount = "",
+    fastqDir = pipelineList[["fastqDir"]]
+
+)
+
+
+##
+###############################################################################
+
+###############################################################################
 ## Create a design file                                                      ##
 
 # The easiest is create a basedesign file with the following columns:
@@ -153,14 +243,20 @@ pipelineList[["abstract"]] <- "Automatic"
 # |f_experimental_factor_1|f_experimental_factor_2|...
 
 # Load design file from file:
-baseDesignFN <- "/camp/stp/babs/working/boeings/Projects/pachnisv/franze.progatzky/209_vpl_fp_RNAseq_inflammatory_enteric_glia_cell_characterization/workdir/bulkRNAseq_workflow/design/design.file.txt"
 
-dfDesign <- read.delim(
-    baseDesignFN, 
-    header = T,
-    sep = "\t",
-    stringsAsFactors = F
-)
+# baseDesignFN <- paste0(
+#   pipelineList[["folder"]],
+#   "workdir/bulkRNAseq_workflow/design/design.file.txt"
+# )
+#   
+#  
+# 
+# dfDesign <- read.delim(
+#     baseDesignFN, 
+#     header = T,
+#     sep = "\t",
+#     stringsAsFactors = F
+# )
 
 
 ## Check: Make sure the above required columns are present:
@@ -177,7 +273,7 @@ dfDesign$sample.groups <- NULL
 
 ###############################################################################
 ## Add sample group colors
-pos <- grep("sample.group_color", names(Obio@dfDesign))
+pos <- grep("sample.group_color", names(dfDesign))
         
 if (length(pos) == 0){
     sample.group <- unique(dfDesign$sample.group)
@@ -266,120 +362,137 @@ names(dfDesign)
 
 # If you already have a model file, just add the path to the file at the bottom
 # of this section. There is no need to create the file. 
-comparisonID <- names(dfDesign)[grep("comp_", names(dfDesign))]
-comparison <- rep("", length(comparisonID))
-for (i in 1:length(comparisonID)){
-    contrasts = sort(as.vector(unique(dfDesign[,comparisonID[i]])), decreasing = FALSE)
-    contrasts = contrasts[contrasts != ""]
-    
-    contrasts <- gsub("^1_", "", contrasts)
-    contrasts <- gsub("^2_", "", contrasts)
-    
-    #Create contrast vector
-    #contrast.vector = c([condition],[1_diff.gene set, e.g. mt],[2_baseline, e.g. wt])
-    #if (contrasts[2] != "scr"){
-    #  contrasts = rev(contrasts)
-    #}
-    sel.col = contrasts
-    
-    contrast.vector = append("condition", contrasts)
-    colName = paste(contrasts, collapse = "_vs_")
-    comparison[i] <- colName
-}
-
-test <- rep("Wald", length(comparison))
-type <- rep("DGE", length(comparison))
-
-model <- rep("~ condition", length(comparison))
-
-## You might need to replace the above model vector with a bespoke model 
-# for each comparison
-# example for an experiment with 5 comparisons
-# model <- c(
-#     "~ condition",
-#     "~ condition + f_timepoint + condition:f_timepoint",
-#     "~ condition + f_timepoint + condition:f_timepoint",
-#     "~ condition + f_timepoint + condition:f_timepoint",
-#     "~ condition + f_timepoint + condition:f_timepoint"
+# comparisonID <- names(dfDesign)[grep("comp_", names(dfDesign))]
+# comparison <- rep("", length(comparisonID))
+# for (i in 1:length(comparisonID)){
+#     contrasts = sort(as.vector(unique(dfDesign[,comparisonID[i]])), decreasing = FALSE)
+#     contrasts = contrasts[contrasts != ""]
+#     
+#     contrasts <- gsub("^1_", "", contrasts)
+#     contrasts <- gsub("^2_", "", contrasts)
+#     
+#     #Create contrast vector
+#     #contrast.vector = c([condition],[1_diff.gene set, e.g. mt],[2_baseline, e.g. wt])
+#     #if (contrasts[2] != "scr"){
+#     #  contrasts = rev(contrasts)
+#     #}
+#     sel.col = contrasts
+#     
+#     contrast.vector = append("condition", contrasts)
+#     colName = paste(contrasts, collapse = "_vs_")
+#     comparison[i] <- colName
+# }
+# 
+# test <- rep("Wald", length(comparison))
+# type <- rep("DGE", length(comparison))
+# 
+# model <- rep("~ condition", length(comparison))
+# 
+# ## You might need to replace the above model vector with a bespoke model 
+# # for each comparison
+# # example for an experiment with 5 comparisons
+# # model <- c(
+# #     "~ condition",
+# #     "~ condition + f_timepoint + condition:f_timepoint",
+# #     "~ condition + f_timepoint + condition:f_timepoint",
+# #     "~ condition + f_timepoint + condition:f_timepoint",
+# #     "~ condition + f_timepoint + condition:f_timepoint"
+# # )
+# 
+# ## Reduced model not relevant for a DGE, but a column that needs to be present
+# reducedModel <- rep("", length(comparison))
+# 
+# ## Normalise all samples together, or just those involved in the DGE comparison
+# normalizeAllSamplesTogether <- rep(FALSE, length(comparison))
+# betaPrior <- rep(TRUE, length(comparison))
+# 
+# 
+# dfModel <- data.frame(
+#     comparison,
+#     comparisonID,
+#     test,
+#     type,
+#     model,
+#     reducedModel,
+#     normalizeAllSamplesTogether,
+#     betaPrior, stringsAsFactors = TRUE
 # )
+# 
+# 
+# ## Now add the LRT part 
+# comparisonID <- names(dfDesign)[grep("LRT_", names(dfDesign))]
+# comparison <- names(dfDesign)[grep("LRT_", names(dfDesign))]
+# 
+# 
+# if (length(comparison) > 0){
+#         test <- rep("LRT", length(comparison))
+#         type <- rep("LRT", length(comparison))
+#         model <- c(
+#             "~ LRT_Sample_Treatment",
+#             "~ LRT_timepoint"
+#         )
+#         # 
+#         # 
+#         reducedModel <- c(
+#             "~ 1",
+#             "~ 1"
+#         )
+#         # 
+#         normalizeAllSamplesTogether <- rep(FALSE, length(comparison))
+#         betaPrior <- rep("", length(comparison))
+#         
+#         
+#             
+#         dfMLRT <- data.frame(
+#             comparison,
+#             comparisonID,
+#             test,
+#             type,
+#             model,
+#             reducedModel,
+#             normalizeAllSamplesTogether,
+#             betaPrior,
+#             stringsAsFactors = FALSE
+#         )
+#         
+#         dfModel <- rbind(
+#             dfModel,
+#             dfMLRT
+#         )
+# }
+# 
+# dfModel[is.na(dfModel)] <- ""
 
-## Reduced model not relevant for a DGE, but a column that needs to be present
-reducedModel <- rep("", length(comparison))
-
-## Normalise all samples together, or just those involved in the DGE comparison
-normalizeAllSamplesTogether <- rep(FALSE, length(comparison))
-betaPrior <- rep(TRUE, length(comparison))
-
-
-dfModel <- data.frame(
-    comparison,
-    comparisonID,
-    test,
-    type,
-    model,
-    reducedModel,
-    normalizeAllSamplesTogether,
-    betaPrior, stringsAsFactors = TRUE
-)
-
-
-## Now add the LRT part 
-comparisonID <- names(dfDesign)[grep("LRT_", names(dfDesign))]
-comparison <- names(dfDesign)[grep("LRT_", names(dfDesign))]
-
-
-if (length(comparison) > 0){
-        test <- rep("LRT", length(comparison))
-        type <- rep("LRT", length(comparison))
-        model <- c(
-            "~ LRT_Sample_Treatment",
-            "~ LRT_timepoint"
-        )
-        # 
-        # 
-        reducedModel <- c(
-            "~ 1",
-            "~ 1"
-        )
-        # 
-        normalizeAllSamplesTogether <- rep(FALSE, length(comparison))
-        betaPrior <- rep("", length(comparison))
-        
-        
-            
-        dfMLRT <- data.frame(
-            comparison,
-            comparisonID,
-            test,
-            type,
-            model,
-            reducedModel,
-            normalizeAllSamplesTogether,
-            betaPrior,
-            stringsAsFactors = FALSE
-        )
-        
-        dfModel <- rbind(
-            dfModel,
-            dfMLRT
-        )
-}
-
-dfModel[is.na(dfModel)] <- ""
-
-
+## Here model is loaded from file
  
 pipelineList[["modelFN"]] <- paste0(pipelineList[["folder"]], "/workdir/bulkRNAseq_workflow/design/", pipelineList[["project_id"]],".model.table.txt")
 #model.file <- "design/dge.model.table.txt"
 
+file.exists(pipelineList[["modelFN"]])
+
 ## Write model to file
-write.table(dfModel ,pipelineList[["modelFN"]] , row.names = FALSE, sep = "\t")
+#write.table(dfModel ,pipelineList[["modelFN"]] , row.names = FALSE, sep = "\t")
 
 ## Done model file                                                           ##
 ###############################################################################
 
 ###############################################################################
 ## Part 2A: Use to start from fastq files                                    ##
+
+###############################################################################
+## Create analysis scripts                                                   ##
+# sDir <- getwd()
+# setwd(Obio@parameterList$localWorkDir)
+# 
+# Obio <- biologicSeqTools2::createbulkRNASeqAnalysisBashScripts(
+#     obj = Obio,
+#     scriptVecSlot = "scriptVec"
+# )
+# setwd(sDir)
+
+## Run analysis BASH script ##
+## Done creating analysis bash scripts                                       ##
+###############################################################################
 
 ## End Part 2A                                                               ##
 ###############################################################################
@@ -394,7 +507,7 @@ RSEM_folder <- paste0(pipelineList[["folder"]], "workdir/RSEM/Ensembl")
 pipelineList[["RSEM_folder"]]  <- RSEM_folder 
 
 ## This is the name of the RSEM output file
-countTableFN <- "/camp/stp/babs/working/boeings/Projects/pachnisv/franze.progatzky/209_vpl_fp_RNAseq_inflammatory_enteric_glia_cell_characterization/workdir/RSEM/p209.count.data.txt" 
+countTableFN <- paste0(pipelineList[["folder"]], "workdir/RSEM/RN21224.count.data.txt")
 
 
 ## Save as parameter
@@ -435,7 +548,7 @@ dfRSEM <- read.delim(
 ## Make sure it's integers:
 dfRSEM[,2:ncol(dfRSEM)] <- round(dfRSEM[,2:ncol(dfRSEM)])
 
-names(dfRSEM) <- gsub(paste0("X", gsub("/", ".", rsem.sample.folder), "."), "", names(dfRSEM))
+names(dfRSEM) <- gsub(paste0("X", gsub("/", ".", pipelineList[["folder"]]), ".workdir.RSEM.Ensembl."), "", names(dfRSEM))
 names(dfRSEM) <- gsub(".genes.results", "", names(dfRSEM))
 
 ## Format: |gene_id column names X|sample.id[1]|sample.id[2]|sample.id[3]|...
@@ -533,7 +646,7 @@ write.table(dfTPM, pipelineList[["TpmTableFN"]] , sep="\t", row.names=F)
 ## Create parameter File                                                     ##
 
 ## To create pipelineJSON, remove reference list ##
-dfRefTab <- pipelineList[["ReferenceTable"]]
+dfRefTab <- data.frame(t(pipelineList[["ReferenceTable"]]))
 pipelineList[["ReferenceTable"]] <- NULL
 
 pipelineJson <- jsonlite::toJSON(pipelineList)
@@ -568,6 +681,54 @@ write.table(dfObio, settingsFN , row.names=FALSE, col.names=FALSE, sep=",")
 <!-- Essential 1: (output required later): Set Parameters and directories and create Obio object Chapter/Module -->
 <!-- This section creates the plain Obio object without any data in it. -->
 ```{r child = 'src/modules/settings/set.parameters.Rmd', eval=TRUE}
+```
+
+<!-- Create fastq analysis files-->
+```{r, echo=T, eval=TRUE, warning=FALSE, results="asis"}
+
+dfDesign[["FASTQ"]] <- dfDesign$sample.id
+Obio@dfDesign <- dfDesign
+
+
+###############################################################################
+## Create analysis scripts                                                   ##
+
+Obio@parameterList[["stranded"]] <- TRUE
+Obio@parameterList[["scriptVec"]] <- as.vector(NULL, mode="character")
+Obio@parameterList[["AlignFASTQcolumn"]] <- "sample.id"
+
+Obio@parameterList[["ModuleFASTQC"]] = "module load FastQC/0.11.5-Java-1.8.0_92"
+Obio@parameterList[["ModuleTrimGalore"]] = "Trim_Galore/0.4.2-foss-2016b"
+Obio@parameterList[["TrimGaloreMinLength"]] = 25
+Obio@parameterList[["TrimGaloreMinQuality"]] = 20
+Obio@parameterList[["read.length"]] =  "100bp"
+
+#Obio <- setMountingPoint(Obio)
+#Obio <- setAnalysisPaths(Obio)
+
+## Set genome paths
+Obio <- biologicSeqTools2::setCrickGenomeAndGeneNameTable(Obio)
+#Obio <- createAnalysisFolders(
+#    Obio
+#)
+#Obio <- setDataBaseParameters(Obio)
+
+## This can be upgraded to web retrieval of annotation data 
+#Obio <- addGeneAnnotation(Obio)
+
+sDir <- getwd()
+setwd(Obio@parameterList$localWorkDir)
+
+
+Obio <- biologicSeqTools2::createbulkRNASeqAnalysisBashScripts(
+    obj = Obio,
+    scriptVecSlot = "scriptVec"
+)
+setwd(sDir)
+
+## Run analysis BASH script ##
+## Done creating analysis bash scripts                                       ##
+###############################################################################
 ```
 
 <!-- Essential 2: Load all available data into Obio object and check -->
