@@ -76,9 +76,9 @@ if (dir.exists("/Volumes/babs/working/boeings/")){
     hpc.mount <- ""
 }
 
-renv::install("decusInLabore/biologicSeqTools")
+renv::install("decusInLabore/biologicSeqTools2")
 
-library(biologicSeqTools)
+library(biologicSeqTools2)
 
 
 ## Heatmap setup ##

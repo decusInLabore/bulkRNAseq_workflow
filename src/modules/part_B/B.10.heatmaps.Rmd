@@ -6,6 +6,13 @@ VersionPdfExt <- VersionPdfExt <- paste0(".",chnkPrefix,"V", gsub("-", "", Sys.D
 ```
 
 ```{r, echo=FALSE, eval=TRUE, warning=FALSE, results=F}
+
+###############################################################################
+## Load Obio object                                                          ##
+
+## Done Loading Obio object                                                  ##
+###############################################################################
+
 dfMainData <- Obio@databaseTable
 geneIDcolumn <- Obio@parameterList$geneIDcolumn
 if (geneIDcolumn != "hgnc_symbol" | geneIDcolumn != "mgi_symbol"){
@@ -330,7 +337,7 @@ for (k in 1:length(HmDisplayCatsFromDb)){
     }
   
     ## Check ##
-    sampleSelection <- names(dfMainData)[sapply(sampleSelection, function(x) grep(x, names(dfMainData)))]
+    sampleSelection <- names(dfMainData)[unlist(sapply(sampleSelection, function(x) grep(x, names(dfMainData))))]
     selVec <- c(geneIDcolumn, sampleSelection )
     ## Get gene selection 
     geneSel <- HmDisplayCatsFromDb[[k]]$geneVec
