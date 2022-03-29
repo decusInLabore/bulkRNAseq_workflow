@@ -462,7 +462,7 @@ if (length(pos) == 1){
 }
 
 biologicSeqTools2::createSettingsFile(
-    publicDataset = TRUE,
+    publicDataset = FALSE,
     obj = Obio,
     df.data = Obio@databaseTable,
     defaultXcolName = xdefault,
@@ -519,6 +519,21 @@ projectJSON <- biologicSeqTools2::createSettingsJSON(
 ## Done                                                                      ##
 ###############################################################################
 
+## Specific to this project ##
+# jsonList <- jsonlite::fromJSON(projectJSON)
+# 
+# #jsonList$timecourse_chart$datasets$HET$sample_group
+# 
+# jsonList$timecourse_chart$datasets$HOM$sample_group$HOM_MaleED07 <- NULL
+# jsonList$timecourse_chart$datasets$HOM$sample_group$HOM_MaleED10 <- NULL
+# jsonList$timecourse_chart$datasets$HOM$sample_group$HOM_MaleED14 <- NULL
+# 
+# jsonList$timecourse_chart$datasets$WT$sample_group$WT_MaleED07 <- NULL
+# jsonList$timecourse_chart$datasets$WT$sample_group$WT_MaleED10 <- NULL
+# jsonList$timecourse_chart$datasets$WT$sample_group$WT_MaleED14 <- NULL
+# 
+# projectJSON <- jsonlite::toJSON(jsonList)
+# 
 projectJSONstring <- gsub("[\n]", "", toString(projectJSON))
 projectJSONstring <- gsub(" ", "", projectJSONstring)
 
@@ -906,11 +921,21 @@ if (length(Obio@referenceTableList) == 0){
 Obio@referenceTableList[[labCatName]] <- Obio@parameterList$lab.categories.table
 
 ## Define relevant genes for selection ##
+
+
+if (Obio@parameterList$geneIDcolumn != "hgnc_symbol" && Obio@parameterList$geneIDcolumn != "mgi_symbol"){
+    gsCol <- "hgnc_symbol"
+} else {
+    gsCol <- Obio@parameterList$geneIDcolumn 
+}
+
 relevant.genes <- as.vector(
     unique(
-        Obio@databaseTable[Obio@databaseTable$cluster_order, Obio@parameterList$geneIDcolumn]
+        Obio@databaseTable[Obio@databaseTable$cluster_order, gsCol]
     )
 )
+
+
 
 length(relevant.genes)
 
@@ -934,7 +959,7 @@ for (i in 1:length(Obio@referenceTableList)) {
         df.ref = df.ref,
         cat_group_name = names(Obio@referenceTableList)[i],
         reference.gene.vector = relevant.genes,
-        ref.gene.vec.id = Obio@parameterList$geneIDcolumn,
+        ref.gene.vec.id = gsCol,
         cat_views = NA
     )
 
@@ -997,7 +1022,7 @@ if (exists("df.ref") & nrow(df.ref) > 0){
         df.ref = df.ref,
         cat_group_name = "This project",
         reference.gene.vector = reference.gene.vector,
-        ref.gene.vec.id = Obio@parameterList$geneIDcolumn,
+        ref.gene.vec.id = gsCol,
         cat_views = NA
     )
 
