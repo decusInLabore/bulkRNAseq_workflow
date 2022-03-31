@@ -324,33 +324,67 @@ pipelineList[["modelFN"]] <- paste0(pipelineList[["folder"]], "/workdir/bulkRNAs
 ## Create parameter File                                                     ##
 
 ## To create pipelineJSON, remove reference list ##
-dfRefTab <- data.frame(t(pipelineList[["ReferenceTable"]]))
-corGeneVec <- t(pipelineList[["corGeneVec"]])
-corGeneVec <- c("corGeneVec", corGeneVec)
-  
+dfRefTab <- data.frame(pipelineList[["ReferenceTable"]])
+
 pipelineList[["ReferenceTable"]] <- NULL
-pipelineList[["corGeneVec"]] <- NULL
 
-pipelineJson <- jsonlite::toJSON(pipelineList)
+#pipelineJson <- jsonlite::toJSON(pipelineList)
 
-dfObio <- as.data.frame(jsonlite::fromJSON(pipelineJson))
-dfObio <- rbind(names(dfObio), dfObio)
-colnames(dfObio) <- NULL
 
-dfObio <- rbind(dfObio, rep("", ncol(dfObio)))
+maxLength <- max(unlist(lapply(pipelineList, length))) + 1
 
-dfObio <- cbind(
-    dfObio, 
-    dfRefTab,
-    c("designTScol", "f_timepoint", ""),
-    corGeneVec
-)
+if (maxLength <= 3){
+    maxLength  <- 3
+}
+
+for (i in 1:length(pipelineList)){
+    newRow <- c(
+        names(pipelineList)[i], 
+        pipelineList[[i]]
+    )
     
+    if (length(newRow) < maxLength){
+        newRow <- c(
+            newRow, 
+            rep("", maxLength - length(newRow))
+        )
+      
+    }
+    
+    if (i == 1){
+        dfObio <- data.frame(t(newRow))
+    } else {
+        dfObio <- rbind(
+            dfObio,
+            data.frame(t(newRow))
+        )
+    }
+    
+}
 
-dfObio <- data.frame(t(dfObio))
 
-settingsFN <- paste0(pipelineList[["folder"]], "workdir/bulkRNAseq_workflow/design/biologic.settings.csv")
-write.table(dfObio, settingsFN , row.names=FALSE, col.names=FALSE, sep=",")
+
+
+if (ncol(dfRefTab) < maxLength){
+    addCols <- maxLength - ncol(dfRefTab)
+    
+    for (j in 1:addCols){
+        dfRefTab <- cbind(
+            dfRefTab,
+            rep("", nrow(dfRefTab))
+        )
+    }
+    
+}
+
+dfRefTab <- data.frame(dfRefTab)
+
+
+dfObio <- dplyr::bind_rows(dfObio, dfRefTab)
+dfObio[is.na(dfObio)] <- ""
+
+
+write.table(dfObio, pipelineList[["biologicSettingsFN"]]  , row.names=FALSE, col.names=FALSE, sep=",")
 
 ## Done 
 ###############################################################################
