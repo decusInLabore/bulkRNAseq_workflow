@@ -46,46 +46,106 @@ upload.to.database <- TRUE
 
 ```
    
-    
+# Prepare Input files
+In this script all input files will be checked and/or created. 
+
+
 ```{r, echo=T, eval=TRUE, warning=FALSE, results="asis"}
 
 ###############################################################################
-## Part 1: Set essential parameters (essential section)                      ##
+## Part 1 Create Parameter File                                              ##
 
-## Essential parameters
 pipelineList <- list()
 
-## Set folder
+## Section 1            ##
+## Essential parameters ##
+
 # Make sure the final character is a slash /
 pipelineList[["folder"]] <- "/camp/stp/babs/working/boeings/Projects/lovellbadger/gunes.taylor/483_vis_E07_E10_E14_merged/"
 
-## Path were the biologic spec file will be kept:
+## Path were the biologic spec file will be kept: ##
 pipelineList[["biologicSettingsFN"]] <- paste0(pipelineList[["folder"]], "workdir/bulkRNAseq_workflow/design/biologic.settings.file.csv")
 
-## Project parameters
+## Project parameters                       ##
+## This will be the name of the web project ##
 pipelineList[["project_id"]] <- "E7E10E14"
+
+## The LIMS ID will be used to retrieve project information
 pipelineList[["lims.id"]] <- "RN20094"
 
+## This is the lab name ##
 pipelineList[["labname"]] <- "Lovel Badge"
 
+## This is the project under which this experiment will be organised in the db
+## The project is the umbrella under which several experiments around a similar
+## topic are organised. 
+## If a project name exists, this new experiment will be added to that umbrella
+## project. If the project does not exists, it will be created. 
+
+pipelineList[["project_name"]] <- "Sex Determination in Chicken"
+
+## Parameters for the experiment
+## If the parameters title, subtitle and abstract are set to NULL, 
+## they'll be filled automatically based on the LIMS ID
+pipelineList[["Documentation Parameter"]] <- ""
+pipelineList[["title"]] <- NULL
+pipelineList[["subtitle"]] <- NULL
+pipelineList[["abstract"]] <- NULL
+
+
+## Mumber of genes to consider as most variable ##
 pipelineList[["NtopGenes"]] <- 500
 
+## Genes to calculate Pearson correlations for. The gene names need to be 
+## present in the experiment.
+pipelineList[["corGeneVec"]] <- c(
+    "FOXL2", 
+    "DMRT1"
+)
+
+
 # options: "bulk_rna_seq", "sc_rna_seq"
-pipelineList[["experiment.type"]] <- "bulk_rna_seq"  
+pipelineList[["experiment.type"]] <- "bulk_rna_seq"
+
+## This should be the reference transcriptome ##
 pipelineList[["species"]] <- "gallus_gallus"
 pipelineList[["release"]] <- "release-95"
 
-
-pipelineList[["timecourse.units"]] <- "Embryonic Day"
+###############################################################################
+## Display parameters                                                        ##
 pipelineList[["count.table.headline"]] <- "TPM Values for all Samples"
 pipelineList[["count.table.sidelabel"]] <- "TPM"
 pipelineList[["heamap.headline.text"]] <- "Heatmap: Row-averaged Expr"
+##                                                                           ##
+###############################################################################
 
+###############################################################################
+## Timecourse section: Set entries to NULL if not a timecourse experiment    ##
+
+## designTScol entry needs to be present as column name in the design file 
+pipelineList[["designTScol"]] <- "f_timepoint"
+## Default: pipelineList[["designTScol"]] <- NULL
+
+pipelineList[["timecourse.units"]] <- "Embryonic Day"
+## Default: pipelineList[["timecourse.units"]] <- NULL
+
+pipelineList[["timecourse.units"]] <- "Embryonic Day"
+## Default: pipelineList[["timecourse.units"]] <- NULL
+
+## End timecourse section                                                    ##
+###############################################################################
+
+
+
+
+###############################################################################
+## Set database parameters                                                   ##
 
 ## Reference data selections
 pipelineList[["Database Parameters	"]] <- ""
 
 ## Enter lab database name here
+## One database per lab
 pipelineList[["primDataDB"]] <- "rll_data"
 
 ## These three can be left pre-set
@@ -95,33 +155,37 @@ pipelineList[["host"]] <- "10.27.241.82"
 
 ## Add lab categories table, if available.
 pipelineList[["lab.categories.table"]] <- "rl_lab_categories"
+## Default if no lab database table is available
+# pipelineList[["lab.categories.table"]] <- NULL
 
 ## Set additional reference tables ##
 
 dfRef <- cbind(
-    c("Hallmark Signatures",
-      "Pathways",
-    "GO-BP",
-    "GO-MF",
-    "TF Motifs",
-    "Protein Complexes",
-    "Immunologic Signatures",
-    "LINCS Down",
-    "LINCS Up",
-    "Cell Type Signatures",
-    "Cell Type Signatures"
+    c(
+        "Hallmark Signatures",
+        "Pathways",
+        "GO-BP",
+        "GO-MF",
+        "TF Motifs",
+        "Protein Complexes",
+        "Immunologic Signatures",
+        "LINCS Down",
+        "LINCS Up",
+        "Cell Type Signatures",
+        "Cell Type Signatures"
     ),
-    c("mysigdb_h_hallmarks",
-      "mysigdb_c2_1329_canonical_pathways",
-      "mysigdb_c5_BP",
-      "mysigdb_c5_MF",
-      "TRANSFAC_and_JASPAR_PWMs",
-      "networkcategories",
-      "mysigdb_c7_immunologic_signatures",
-      "LINCS_L1000_Chem_Pert_down",
-      "LINCS_L1000_Chem_Pert_up",
-      "mysigdb_sc_sig",
-      "cibersort_L22"
+    c(
+        "mysigdb_h_hallmarks",
+        "mysigdb_c2_1329_canonical_pathways",
+        "mysigdb_c5_BP",
+        "mysigdb_c5_MF",
+        "TRANSFAC_and_JASPAR_PWMs",
+        "networkcategories",
+        "mysigdb_c7_immunologic_signatures",
+        "LINCS_L1000_Chem_Pert_down",
+        "LINCS_L1000_Chem_Pert_up",
+        "mysigdb_sc_sig",
+        "cibersort_L22"
     )
 )
 
@@ -137,17 +201,169 @@ pipelineList[["ReferenceTable"]] <- dfRef
 ## Parameters that might be set automatically at the Crick, when information
 # is available via asf. 
 
-## This is the project under which this experiment will be organised in the db
-pipelineList[["project_name"]] <- "Sex Determination in Chicken"
+###############################################################################
+## Add Sequencing parameters                                                 ##
 
-pipelineList[["Documentation Parameter"]] <- ""
-pipelineList[["title"]] <- "Automatic"
-pipelineList[["subtitle"]] <- "Automatic"
-pipelineList[["abstract"]] <- "Automatic"
+pipelineList[["NFcoreSettingsFN"]] <- pipelineList[["designFN"]] <- paste0(
+    pipelineList[["folder"]], 
+    "workdir/bulkRNAseq_workflow/design/", 
+    pipelineList[["project_id"]],".NFcore.samplesheet.file.txt"
+)
 
-pipelineList[["corGeneVec"]] <- c("FOXL2", "DMRT1")
 
-## End Part 1                                                                ##
+## Specify the folders in which FASTQ sequencing files are located
+## If specified, make sure that pathToSeqStorageFolder has a backslash at the end
+# pipelineList[["pathToSeqStorageFolder"]] <- c(
+#     "path/to/folder/1",
+#     "path/to/folder/2"
+# )
+
+## Default setting if no alignment is required:
+pipelineList[["pathToSeqStorageFolder"]] <- NULL
+
+## Alignment parameters ##
+pipelineList[["stranded"]] <- TRUE
+pipelineList[["paired.end"]] <- FALSE
+pipelineList[["scriptVec"]] <- as.vector(NULL, mode="character")
+pipelineList[["AlignFASTQcolumn"]] <- "sample.id"
+
+pipelineList[["ModuleFASTQC"]] = "module load FastQC/0.11.5-Java-1.8.0_92"
+pipelineList[["ModuleTrimGalore"]] = "Trim_Galore/0.4.2-foss-2016b"
+pipelineList[["TrimGaloreMinLength"]] = 25
+pipelineList[["TrimGaloreMinQuality"]] = 20
+pipelineList[["read.length"]] =  "100bp"
+
+## Folders in which relevant genes.results.files are kept
+## Make sure to add a / at the end of the folder names
+## Under normal circumstances this will be the NF-core output folder
+## If set to NULL, it'll be assumed that a RSEM file will be provided 
+pipelineList[["pathToRSEMresultsFiles"]] <- c(
+    "/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/RN20094_E07/GRCg6a/processed_data/results/star_rsem/",
+    "/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/RN20152_E10/GRCg6a/processed_data/results/star_rsem/",
+    "/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/RN21119_E14/GRCg6a/processed_data/results/star_rsem/"
+)
+
+## This is the folder in which the [sample.id].genes.result files live
+RSEM_folder <- paste0(pipelineList[["folder"]], "basedata/")
+pipelineList[["RSEM_folder"]]  <- RSEM_folder 
+
+## This is the name of the RSEM output file
+countTableFN <- paste0(pipelineList[["folder"]], "basedata/RN21224.count.data.txt")
+
+## Save as parameter
+pipelineList[["countTableFN"]] <- countTableFN
+pipelineList[["preProcessedCountTableFN"]] <- gsub("count.data", "count.data.preprocessed", countTableFN)
+
+## Default pipelineList[["pathToRSEMresultsFiles"]] <- NULL
+
+## TPM tables ##
+pipelineList[["TpmTableFN"]] <- paste0(
+        pipelineList[["folder"]],
+        "basedata/",
+        pipelineList[["project_id"]],
+        ".tpm.file.txt"
+)
+
+###############################################################################
+## Create folder structure                                                   ##
+
+###############################################################################
+## Helper function                                                           ##
+checkDir <- function(checkDir){
+    if (!dir.exists(checkDir)){
+        dir.create(
+            checkDir,
+            recursive = TRUE
+        )
+    }
+}
+##                                                                           ##
+###############################################################################
+
+## FASTQ Directory ##
+pipelineList[["fastqDir"]] <- paste0(
+    pipelineList[["folder"]],
+    "FASTQ_files/"
+)
+
+checkDir(pipelineList[["fastqDir"]])
+
+## workdir 
+pipelineList[["localWorkDir"]] <- paste0(
+    pipelineList[["folder"]],
+    "workdir/"
+)
+
+## data
+pipelineList[["dataDir"]] <- paste0(
+    pipelineList[["folder"]],
+    "data/"
+)
+
+checkDir(pipelineList[["dataDir"]])
+
+## Done folder structure                                                     ##
+###############################################################################
+
+
+# Location where the design file will be saved
+pipelineList[["designFN"]] <- paste0(
+    pipelineList[["folder"]], 
+    "workdir/bulkRNAseq_workflow/design/", 
+    pipelineList[["project_id"]],".design.table.txt"
+)
+
+pipelineList[["modelFN"]] <- paste0(pipelineList[["folder"]], "/workdir/bulkRNAseq_workflow/design/", pipelineList[["project_id"]],".model.table.txt")
+
+
+##                                                                           ##
+###############################################################################
+
+
+###############################################################################
+## Create parameter File                                                     ##
+
+## To create pipelineJSON, remove reference list ##
+dfRefTab <- data.frame(t(pipelineList[["ReferenceTable"]]))
+corGeneVec <- t(pipelineList[["corGeneVec"]])
+corGeneVec <- c("corGeneVec", corGeneVec)
+  
+pipelineList[["ReferenceTable"]] <- NULL
+pipelineList[["corGeneVec"]] <- NULL
+
+pipelineJson <- jsonlite::toJSON(pipelineList)
+
+dfObio <- as.data.frame(jsonlite::fromJSON(pipelineJson))
+dfObio <- rbind(names(dfObio), dfObio)
+colnames(dfObio) <- NULL
+
+dfObio <- rbind(dfObio, rep("", ncol(dfObio)))
+
+dfObio <- cbind(
+    dfObio, 
+    dfRefTab,
+    c("designTScol", "f_timepoint", ""),
+    corGeneVec
+)
+    
+
+dfObio <- data.frame(t(dfObio))
+
+settingsFN <- paste0(pipelineList[["folder"]], "workdir/bulkRNAseq_workflow/design/biologic.settings.csv")
+write.table(dfObio, settingsFN , row.names=FALSE, col.names=FALSE, sep=",")
+
+## Done 
+###############################################################################
+## End Section 1                                                             ##
+## Settings file created                                                     ##
+###############################################################################
+
+
+
+###############################################################################
+###############################################################################
+## Section 2: Assemble/check relevant files                                  ##
+###############################################################################
 ###############################################################################
 
 ###############################################################################
@@ -164,82 +380,7 @@ if (dir.exists("/Volumes/babs/working/boeings/")){
     hpc.mount <- ""
 }
 
-baseMount <- gsub(
-    "boeings/",
-    "",
-    hpc.mount
-)
 
-## If specified, make sure that pathToSeqStorageFolder has a backslash at the end
-pipelineList[["pathToSeqStorageFolder"]] <- NULL
-
-pipelineList[["fastqDir"]] <- paste0(
-    pipelineList[["folder"]],
-    "FASTQ_files/"
-)
-
-pipelineList[["localWorkDir"]] <- paste0(
-    pipelineList[["folder"]],
-    "workdir/"
-)
-
-# returnList <- biologicSeqTools2::organizeFastqFiles(
-#     baseMount = "",
-#     pathToSeqStorageFolder = pipelineList[["pathToSeqStorageFolder"]],
-#     fastqOutputDir = pipelineList[["fastqDir"]],
-#     localWorkDir = pipelineList[["localWorkDir"]],
-#     checkFileExists = FALSE
-# )
-# 
-# shellscriptVec <- returnList$shellscriptVec
-# concatenationRequired <- returnList$concatenationRequired
-# 
-# if (concatenationRequired){
-#     print("Concatenation script executed?")
-#     pathToSeqStorageFolder <- pipelineList[["fastqDir"]]
-# } else {
-#     pathToSeqStorageFolder <- pipelineList[["pathToSeqStorageFolder"]]
-# }
-# 
-# #################################################################################
-# ## If concatenation required, generate new input files                         ##
-# setwd(pipelineList[["localWorkDir"]])
-# if (concatenationRequired){
-#     system("concatFASTQfiles.sh ")
-# }
-# 
-# ## Temporary fix
-# setwd(paste0(pipelineList[["localWorkDir"]], "bulkRNAseq_workflow"))
-# ## end
-# 
-# ## Done                                                                        ##
-# #################################################################################
-
-# ###############################################################################
-# ## Create Design File                                                        ##
-#
-## this setup requires a file named sample.ids.txt in workir with two columns:
-# sampleID (with the ASF id) and 
-# sample.id with the experimental sample name. 
-
-# pipelineList[["paired.end"]] <- FALSE
-# pipelineList[["baseDesignFN"]] <- paste0(
-#   pipelineList[["localWorkDir"]],
-#   "sample.ids.txt"
-# ) 
-# 
-# dfDesign <- biologicSeqTools2::createDesignFileCrickASFsamples(
-#     pathToSeqStorageFolder = pathToSeqStorageFolder,
-#     FNsampleAnnotation = pipelineList[["baseDesignFN"]],
-#     paired.end = pipelineList[["paired.end"]] ,
-#     baseMount = "",
-#     fastqDir = pipelineList[["fastqDir"]]
-# 
-# )
-
-
-##
-###############################################################################
 
 ###############################################################################
 ## Create a design file                                                      ##
@@ -247,6 +388,11 @@ pipelineList[["localWorkDir"]] <- paste0(
 # The easiest is create a basedesign file with the following columns:
 # |sample.id|sample.group|dataseries|comp_1|comp_2|...|comp_N|LRT_Treatment|LRT_...|
 # |f_experimental_factor_1|f_experimental_factor_2|...
+# dataseries_colors may be specified in a dataseries_color column with a unique
+# hex code (#FF0000) for each dataseries
+
+# sample.group_colors may be specified in a sample.group_color column with one entry per 
+# sample.group
 
 # Load design file from file:
 
@@ -268,7 +414,7 @@ dfDesign <- read.delim(
 # dataseries_saplegroup_replicate
 dfDesign <- biologicSeqTools2::completeDesignBasedOnSampleID(dfDesign)
 
- dfDesign[["f_replicate"]] <- paste0("R", sapply(dfDesign$sample.id, function(x) unlist(strsplit(x, "_"))[3]))
+dfDesign[["f_replicate"]] <- paste0("R", sapply(dfDesign$sample.id, function(x) unlist(strsplit(x, "_"))[3]))
 
 ## Check: Make sure the above required columns are present:
 names(dfDesign)
@@ -283,7 +429,34 @@ names(dfDesign)
 dfDesign$sample.groups <- NULL
 
 ###############################################################################
-## Add sample group colors
+## Add dataseries color, if not provided in base design file                 ##
+pos <- grep("^dataseries_color$", names(dfDesign))
+        
+if (length(pos) == 0){
+    dataseries <- unique(dfDesign$dataseries)
+    dataseries_color <- dataseries
+
+
+            #library(scales)
+    #dataseries_color = scales::hue_pal()(length(dataseries_color))
+    
+    ## Avoid clashes with sample.group colors ##
+     dataseries_color <- rainbow(length(dataseries_color))
+    
+            #sample.group_color = c("#990000", "#009900")
+
+    dfSeriesColors <- unique(data.frame(dataseries, dataseries_color))
+
+    dfDesign <- merge(dfDesign, dfSeriesColors, by.x = "dataseries", "dataseries")
+
+}
+
+
+## Done                                                                      ##
+###############################################################################
+
+###############################################################################
+## Add sample group colors if not provied                                    ##
 pos <- grep("sample.group_color", names(dfDesign))
         
 if (length(pos) == 0){
@@ -300,16 +473,24 @@ if (length(pos) == 0){
     dfDesign <- merge(dfDesign, dfGroupColors, by.x = "sample.group", "sample.group")
 
 }
-##
+##                                                                           ##
 ###############################################################################
 
+###############################################################################
+## Order dfDesign for displays.                                              ##
+
 pos <- grep("^f_timepoint$", names(dfDesign))
+library(dplyr)
 
 if (length(pos) == 1){
-    library(dplyr)
     dfDesign <- dfDesign %>%
         mutate(f_timepoint = as.numeric(f_timepoint)) %>%
         arrange(f_gender, match(dataseries, c("WtFemale", "HetFemale", "HomFemale", "WtMale", "HomMale")), f_timepoint, f_replicate, .by_group = FALSE)  
+
+    dfDesign <- data.frame(dfDesign)
+} else {
+    dfDesign <- dfDesign %>%
+        arrange(f_gender, match(dataseries, c("WtFemale", "HetFemale", "HomFemale", "WtMale", "HomMale")), f_replicate, .by_group = FALSE)  
 
     dfDesign <- data.frame(dfDesign)
 }
@@ -318,13 +499,10 @@ if (length(pos) == 1){
 ###############################################################################
 
 
+## Save design file for the workflow in PartB ##
 
-# Location where the design file will be saved
-pipelineList[["designFN"]] <- paste0(pipelineList[["folder"]], "workdir/bulkRNAseq_workflow/design/", pipelineList[["project_id"]],".design.table.txt")
-
-## ensure a replicate factor column is present
-# dfDesign[["f_replicate"]] <- paste0("R", sapply(dfDesign$sample.id, function(x) unlist(strsplit(x, "_"))[3]))
-
+## Additon for backwards compatibility - to be phased out. 
+dfDesign[["FASTQ"]] <- dfDesign$sample.id
 
 write.table(
     dfDesign,
@@ -335,7 +513,6 @@ write.table(
 
 ## check design file ##
 ## This section will check if all relevant columns are present
-names(dfDesign)
 
 # sample.id has a unique name for each sample without spaces, 
 # e.g. dataseries_sampleGroup_rep1
@@ -372,7 +549,9 @@ names(dfDesign)
 ## Create model files                                                        ##
 
 # If you already have a model file, just add the path to the file at the bottom
-# of this section. There is no need to create the file. 
+# of this section. In this case, there is no need to create the file using this
+# template.
+
 comparisonID <- names(dfDesign)[grep("comp_", names(dfDesign))]
 comparison <- rep("", length(comparisonID))
 for (i in 1:length(comparisonID)){
@@ -439,19 +618,8 @@ comparison <- names(dfDesign)[grep("LRT_", names(dfDesign))]
 if (length(comparison) > 0){
         test <- rep("LRT", length(comparison))
         type <- rep("LRT", length(comparison))
-        model <- c(
-            "~ condition",
-            "~ condition",
-            "~ condition"
-        )
-        #
-        #
-        reducedModel <- c(
-            "~1",
-            "~1",
-            "~1"
-        )
-        #
+        model <- rep("~ condition", length(comparison))
+        reducedModel <- rep("~1", length(comparison))
         normalizeAllSamplesTogether <- rep(FALSE, length(comparison))
         betaPrior <- rep("", length(comparison))
 
@@ -477,8 +645,6 @@ if (length(comparison) > 0){
 
 dfModel[is.na(dfModel)] <- ""
 
-pipelineList[["modelFN"]] <- paste0(pipelineList[["folder"]], "/workdir/bulkRNAseq_workflow/design/", pipelineList[["project_id"]],".model.table.txt")
-
 
 write.table(dfModel ,pipelineList[["modelFN"]] , row.names = FALSE, sep = "\t")
 
@@ -491,6 +657,21 @@ file.exists(pipelineList[["modelFN"]])
 ## Write model to file
 
 ## Done model file                                                           ##
+###############################################################################
+
+
+###############################################################################
+## Create NF-core samplesheet file                                           ##
+## Instructions: https://nf-co.re/rnaseq/usage
+## sample,fastq_1,fastq_2,strandedness
+
+if (! is.null(pipelineList[["NFcoreSettingsFN"]]) | !is.null(pipelineList[["pathToSeqStorageFolder"]])){
+    files <- list.files(
+        
+    )
+}
+
+## Done                                                                      ##
 ###############################################################################
 
 ###############################################################################
@@ -532,39 +713,19 @@ file.exists(pipelineList[["modelFN"]])
 
 
 
-## Create RSEM count matrix if it doesn't exist yet
-
-## This is the folder in which the [sample.id].genes.result files live
-RSEM_folder <- paste0(pipelineList[["folder"]], "basedata/")
-pipelineList[["RSEM_folder"]]  <- RSEM_folder 
-
-## This is the name of the RSEM output file
-countTableFN <- paste0(pipelineList[["folder"]], "basedata/RN21224.count.data.txt")
-
-
-## Save as parameter
-pipelineList[["countTableFN"]] <- countTableFN
-
-files <- c(
-    paste0(
-        "/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/RN20094_E07/GRCg6a/processed_data/results/star_rsem/", 
-        list.files("/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/RN20094_E07/GRCg6a/processed_data/results/star_rsem")),
-    paste0(
-        "/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/RN20152_E10/GRCg6a/processed_data/results/star_rsem/", 
-        list.files("/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/RN20152_E10/GRCg6a/processed_data/results/star_rsem")),
-    paste0(
-        "/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/RN21119_E14/GRCg6a/processed_data/results/star_rsem/", 
-        list.files("/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/RN21119_E14/GRCg6a/processed_data/results/star_rsem"))    
-)
+## Create RSEM count matrix if it doesn't exist yet ##
+if (!is.null(pipelineList[["pathToRSEMresultsFiles"]] )){
+    files <- unlist(
+        lapply(
+            pipelineList[["pathToRSEMresultsFiles"]], 
+            function(x)paste0(x, list.files(x))
+        )
+    )
+}
 
 files <- files[grep(".genes.results", files)]
 
 
-
-# files <- paste0(
-#     RSEM_folder, "/",
-#     list.files(RSEM_folder )[grep(".genes.results", list.files(RSEM_folder))]
-# )
 
 files = paste(
     files,
@@ -576,7 +737,7 @@ RSEM.CMD = paste(
     "rsem-generate-data-matrix ",
     files,
     " > ",
-    pipelineList[["countTableFN"]],
+    pipelineList[["preProcessedcountTableFN"]],
     sep=""
 )
 
@@ -587,10 +748,11 @@ cat(RSEM.CMD)
 sink()
 
 #system(RSEM.CMD)
+## Run RSEM shell script ##
 
 ## Read resulting RSEM table
 dfRSEM <- read.delim(
-    pipelineList[["countTableFN"]], 
+    pipelineList[["preProcessedcountTableFN"]], 
     sep = "\t",
     header = T,
     stringsAsFactors = F
@@ -599,10 +761,9 @@ dfRSEM <- read.delim(
 ## Make sure it's integers:
 dfRSEM[,2:ncol(dfRSEM)] <- round(dfRSEM[,2:ncol(dfRSEM)])
 
-names(dfRSEM) <- gsub(paste0("X", gsub("/", ".", pipelineList[["folder"]]), ".workdir.RSEM.Ensembl."), "", names(dfRSEM))
-names(dfRSEM) <- gsub(paste0("X", gsub("/", ".", "/camp/stp/babs/working/eastp/analysis/073_fox12._chicken_gonads.gunes.taylor/experiments/RN20094_E07/GRCg6a/processed_data/results/star_rsem/")), "", names(dfRSEM))
-names(dfRSEM) <- gsub(paste0("X", gsub("/", ".", "/camp/stp/babs/working/eastp/analysis/073_fox12._chicken_gonads.gunes.taylor/experiments/RN20152_E10/GRCg6a/processed_data/results/star_rsem/")), "", names(dfRSEM))
-names(dfRSEM) <- gsub(paste0("X", gsub("/", ".", "/camp/stp/babs/working/eastp/analysis/073_fox12._chicken_gonads.gunes.taylor/experiments/RN21119_E14/GRCg6a/processed_data/results/star_rsem/")), "", names(dfRSEM))
+for (i in 1:length(pipelineList[["pathToRSEMresultsFiles"]])){
+    names(dfRSEM) <- gsub(paste0("X", gsub("/", ".", pipelineList[["pathToRSEMresultsFiles"]][[i]])), "", names(dfRSEM))
+}
 
 names(dfRSEM) <- gsub(".genes.results", "", names(dfRSEM))
 
@@ -674,35 +835,26 @@ write.table(dfRSEM, pipelineList[["countTableFN"]], sep = "\t", row.names=F)
 ## first column: primary gene alignment ID, named either "X" or "ENSG|ENSMUSG|or whatever species
 ## second to N-th column: one column for each sample as liste in Obio@dfDesign$sample.id. Can be extended by a
 ## _TPM suffix. 
-pipelineList[["TpmTableFN"]] <- paste0(
-        pipelineList[["folder"]],
-        "basedata/",
-        pipelineList[["project_id"]],
-        ".tpm.file.txt"
-        
-    )
+
 
 #if (!is.null(pipelineList[["RSEM_folder"]])){
-    files <- c(
-    paste0(
-        "/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/RN20094_E07/GRCg6a/processed_data/results/star_rsem/", 
-        list.files("/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/RN20094_E07/GRCg6a/processed_data/results/star_rsem")),
-    paste0(
-        "/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/RN20152_E10/GRCg6a/processed_data/results/star_rsem/", 
-        list.files("/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/RN20152_E10/GRCg6a/processed_data/results/star_rsem")),
-    paste0(
-        "/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/RN21119_E14/GRCg6a/processed_data/results/star_rsem/", 
-        list.files("/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/RN21119_E14/GRCg6a/processed_data/results/star_rsem"))    
-)
-
-    files <- files[grep(".genes.results", files)]
-
-    samples <- sapply(
-        files, 
-        function(x)
-        strsplit(x, "/")
-        
+if (!is.null(pipelineList[["pathToRSEMresultsFiles"]] )){
+    files <- unlist(
+        lapply(
+            pipelineList[["pathToRSEMresultsFiles"]], 
+            function(x)paste0(x, list.files(x))
+        )
     )
+}
+
+
+files <- files[grep(".genes.results", files)]
+
+samples <- sapply(
+    files, 
+    function(x)
+    strsplit(x, "/")
+)
     
     samples <- unlist(sapply(
         samples, 
@@ -749,70 +901,45 @@ pipelineList[["TpmTableFN"]] <- paste0(
 
 
 
-#tpmFN <- "/camp/stp/babs/working/bioinformatics/projects/sahaie/colin.ratcliffe/Capivasertib_resistant_in_triple_negative_breast_tumour_organoids/babs/outputs/data/rsem.merged.gene_tpm.tsv"
-
-# dfTPM <- read.delim(
-#     pipelineList[["TpmTableFN"]], 
-#     sep = "\t",
-#     stringsAsFactors = F,
-#     header=T
-# )
-# 
-# pipelineList[["primaryAlignmentGeneID"]] <- gsub("[0-9]", "", as.vector(dfTPM$gene_id[1]))
-# 
-# dfTPM$gene_name <- NULL
-# dfTPM$transcript_id.s. <- NULL
-# names(dfTPM) <- gsub("gene_id", pipelineList[["primaryAlignmentGeneID"]] , names(dfTPM))
-# 
-# 
-# write.table(dfTPM, pipelineList[["TpmTableFN"]] , sep="\t", row.names=F)
 
 
 ## End Part 2C                                                               ##
 ###############################################################################
 
 ###############################################################################
-## Create settings file                                                      ##
+## Create external DEseq2 folder                                             ##
 
-###############################################################################
-## Create parameter File                                                     ##
-
-## To create pipelineJSON, remove reference list ##
-dfRefTab <- data.frame(t(pipelineList[["ReferenceTable"]]))
-corGeneVec <- t(pipelineList[["corGeneVec"]])
-corGeneVec <- c("corGeneVec", corGeneVec)
-  
-pipelineList[["ReferenceTable"]] <- NULL
-pipelineList[["corGeneVec"]] <- NULL
-
-pipelineJson <- jsonlite::toJSON(pipelineList)
-
-dfObio <- as.data.frame(jsonlite::fromJSON(pipelineJson))
-dfObio <- rbind(names(dfObio), dfObio)
-colnames(dfObio) <- NULL
-
-dfObio <- rbind(dfObio, rep("", ncol(dfObio)))
-
-dfObio <- cbind(
-    dfObio, 
-    dfRefTab,
-    c("designTScol", "f_timepoint", ""),
-    corGeneVec
-)
+## External DEseq2 results can be saved in the /data/DEseq2external folder
+pipelineList[["dataDir"]]
     
+if (!dir.exists(paste0(pipelineList[["dataDir"]], "DEseq2External"))){
+    dir.create(paste0(pipelineList[["dataDir"]], "DEseq2External"), recursive = T)
+}
 
-dfObio <- data.frame(t(dfObio))
+## External DEseq2 results can be res(dds) and saved with write.table ##
+files <- paste0(
+    "/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/biologic/GRCg6a/",
+    list.files("/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/biologic/GRCg6a")
+)    
 
-settingsFN <- paste0(pipelineList[["folder"]], "workdir/bulkRNAseq_workflow/design/biologic.settings.csv")
-write.table(dfObio, settingsFN , row.names=FALSE, col.names=FALSE, sep=",")
+files <- files[grep("rda$", files)]    
 
-## Done 
-###############################################################################
+for (i in 1:length(files)){
+    FNbase <- gsub("/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/biologic/GRCg6a/", "", files[i])
+    FNbase <- gsub("_results.rda", ".txt", FNbase)
+    dfTemp <- data.frame(readRDS(files[1]))
+    write.table(
+        dfTemp,
+        paste0(pipelineList[["dataDir"]], "DEseq2External/PE_", FNbase),
+        sep = "\t"
+    )
+    
+}
+
 
 ## Done                                                                      ##
 ###############################################################################
 
-## Settings file created and saved in design/biologic.settings.csv
 
 ```    
     
@@ -825,7 +952,7 @@ write.table(dfObio, settingsFN , row.names=FALSE, col.names=FALSE, sep=",")
 <!-- Create fastq analysis files-->
 ```{r, echo=T, eval=TRUE, warning=FALSE, results="asis"}
 
-dfDesign[["FASTQ"]] <- dfDesign$sample.id
+
 Obio@dfDesign <- dfDesign
 Obio@parameterList[["labname"]] = "Lovel Badge"
 
