@@ -101,7 +101,7 @@ for (i in 1:length(lrtVec)){
     
     NewChnk <- paste0(
         paste0("### ",tag," \n"),
-            "\n```{r LRT_, ",tag,"  , results='asis', echo=F, eval=TRUE, warning=FALSE, fig.cap='",figCap,"'}\n",
+            "\n```{r, results='asis', echo=F, eval=TRUE, warning=FALSE, fig.cap='",figCap,"'}\n",
             "\n",
             "\n print(plotList[['",tag,"']])",
             "\n cat(  '\n')",

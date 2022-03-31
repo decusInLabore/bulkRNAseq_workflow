@@ -29,7 +29,6 @@
 "RSEM_folder","/camp/stp/babs/working/boeings/Projects/lovellbadger/gunes.taylor/483_vis_E07_E10_E14_merged/basedata/",""
 "countTableFN","/camp/stp/babs/working/boeings/Projects/lovellbadger/gunes.taylor/483_vis_E07_E10_E14_merged/basedata/RN21224.count.data.txt",""
 "TpmTableFN","/camp/stp/babs/working/boeings/Projects/lovellbadger/gunes.taylor/483_vis_E07_E10_E14_merged/basedata/E7E10E14.tpm.file.txt",""
-"primaryAlignmentGeneID","ENSGALG",""
 "referenceTableListDB","Hallmark Signatures","mysigdb_h_hallmarks"
 "referenceTableListDB","Pathways","mysigdb_c2_1329_canonical_pathways"
 "referenceTableListDB","GO-BP","mysigdb_c5_BP"
