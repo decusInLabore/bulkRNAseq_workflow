@@ -309,7 +309,7 @@ if (length(pos) == 1){
     library(dplyr)
     dfDesign <- dfDesign %>%
         mutate(f_timepoint = as.numeric(f_timepoint)) %>%
-        arrange(f_gender, match(dataseries, c("WT", "HET", "HOM")), f_timepoint, f_replicate, .by_group = FALSE)  
+        arrange(f_gender, match(dataseries, c("WtFemale", "HetFemale", "HomFemale", "WtMale", "HomMale")), f_timepoint, f_replicate, .by_group = FALSE)  
 
     dfDesign <- data.frame(dfDesign)
 }
@@ -751,21 +751,21 @@ pipelineList[["TpmTableFN"]] <- paste0(
 
 #tpmFN <- "/camp/stp/babs/working/bioinformatics/projects/sahaie/colin.ratcliffe/Capivasertib_resistant_in_triple_negative_breast_tumour_organoids/babs/outputs/data/rsem.merged.gene_tpm.tsv"
 
-dfTPM <- read.delim(
-    pipelineList[["TpmTableFN"]], 
-    sep = "\t",
-    stringsAsFactors = F,
-    header=T
-)
-
-pipelineList[["primaryAlignmentGeneID"]] <- gsub("[0-9]", "", as.vector(dfTPM$gene_id[1]))
-
-dfTPM$gene_name <- NULL
-dfTPM$transcript_id.s. <- NULL
-names(dfTPM) <- gsub("gene_id", pipelineList[["primaryAlignmentGeneID"]] , names(dfTPM))
-
-
-write.table(dfTPM, pipelineList[["TpmTableFN"]] , sep="\t", row.names=F)
+# dfTPM <- read.delim(
+#     pipelineList[["TpmTableFN"]], 
+#     sep = "\t",
+#     stringsAsFactors = F,
+#     header=T
+# )
+# 
+# pipelineList[["primaryAlignmentGeneID"]] <- gsub("[0-9]", "", as.vector(dfTPM$gene_id[1]))
+# 
+# dfTPM$gene_name <- NULL
+# dfTPM$transcript_id.s. <- NULL
+# names(dfTPM) <- gsub("gene_id", pipelineList[["primaryAlignmentGeneID"]] , names(dfTPM))
+# 
+# 
+# write.table(dfTPM, pipelineList[["TpmTableFN"]] , sep="\t", row.names=F)
 
 
 ## End Part 2C                                                               ##
@@ -827,7 +827,7 @@ write.table(dfObio, settingsFN , row.names=FALSE, col.names=FALSE, sep=",")
 
 dfDesign[["FASTQ"]] <- dfDesign$sample.id
 Obio@dfDesign <- dfDesign
-
+Obio@parameterList[["labname"]] = "Lovel Badge"
 
 ###############################################################################
 ## Create analysis scripts                                                   ##
@@ -872,7 +872,7 @@ Obio <- biologicSeqTools2::setCrickGenomeAndGeneNameTable(Obio)
 
 <!-- Essential 2: Load all available data into Obio object and check -->
 <!-- This part will move to part B -->
-```{r child = 'src/modules/part_A/A.1.add.data.to.analysis.object.Rmd', eval=FALSE}
+```{r child = 'src/modules/part_A/A.1.add.data.to.analysis.object.Rmd', eval=TRUE}
 ```
 
 <!-- Essential 1: (output required later): Set Parameters and directories and create Obio object Chapter/Module -->

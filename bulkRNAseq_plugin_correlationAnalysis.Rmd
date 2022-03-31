@@ -121,7 +121,7 @@ Obio <- createAnalysisFolders(
 Obio <- setDataBaseParameters(Obio)
 
 
-Obio@parameterList[["reportFigDir"]] <- paste0(Obio@parameterList$localWorkDir,Obio@parameterList$project_id, "/report_figures/")
+Obio@parameterList[["reportFigDir"]] <- paste0(Obio@parameterList$localWorkDir, "html_local/report_figures/")
 
 ## Create outputfolders ##
 if (!dir.exists(paste0(Obio@parameterList$localWorkDir,Obio@parameterList$project_id))){
