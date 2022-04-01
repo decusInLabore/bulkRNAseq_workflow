@@ -12,20 +12,20 @@ VersionPdfExt <- VersionPdfExt <- paste0(".",chnkPrefix,"V", gsub("-", "", Sys.D
 ###############################################################################
 ## Create biologic Metadata object                                           ##
 
-FN <- paste0(workdir, "/design/biologic.settings.csv")
-
-if (file.exists(FN)){
-    dfObio <- read.csv(FN, header = F, stringsAsFactors = F)
+if (file.exists(pipelineList[["biologicSettingsFN"]])){
+    dfObio <- read.csv(pipelineList[["biologicSettingsFN"]], header = F, stringsAsFactors = F)
+} else {
+    stop("biologic settings file not found.")
 }
 
-dfObio[is.na(dfObio)] <- ""
 
-dfObio <- dfObio[dfObio[,1] != "", ]
 
 dfObio <- data.frame(t(dfObio), stringsAsFactors = F)
-
-names(dfObio) <- as.vector(t(dfObio[1,]))
+dfObio[is.na(dfObio)] <- ""
+colnames(dfObio) <- t(dfObio[1,])
 dfObio <- dfObio[-1,]
+
+
 
 for (i in 1:ncol(dfObio)){
     pos <- grep("#", dfObio[,i], useBytes = TRUE)
@@ -77,7 +77,7 @@ projectDetailList <- list(
     "primaryAlignmentGeneID" = as.vector(dfObio$primaryAlignmentGeneID[1]),
     "paired.end" =  as.logical(dfObio$paired.end[1]),
     "stranded" = as.logical(dfObio$stranded[1]),
-    "labname" = as.logical(dfObio$labname[1]),
+    "labname" = as.vector(dfObio$labname[1]),
     "projectName" = as.vector(dfObio$project_name[1]),
     "read.length" =  as.vector(dfObio$read.length[1]),
     
