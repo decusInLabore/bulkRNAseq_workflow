@@ -264,6 +264,11 @@ pipelineList[["TpmTableFN"]] <- paste0(
         ".tpm.file.txt"
 )
 
+
+## Add location of external DEseq2 inputs
+pipelineList[["DEseq2_DGE_result_folder"]] <- paste0(pipelineList[["dataDir"]], "DEseq2External/")
+pipelineList[["DEseq2_LRT_result_folder"]] <- NULL
+
 ###############################################################################
 ## Create folder structure                                                   ##
 
@@ -378,6 +383,7 @@ if (ncol(dfRefTab) < maxLength){
 }
 
 dfRefTab <- data.frame(dfRefTab)
+names(dfRefTab) <- names(dfObio)
 
 
 dfObio <- dplyr::bind_rows(dfObio, dfRefTab)
@@ -961,7 +967,7 @@ files <- files[grep("rda$", files)]
 for (i in 1:length(files)){
     FNbase <- gsub("/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/biologic/GRCg6a/", "", files[i])
     FNbase <- gsub("_results.rda", ".txt", FNbase)
-    dfTemp <- data.frame(readRDS(files[1]))
+    dfTemp <- data.frame(readRDS(files[i]))
     write.table(
         dfTemp,
         paste0(pipelineList[["dataDir"]], "DEseq2External/PE_", FNbase),
@@ -987,24 +993,10 @@ for (i in 1:length(files)){
 ```{r, echo=T, eval=TRUE, warning=FALSE, results="asis"}
 
 
-Obio@dfDesign <- dfDesign
-Obio@parameterList[["labname"]] = "Lovel Badge"
-
 ###############################################################################
 ## Create analysis scripts                                                   ##
 
-Obio@parameterList[["stranded"]] <- TRUE
-Obio@parameterList[["scriptVec"]] <- as.vector(NULL, mode="character")
-Obio@parameterList[["AlignFASTQcolumn"]] <- "sample.id"
 
-Obio@parameterList[["ModuleFASTQC"]] = "module load FastQC/0.11.5-Java-1.8.0_92"
-Obio@parameterList[["ModuleTrimGalore"]] = "Trim_Galore/0.4.2-foss-2016b"
-Obio@parameterList[["TrimGaloreMinLength"]] = 25
-Obio@parameterList[["TrimGaloreMinQuality"]] = 20
-Obio@parameterList[["read.length"]] =  "100bp"
-
-#Obio <- setMountingPoint(Obio)
-#Obio <- setAnalysisPaths(Obio)
 
 ## Set genome paths
 Obio <- biologicSeqTools2::setCrickGenomeAndGeneNameTable(Obio)

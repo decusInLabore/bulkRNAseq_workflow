@@ -496,7 +496,6 @@ setwd(Obio@parameterList$localWorkDir)
 ## This project only ##
 dfSel <- Obio@dfDesign
 dfSel <- dfSel[dfSel$f_gender == "ZZ",c("sample.id", "f_gender")]
-samplesToExcludeFromTSdisplay <- 
 
 projectJSON <- biologicSeqTools2::createSettingsJSON(
     obj = Obio,
@@ -519,8 +518,8 @@ projectJSON <- biologicSeqTools2::createSettingsJSON(
     upper_heatmap_limit = 3,
     lower_heatmap_limit = -3,
     heamap.headline.text = Obio@parameterList$heamap.headline.text,
-    project_id = Obio@parameterList$project_id,
-    samplesToExcludeFromTSdisplay = samplesToExcludeFromTSdisplay
+    project_id = Obio@parameterList$project_id #,
+    #samplesToExcludeFromTSdisplay = samplesToExcludeFromTSdisplay
 )
 
 ## Done                                                                      ##
