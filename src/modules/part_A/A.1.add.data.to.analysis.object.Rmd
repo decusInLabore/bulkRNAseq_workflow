@@ -26,6 +26,8 @@ if (!is.null(Obio@projectDetailList$designFN)){
         sep = "\t",
         stringsAsFactors = F
     )
+    
+    dfDesign[is.na(dfDesign)] <- ""
 } else {
     stop("Error: Now design file specified")
 }

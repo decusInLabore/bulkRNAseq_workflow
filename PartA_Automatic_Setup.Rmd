@@ -265,8 +265,27 @@ pipelineList[["TpmTableFN"]] <- paste0(
 )
 
 
-## Add location of external DEseq2 inputs
-pipelineList[["DEseq2_DGE_result_folder"]] <- paste0(pipelineList[["dataDir"]], "DEseq2External/")
+
+
+
+## Add external files to design and model files ##
+## Make sure in the design file the samples for the following comparisons are assigned:
+# columnsToAdd <- list.files(pipelineList[["DEseq2_DGE_result_folder"]])
+# columnsToAdd <- gsub(".txt", "", columnsToAdd)
+# 
+# for (i in 1:length(columnsToAdd)){
+#     dfDesign[[columnsToAdd[i]]] <- ""
+# }
+
+# write.table(
+#     dfDesign,
+#     pipelineList[["designFN"]] ,
+#     sep = "\t",
+#     row.names = F
+# )
+
+## sample selections to model file
+
 pipelineList[["DEseq2_LRT_result_folder"]] <- NULL
 
 ###############################################################################
@@ -307,9 +326,12 @@ pipelineList[["dataDir"]] <- paste0(
 
 checkDir(pipelineList[["dataDir"]])
 
+
 ## Done folder structure                                                     ##
 ###############################################################################
 
+## Add location of external DEseq2 inputs
+pipelineList[["DEseq2_DGE_result_folder"]] <- paste0(pipelineList[["dataDir"]], "DEseq2External/")
 
 # Location where the design file will be saved
 pipelineList[["designFN"]] <- paste0(
@@ -538,6 +560,52 @@ if (length(pos) == 1){
 ##
 ###############################################################################
 
+###############################################################################
+## Create external DEseq2 folder                                             ##
+
+## External DEseq2 results can be saved in the /data/DEseq2external folder
+pipelineList[["dataDir"]]
+    
+if (!dir.exists(paste0(pipelineList[["dataDir"]], "DEseq2External"))){
+    dir.create(paste0(pipelineList[["dataDir"]], "DEseq2External"), recursive = T)
+}
+
+## External DEseq2 results can be res(dds) and saved with write.table ##
+files <- paste0(
+    "/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/biologic/GRCg6a/",
+    list.files("/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/biologic/GRCg6a")
+)    
+
+files <- files[grep("rda$", files)]    
+
+for (i in 1:length(files)){
+    FNbase <- gsub("/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/biologic/GRCg6a/", "", files[i])
+    FNbase <- gsub("_results.rda", ".txt", FNbase)
+    dfTemp <- data.frame(readRDS(files[i]))
+    write.table(
+        dfTemp,
+        paste0(pipelineList[["dataDir"]], "DEseq2External/PE_", FNbase),
+        sep = "\t"
+    )
+    
+}
+
+
+## Done                                                                      ##
+###############################################################################
+
+###############################################################################
+## If applicable - add external input files                                  ##
+externalFiles <- list.files( paste0(pipelineList[["dataDir"]], "DEseq2External/"))
+
+if (length(externalFiles) > 0){
+    externalFiles <- gsub(".txt", "", externalFiles)
+    for (i in 1:length(externalFiles)){
+        dfDesign[[paste0("comp_", externalFiles[i])]] <- ""
+    }
+}
+## Done adding external                                                      ##
+###############################################################################
 
 ## Save design file for the workflow in PartB ##
 
@@ -592,7 +660,9 @@ write.table(
 # of this section. In this case, there is no need to create the file using this
 # template.
 
-comparisonID <- names(dfDesign)[grep("comp_", names(dfDesign))]
+comparisonID <- c(
+    names(dfDesign)[grep("comp_", names(dfDesign))]
+)
 comparison <- rep("", length(comparisonID))
 for (i in 1:length(comparisonID)){
     contrasts = sort(as.vector(unique(dfDesign[,comparisonID[i]])), decreasing = FALSE)
@@ -606,11 +676,17 @@ for (i in 1:length(comparisonID)){
     #if (contrasts[2] != "scr"){
     #  contrasts = rev(contrasts)
     #}
-    sel.col = contrasts
+    
+    if (length(contrasts) > 0){
+        sel.col = contrasts
 
-    contrast.vector = append("condition", contrasts)
-    colName = paste(contrasts, collapse = "_vs_")
-    comparison[i] <- colName
+        contrast.vector = append("condition", contrasts)
+        colName = paste(contrasts, collapse = "_vs_")
+        comparison[i] <- colName  
+    } else {
+        comparison[i] <- gsub("comp_", "", comparisonID[i])
+    }
+    
 }
 
 test <- rep("Wald", length(comparison))
@@ -777,7 +853,7 @@ RSEM.CMD = paste(
     "rsem-generate-data-matrix ",
     files,
     " > ",
-    pipelineList[["preProcessedcountTableFN"]],
+    pipelineList[["preProcessedCountTableFN"]],
     sep=""
 )
 
@@ -792,7 +868,7 @@ sink()
 
 ## Read resulting RSEM table
 dfRSEM <- read.delim(
-    pipelineList[["preProcessedcountTableFN"]], 
+    pipelineList[["preProcessedCountTableFN"]], 
     sep = "\t",
     header = T,
     stringsAsFactors = F
@@ -802,7 +878,7 @@ dfRSEM <- read.delim(
 dfRSEM[,2:ncol(dfRSEM)] <- round(dfRSEM[,2:ncol(dfRSEM)])
 
 for (i in 1:length(pipelineList[["pathToRSEMresultsFiles"]])){
-    names(dfRSEM) <- gsub(paste0("X", gsub("/", ".", pipelineList[["pathToRSEMresultsFiles"]][[i]])), "", names(dfRSEM))
+    names(dfRSEM) <- gsub(paste0("X", gsub("-", ".", gsub("/", ".", pipelineList[["pathToRSEMresultsFiles"]][[i]]))), "", names(dfRSEM))
 }
 
 names(dfRSEM) <- gsub(".genes.results", "", names(dfRSEM))
@@ -946,39 +1022,7 @@ samples <- sapply(
 ## End Part 2C                                                               ##
 ###############################################################################
 
-###############################################################################
-## Create external DEseq2 folder                                             ##
 
-## External DEseq2 results can be saved in the /data/DEseq2external folder
-pipelineList[["dataDir"]]
-    
-if (!dir.exists(paste0(pipelineList[["dataDir"]], "DEseq2External"))){
-    dir.create(paste0(pipelineList[["dataDir"]], "DEseq2External"), recursive = T)
-}
-
-## External DEseq2 results can be res(dds) and saved with write.table ##
-files <- paste0(
-    "/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/biologic/GRCg6a/",
-    list.files("/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/biologic/GRCg6a")
-)    
-
-files <- files[grep("rda$", files)]    
-
-for (i in 1:length(files)){
-    FNbase <- gsub("/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/biologic/GRCg6a/", "", files[i])
-    FNbase <- gsub("_results.rda", ".txt", FNbase)
-    dfTemp <- data.frame(readRDS(files[i]))
-    write.table(
-        dfTemp,
-        paste0(pipelineList[["dataDir"]], "DEseq2External/PE_", FNbase),
-        sep = "\t"
-    )
-    
-}
-
-
-## Done                                                                      ##
-###############################################################################
 
 
 ```    

@@ -110,10 +110,25 @@ HmDisplayCatsFromDb[[cat.name]] <- list(
 numextract <- function(string){ 
     stringr::str_extract(string, "contrast_\\-*\\d+\\.*\\d*_")
 } 
-dfSelections[["designColumn"]] <- numextract(dfSelections$padjSelections)
-dfSelections[["designColumn"]] <- gsub("contrast_", "comp_", dfSelections[["designColumn"]] )
-dfSelections[["designColumn"]] <- gsub("_$", "", dfSelections[["designColumn"]] )
+
+dfSelections[["designColumn"]] <- sapply(dfSelections$padjSelections, function(x) unlist(strsplit(x, "padj_"))[2]) 
+
+## Get design column from model file ##
+designColNames <- sapply(dfSelections$padjSelections, function(x) unlist(strsplit(x, "padj_"))[2])
+
+
+dfModelSel <- dfModel[dfModel$comparison %in% designColNames,]
+
+## replace all entries found in dfModel to comparisonID
+for (i in 1:nrow(dfModelSel)){
+    designColNames <- gsub(paste0("^", as.vector(dfModel[i, "comparison"]), "$"), as.vector(dfModel[i, "comparisonID"]),designColNames )
+}
+
+dfSelections[["designColumn"]]  <-  designColNames 
+ 
+
 dfSelections$designColumn[!(dfSelections$designColumn %in% names(dfDesign))] <- ""
+
 for (k in 1:nrow(dfSelections)){
     dfDataTable <- dfMainData
     padjCutOff <- 0.05
@@ -331,7 +346,13 @@ for (k in 1:length(HmDisplayCatsFromDb)){
     if (!is.null(HmDisplayCatsFromDb[[k]]$comparisonID)){
         dfSel <- unique(dfDesign[,c("sample.id", HmDisplayCatsFromDb[[k]]$comparisonID)])
         dfSel <- dfSel[dfSel[,HmDisplayCatsFromDb[[k]]$comparisonID] != "",]
-        sampleSelection <- paste0("norm_counts_", unique(dfSel$sample.id))
+        
+        if (nrow(dfSel) > 1){
+            sampleSelection <- paste0("norm_counts_", unique(dfSel$sample.id))    
+        } else {
+            sampleSelection <- paste0("norm_counts_", unique(dfDesign$sample.id))
+        }
+        
     } else {
         sampleSelection <- paste0("norm_counts_", unique(dfDesign$sample.id))
     }
