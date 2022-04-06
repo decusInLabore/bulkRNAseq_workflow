@@ -202,6 +202,16 @@ pipelineList[["ReferenceTable"]] <- dfRef
 # is available via asf. 
 
 ###############################################################################
+## Specify GSEA and HG gmt enrichment files                                  ##
+## gmt files are assumed to be in human nomanclature                         ##
+pipelineList[["HGtestEnrichmentGmtFile"]] <- NULL
+
+pipelineList[["GSEAtestEnrichmentGmtFile"]] <- NULL
+
+##                                                                           ##
+###############################################################################
+
+###############################################################################
 ## Add Sequencing parameters                                                 ##
 
 pipelineList[["NFcoreSettingsFN"]] <- pipelineList[["designFN"]] <- paste0(

@@ -25,7 +25,7 @@ always_allow_html: yes
 
 ```
 
-```{r setup, include=FALSE}
+```{r, include=FALSE}
 knitr::opts_chunk$set(
     tidy = TRUE,
     tidy.opts = list(width.cutoff = 120),
@@ -44,21 +44,23 @@ remotes::install_github("rstudio/renv")
 if (!file.exists("renv.lock")){
     renv::init()
 } else {
-    renv::restore()
+    renv::restore(prompt=FALSE)
 }
+
+urlString <- "biologic.crick.ac.uk"
 ```
 
 
-```{r methods, eval=T}
+```{r, eval=T}
 
 ```
 
-```{r set_directories, eval=T}
+```{r, eval=T}
 ## Setup plot collection object
-library(knitr)
-library(ggplot2)
-library(ggpubr)
-library(DT)
+# library(knitr)
+# library(ggplot2)
+# library(ggpubr)
+# library(DT)
 
 addCorCatsToLabDb <- FALSE
 figureCount <- 1
@@ -148,7 +150,7 @@ Obio@parameterList$HmDisplayCatsFromDb <- list(
 ## Correlation Heatmap
 The correlation heatmap is based on the 500 most time-variable genes in this experiment. 
 
-```{r alignment_dat, echo=F, eval=TRUE, warning=FALSE, result="asis", include = FALSE}
+```{r, echo=F, eval=TRUE, warning=FALSE, result="asis", include = FALSE}
 
 ###############################################################################
 ## Set parameters                                                            ##
@@ -324,8 +326,7 @@ figureCount <- figureCount + 1
 
 NewChnk <- paste0(
     "### ", tag,
-    "\n```{r Heatmap_most_var_genes",
-    ", results='asis', echo=F, eval=TRUE, warning=FALSE, fig.cap='",
+    "\n```{r, results='asis', echo=F, eval=TRUE, warning=FALSE, fig.cap='",
     figLegend,"', fig.asp = 1, fig.align = 'center'}\n",
     "\n",
     "\n print(plotListHM[['",tag,"']])",
@@ -344,13 +345,13 @@ chnkVec <- unique(c(
 ## Upload correlation class genes as gene cats
 ```
 
-```{r knit_cor_plot_characterization_plot, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
+```{r, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
 cat(paste(knit(text = chnkVec, quiet = T), collapse = '\n'))
 ```
 
 ## Median gene expression pattern for each correlation cluster {.tabset .tabset-fade .tabset-pills}
 
-```{r add_cluster_measurements, echo=F, eval=TRUE, warning=FALSE, result="asis"}
+```{r, echo=F, eval=TRUE, warning=FALSE, result="asis"}
 
 ###############################################################################
 
@@ -450,8 +451,124 @@ df.gmt[,2] <- gsub("RN20157_temp_cc_7", "kn_lab_categories__113", df.gmt[,2])
 ## Create median profile plots for n correlation clusters ##
 ```
 
+## Correlation cluster table {.tabset .tabset-fade .tabset-pills}
+```{r, echo=T, eval=TRUE, warning=FALSE, result="asis",include = TRUE}
+library(DT)
 
-```{r function_block, echo=F, eval=TRUE, warning=FALSE, result="asis",include = FALSE}
+colorVec <- rainbow(nrow(df.gmt))
+
+
+
+for (i in 1:nrow(df.gmt)){
+    tempVec <- as.vector(t(df.gmt[i,]))
+    tempVec <- unique(tempVec[tempVec != ""])
+    nameTag <- tempVec[1]
+    tempVec <- sort(tempVec[3:length(tempVec)])
+    catColor <- colorVec[i]
+    dfTemp <- data.frame(
+        Correlation_Cluster =  rep(
+            paste0(
+                '<p style="background-color:',catColor,';text-align:center">',gsub("_", " ", nameTag),'</p>'), 
+            length(tempVec)
+        ),
+        Correlation_Cluster_Genes = paste0(
+    '<a href="https://', urlString,'/',Obio@parameterList$project_id,'/gene-view?query=',tempVec, '&exact=true  target = "_blank">',tempVec,'</a>')
+    )
+    
+    dfTemp2 <- data.frame(
+        Correlation_Cluster =  rep(
+            gsub("_", " ", nameTag), 
+            length(tempVec)
+        ),
+        Correlation_Cluster_Genes = tempVec
+    )
+    
+    if (i ==1){
+        dfRes <- dfTemp
+        dfOut <- dfTemp2
+    } else {
+        dfRes <- rbind(dfRes, dfTemp)
+        dfOut <- rbind(dfOut, dfTemp2)
+    }
+}
+
+baseFN <- paste0(
+    Obio@parameterList$project_id, 
+    ".correlation.cluster.table.xlsx"
+)
+
+FNtabrel <- paste0("report_tables/", baseFN)
+tablink <- paste0('An Excel table containing the genes in each Pearson correlation cluster can be downloaded <a href = "',FNtabrel,'">here</a>. ')
+
+
+
+##############################################################################
+## Create marker gene table Excel                                           ##
+###############################################################################
+## Assemble DGE summary table                                                ##
+
+wb <- openxlsx::createWorkbook()
+hs1 <- openxlsx::createStyle(
+    fontColour = "#ffffff",
+    fgFill = "#000000",
+    halign = "CENTER",
+    textDecoration = "Bold"
+)
+sheetName <- "Correlation Clusters"
+  
+  openxlsx::addWorksheet(
+      wb, 
+      sheetName = sheetName
+  )
+  
+  
+  openxlsx::freezePane(wb, sheetName ,  firstActiveRow = 2)
+  openxlsx::writeData(wb, 1, dfOut, startRow = 1, startCol = 1, headerStyle = hs1)
+  ## Done adding to Excel workbook ##
+  
+## Save workbook ##
+baseFN <- paste0(
+   Obio@parameterList$project_id, 
+   ".Cluster.marker.table.xlsx"
+)
+FNtabrel <- paste0("report_figures/", baseFN)
+outPutFN <- paste0(
+     Obio@parameterList$reportTableDir,
+     baseFN
+)
+openxlsx::saveWorkbook(
+        wb,
+        outPutFN ,
+        overwrite = TRUE
+)
+    
+## Done creating marker gene table                                          ##
+##############################################################################
+
+tabLegend = paste0('**Table: ** Table showing the genes in each correlation cluster. An Excel version of this table can be downloaded <a href="',FNtabrel,'">here</a>')
+
+NewChnk <- paste0(
+        "## Correlation Cluster Gene Table", 
+        "\n```{r table, results='asis', echo=F, eval=TRUE, warning=FALSE, fig.cap='",
+        tabLegend,"'}\n",
+        "\n",
+        "\n datatable(dfRes,rownames = FALSE,  escape = FALSE)",
+        "\n cat(  '\n')",
+        "\n\n\n```\n"   
+    )
+    
+chnkVec <- c(
+            # chnkVec,
+            NewChnk
+)
+
+```
+
+```{r, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
+cat(paste(knit(text = chnkVec, quiet = T), collapse = '\n'))
+```
+
+```{r, echo=F, eval=TRUE, warning=FALSE, result="asis",include = FALSE}
 ###############################################################################
 ## Function Create cluster.timecourse.chart                                  ##
 ###############################################################################
@@ -823,7 +940,7 @@ setGeneric(
 ## End method createMedianProfilePlots()                                   ##
 ```
 
-```{r median_cor_dat, echo=F, eval=TRUE, warning=FALSE, result="asis"}
+```{r, echo=F, eval=TRUE, warning=FALSE, result="asis"}
 ###############################################################################
 ## Make category plots ##
 setwd(Obio@parameterList$localWorkDir)
@@ -879,12 +996,12 @@ plotList <- list()
 plotList <- df.median$plotList
 ```
 
-```{r cat_plot_medians_plot, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
+```{r, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
 cat(paste(knit(text = chnkVec, quiet = T), collapse = '\n'))
 ```
 
 ## Category Enrichment Analysis on Gene Sets {.tabset .tabset-fade .tabset-pills}
-```{r make_enrichment_plots, echo=F, eval=TRUE, warning=FALSE, result="asis",include = FALSE}
+```{r, echo=F, eval=TRUE, warning=FALSE, result="asis",include = FALSE}
 
 # dfENRgmt <- df.gmt
 # 
@@ -1082,7 +1199,7 @@ cat(paste(knit(text = chnkVec, quiet = T), collapse = '\n'))
 
 ```
 
-```{r create-markdown-enrichment-chunks-dynamically, echo=T, eval=TRUE, warning=FALSE, results='asis'}
+```{r, echo=T, eval=TRUE, warning=FALSE, results='asis'}
 ###############################################################################
 ## Do category enrichment on clusters                                        ##
 #cat(paste(knit(text = chnkVec, quiet = T), collapse = '\n'))
