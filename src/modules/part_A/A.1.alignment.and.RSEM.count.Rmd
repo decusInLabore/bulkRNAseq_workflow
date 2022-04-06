@@ -71,8 +71,8 @@ setwd(paste0(Obio@parameterList$localWorkDir, "bulkRNAseq_workflow"))
 # ## Create Design File                                                        ##
 #
 ## this setup requires a file named sample.ids.txt in workir with two columns:
-sampleID (with the ASF id) and 
-sample.id with the experimental sample name. 
+# sampleID (with the ASF id) and 
+# sample.id with the experimental sample name. 
 
 dfDesign <- biologicSeqTools2::createDesignFileCrickASFsamples(
     pathToSeqStorageFolder = pathToSeqStorageFolder,
