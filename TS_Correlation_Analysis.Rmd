@@ -44,8 +44,10 @@ remotes::install_github("rstudio/renv")
 if (!file.exists("renv.lock")){
     renv::init()
 } else {
-    renv::restore()
+    renv::restore(prompt = FALSE)
 }
+
+urlString <- "biologic.crick.ac.uk"
 ```
 
 
@@ -99,19 +101,6 @@ ObioFN <- paste0("../",list.files("..")[grep(".bioLOGIC.Robj", list.files(".."))
 load(ObioFN)
 
 
-
-
-
-# checkFile = paste0(
-#          Obio@parameterList$project_id,
-#          ".bioLOGIC.Robj"
-# )
-# 
-# if (ObioFN != checkFile){
-#     exit()
-# }
-
-
 Obio <- setMountingPoint(Obio)
 Obio <- setAnalysisPaths(Obio)
 Obio <- setCrickGenomeAndGeneNameTable(Obio)
@@ -133,15 +122,6 @@ if (!dir.exists(Obio@parameterList$reportFigDir)){
 }
 
 figureCount <- 1
-
-## Load R module load R/3.5.1-foss-2018b ##
-#setwd(Obio@parameterList$localWorkDir)
-
-###########################
-## Set default 
-Obio@parameterList$HmDisplayCatsFromDb <- list(
-  "Transcription Factors" = "ag_lab_categories__10"
-  )
 
 ```
 
@@ -277,12 +257,6 @@ GroupVec <- as.vector(unique(df$colorVec))
 names(GroupVec) <- as.vector(unique(df[,"clusterID"]))
 
 
-
-#df2 <- unique(data.frame(Obio@dfDesign[,c("sample.id","sample.group", "sample.group_color")]))
-#df2 <- data.frame(df2[,c("sample.group")])
-
-
-
 top_ha = ComplexHeatmap::HeatmapAnnotation(df = df2, col = list(Group = GroupVec))
 
 ComplexHeatmap::ht_opt(
@@ -294,32 +268,10 @@ ComplexHeatmap::ht_opt(
 
 ## Create correlation heatmap and clustering
 library(ComplexHeatmap)
-library(circlize)
-f1 = colorRamp2(seq(-1, 1, length = 3), c("#3060cf", "#fffbbc","#c4463a"))
+f1 = circlize::colorRamp2(seq(-1, 1, length = 3), c("#3060cf", "#fffbbc","#c4463a"))
 
 
-#dfTop = data.frame(Type = c(rep("Glia", 15),rep("Transition",5),  rep("Neuron", 80)))
-#top_ha = HeatmapAnnotation(df = dfTop, col = list(Type = c("Glia" =  "orange", "Transition" = "grey", "Neuron" = "#009900")))
-
-# split
-#left_ha <- rowAnnotation(foo = anno_block(gp = gpar(fill = 1:k.number),
-#        labels = paste0("C",1:k.number), 
-#        labels_gp = gpar(col = "white", fontsize = 8)))
-
-
-posVec <- as.vector(NULL, mode = "integer")
-
-
-#right_ha = rowAnnotation(Genes = anno_mark(at = posVec, labels = names(posVec)))
-# mHmPlot <- mHmBase
-# posVec <- as.vector(NULL, mode = "integer")
-# for (i in 1:nrow(dfAnnoHL)){
-#   posVec <- c(
-#     posVec,
-#     grep(as.vector(dfAnnoHL[i, Obio@parameterList$primaryAlignmentGeneID]), as.vector(row.names(mHmPlot)))
-#   )
-# }
-
+## Create heatmap ##
 plotListHM <- list()
 chnkVec <- as.vector(NULL, mode="character")
 tag <- "CorHM"
@@ -368,8 +320,10 @@ dev.off()
 figLegend <- paste0(
     "**Figure ",
     figureCount,
-    ":** Heatmap showing the ",Obio@parameterList$NtopGenes," most variable genes in the time course. ",
-                "Download a pdf of this figure [here](", FNrel,"). "
+    ":** Heatmap showing the ",
+    Obio@parameterList$NtopGenes,
+    " most variable genes in the time course. ",
+    "Download a pdf of this figure [here](", FNrel,"). "
 )
 
 
@@ -565,18 +519,11 @@ setGeneric(
         dfDesign <- obj@dfDesign
     } 
     
-    dfDesign[["sample.group.only"]] <- sapply(dfDesign$sample.group, function(x) unlist(strsplit(x, "_"))[2])
+    dfDesign[["sample.group.only"]] <- sapply(
+        dfDesign$sample.group, function(x) unlist(strsplit(x, "_"))[2]
+    )
     
-    ## Create one plot per category ##
-    #setwd(localWorkDir)
-    # if ((!make.plots.individually) & make.plots){
-    #     pdf(paste0(obj@parameterList$project_id, file.name.suffix,".correlation.plot.profiles.pdf"))
-    #     dimensions <- ceiling(sqrt(nrow(df.gmt)))
-    #     par.mfrow.default <- par()$mfrow
-    #     par.cex.main.default <- par()$cex.main
-    #     par(mfrow = c(dimensions, dimensions))
-    #     par(cex.main = headline.font.size)
-    # }
+    
 
     for (i in 1:nrow(df.gmt)) {
         ######################################################
@@ -596,7 +543,10 @@ setGeneric(
         sel.vec <-
             append(obj@parameterList$geneIDcolumn, colTag)
         ## Subset data table ##
-        df.sel <- unique(df.sel[df.sel[,obj@parameterList$geneIDcolumn] %in% gene.vector, sel.vec])
+        df.sel <- unique(
+            df.sel[df.sel[,obj@parameterList$geneIDcolumn] %in% gene.vector, sel.vec]
+        )
+        
         tag <- as.vector(df.gmt[i, 1])
 
         #######################################################################
@@ -606,9 +556,11 @@ setGeneric(
         
         ## Calculate median for replicates ##
         for (j in 1:length(sample.group.vec)) {
-            df.temp[[paste0(sample.group.vec[j], "_median")]] <- apply(df.temp[,grep(paste0(sample.group.vec[j]) ,names(df.temp))],
-                                                                           1,
-                                                                           median)
+            df.temp[[paste0(sample.group.vec[j], "_median")]] <- apply(
+                df.temp[,grep(paste0(sample.group.vec[j]) ,names(df.temp))],
+                1,
+                median
+            )
         }
         
         ## Keep median genes only 
@@ -772,23 +724,32 @@ setGeneric(
             
             
             ## Make ggplot ##
-                ## create x-y scatterplot ##
-                df.temp.plot <- df.plot
-                selVec <- c(
-                    "sample.group",
-                    Obio@parameterList$designTScol,
-                    names(df.plot)[grep(paste0(names(group.list)[m],"_"), names(df.plot))]
-                )
-                df.temp.plot <- df.plot[,selVec]
-                df.temp.plot[["y"]] <- df.temp.plot[,grep(paste0(names(group.list)[m],"_"), names(df.temp.plot))]
-                lCol = rgb(red,green,blue,1, maxColorValue = 1)
-                
-                if (obj@parameterList$designTScol != "timepoint"){
-                  df.temp.plot[["timepoint"]] <- df.temp.plot[,obj@parameterList$designTScol]
-                }
-                
-                plotList[[tag]] <- plotList[[tag]] + geom_line(data=df.temp.plot, aes(x=timepoint, y=y), col=lCol,se=FALSE, span=spanPar) + geom_point(data=df.temp.plot, aes(x=timepoint, y=y), fill=lCol, shape=21)
-                plotList[[tag]] <- plotList[[tag]] +   theme(
+            ## create x-y scatterplot ##
+            df.temp.plot <- df.plot
+            selVec <- c(
+                "sample.group",
+                Obio@parameterList$designTScol,
+                names(df.plot)[grep(paste0(names(group.list)[m],"_"), names(df.plot))]
+            )
+            
+            df.temp.plot <- df.plot[,selVec]
+            
+            df.temp.plot[["y"]] <- df.temp.plot[,grep(paste0(names(group.list)[m],"_"), names(df.temp.plot))]
+            lCol = rgb(red,green,blue,1, maxColorValue = 1)
+            
+            if (obj@parameterList$designTScol != "timepoint"){
+              df.temp.plot[["timepoint"]] <- df.temp.plot[,obj@parameterList$designTScol]
+            }
+            
+            plotList[[tag]] <- plotList[[tag]] + geom_line(
+                data=df.temp.plot, 
+                aes(x=timepoint, y=y), 
+                col=lCol,se=FALSE, 
+                span=spanPar
+            ) + geom_point(data=df.temp.plot, aes(x=timepoint, y=y), fill=lCol, shape=21
+            )
+            
+            plotList[[tag]] <- plotList[[tag]] +   theme(
                 axis.text.y   = element_text(size=8),
                 axis.text.x   = element_text(size=8),
                 axis.title.y  = element_text(size=8),
@@ -796,14 +757,14 @@ setGeneric(
                 axis.line = element_line(colour = "black"),
                 panel.border = element_rect(colour = "black", fill=NA, size=1),
                 plot.title = element_text(hjust = 0.5, size = 12
-                )
-                ) + labs(
-                    title = paste0(gsub("_", " ", tag), " (",Ngenes,")"), 
-                    y = "Relative Gene Exprssion", 
-                    x=obj@parameterList$timecourse.units
-                ) + xlim(x.min, x.max
-                ) + ylim(y.min, y.max
-                ) 
+            )
+            ) + labs(
+                title = paste0(gsub("_", " ", tag), " (",Ngenes,")"), 
+                y = "Relative Gene Exprssion", 
+                x=obj@parameterList$timecourse.units
+            ) + xlim(x.min, x.max
+            ) + ylim(y.min, y.max
+            ) 
                 
             if (is.null(smooth)){
                 plotList[[tag]]  <- plotList[[tag]] + scale_x_discrete(breaks=as.factor(sort(unique(df.plot[,obj@parameterList$designTScol]))), labels=as.factor(sort(unique(df.plot[,obj@parameterList$designTScol]))))
@@ -898,27 +859,37 @@ dfDesign <- dfDesign[order(dfDesign[,Obio@parameterList$designTScol], decreasing
 selVec2 <- c(Obio@parameterList$geneIDcolumn, names(Obio@databaseTable)[grep("norm_counts_", names(Obio@databaseTable))])
 dfTPM <- unique(Obio@databaseTable[,selVec2])
 names(dfTPM) <- gsub("_TPM", "", names(dfTPM))
-#names(dfTPM) <- gsub("norm_counts_", "", names(dfTPM))
 
-## dfTPM requires gene name col ##
-#dfDesign$sample.group <- gsub("MEF$", "", dfDesign$sample.group)
-#dfDesign$sample.group <- gsub("Gx$", "", dfDesign$sample.group)
-library(scales)
+
 group.size <- length(unique(dfDesign$dataseries))
-group.cols <- hue_pal()(group.size)
+
+pos <- grep("dataseries_colors", names(dfDesign))
+
+if (length(pos) > 0){
+    dfCols <- unique(dfDesign[,c("dataseries", "dataseries_color")])
+    groups <- dfCols$dataseries
+    group.cols <- dfCols$dataseries_color
+    
+} else {
+    groups <- unique(dfDesign$dataseries)
+    group.cols <- scales::hue_pal()(group.size)
+}
+
+
+
 
 
 df.median <- createMedianTsPlots(
     obj = Obio,
     dfDesign = dfDesign,
     df.gmt = df.gmt,
-    group.list = createGroupList(dfDesign, dsOrderVec = unique(dfDesign$dataseries)),
+    group.list = createGroupList(dfDesign, dsOrderVec = groups),
+    ds.color = unique(group.cols),
     df.data = Obio@databaseTable,
     data.selector = "norm_counts_",
     xlab = Obio@parameterList$timecourse.units,
     ylab = "Relative Gene Expression",
     #ds = unique(rev(dfDesign$dataseries)),
-    ds.color = group.cols,
     subheadline = "\n (median category gene profile)",
     make.plots.individually = FALSE,
     plot.individual.medians = FALSE,
