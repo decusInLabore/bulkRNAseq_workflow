@@ -25,7 +25,7 @@ always_allow_html: yes
 
 ```
 
-```{r, include=FALSE}
+```{r setup, include=FALSE}
 knitr::opts_chunk$set(
     tidy = TRUE,
     tidy.opts = list(width.cutoff = 120),
@@ -44,23 +44,21 @@ remotes::install_github("rstudio/renv")
 if (!file.exists("renv.lock")){
     renv::init()
 } else {
-    renv::restore(prompt=FALSE)
+    renv::restore()
 }
-
-urlString <- "biologic.crick.ac.uk"
 ```
 
 
-```{r, eval=T}
+```{r methods, eval=T}
 
 ```
 
-```{r, eval=T}
+```{r set_directories, eval=T}
 ## Setup plot collection object
-# library(knitr)
-# library(ggplot2)
-# library(ggpubr)
-# library(DT)
+library(knitr)
+library(ggplot2)
+library(ggpubr)
+library(DT)
 
 addCorCatsToLabDb <- FALSE
 figureCount <- 1
@@ -78,9 +76,9 @@ if (dir.exists("/Volumes/babs/working/boeings/")){
     hpc.mount <- ""
 }
 
-renv::install("decusInLabore/biologicSeqTools2")
+renv::install("decusInLabore/biologicSeqTools")
 
-library(biologicSeqTools2)
+library(biologicSeqTools)
 
 
 ## Heatmap setup ##
@@ -123,7 +121,7 @@ Obio <- createAnalysisFolders(
 Obio <- setDataBaseParameters(Obio)
 
 
-Obio@parameterList[["reportFigDir"]] <- paste0(Obio@parameterList$localWorkDir, "html_local/report_figures/")
+Obio@parameterList[["reportFigDir"]] <- paste0(Obio@parameterList$localWorkDir,Obio@parameterList$project_id, "/report_figures/")
 
 ## Create outputfolders ##
 if (!dir.exists(paste0(Obio@parameterList$localWorkDir,Obio@parameterList$project_id))){
@@ -150,7 +148,7 @@ Obio@parameterList$HmDisplayCatsFromDb <- list(
 ## Correlation Heatmap
 The correlation heatmap is based on the 500 most time-variable genes in this experiment. 
 
-```{r, echo=F, eval=TRUE, warning=FALSE, result="asis", include = FALSE}
+```{r alignment_dat, echo=F, eval=TRUE, warning=FALSE, result="asis", include = FALSE}
 
 ###############################################################################
 ## Set parameters                                                            ##
@@ -240,6 +238,59 @@ dfCluster$clusterID <- paste0("Cor", dfCluster$clusterID)
 
 cluster.ids <- unique(dfCluster$clusterID)
 
+dfCluster <- data.frame(clusterID = clusters, geneID = names(clusters))
+names(dfCluster) <- gsub("geneID", Obio@parameterList$geneIDcolumn, names(dfCluster))
+dfCluster$clusterID <- paste0("Cor", dfCluster$clusterID)
+
+cluster.ids <- unique(dfCluster$clusterID)
+
+## Create cluster color labels
+
+df <- dfCluster
+
+## Add colors ##
+classes <- sort(unique(df[,"clusterID"]))
+colorVec <- scales::hue_pal()(length(classes))
+
+dfColor <- data.frame(
+    classes, 
+    colorVec
+)
+
+df <- merge(
+    df, 
+    dfColor, 
+    by.x = "clusterID",
+    by.y = "classes"
+)
+
+df <- df[df[,Obio@parameterList$geneIDcolumn] %in% colnames(mHmBase),]
+
+row.names(df) <- df[,Obio@parameterList$geneIDcolumn]
+
+df <- df[colnames(mHmBase),]
+
+df2 <- data.frame(df[,"clusterID"])
+names(df2) <- "Group"
+
+GroupVec <- as.vector(unique(df$colorVec))
+names(GroupVec) <- as.vector(unique(df[,"clusterID"]))
+
+
+
+#df2 <- unique(data.frame(Obio@dfDesign[,c("sample.id","sample.group", "sample.group_color")]))
+#df2 <- data.frame(df2[,c("sample.group")])
+
+
+
+top_ha = ComplexHeatmap::HeatmapAnnotation(df = df2, col = list(Group = GroupVec))
+
+ComplexHeatmap::ht_opt(
+    legend_border = "black",
+    heatmap_border = TRUE,
+    annotation_border = TRUE
+)
+
 
 ## Create correlation heatmap and clustering
 library(ComplexHeatmap)
@@ -294,10 +345,10 @@ plotListHM[[tag]] <- Heatmap(
     clustering_method_rows="ward.D2",
     row_dend_width=unit(10,"mm"),
     #top_annotation = ha,
-    show_heatmap_legend = TRUE
+    show_heatmap_legend = TRUE,
     #row_title = NULL,
     #show_row_dend = FALSE
-    #top_annotation = top_ha,
+    top_annotation = top_ha
     #left_annotation = left_ha
     #right_annotation = right_ha
     
@@ -326,7 +377,8 @@ figureCount <- figureCount + 1
 
 NewChnk <- paste0(
     "### ", tag,
-    "\n```{r, results='asis', echo=F, eval=TRUE, warning=FALSE, fig.cap='",
+    "\n```{r Heatmap_most_var_genes",
+    ", results='asis', echo=F, eval=TRUE, warning=FALSE, fig.cap='",
     figLegend,"', fig.asp = 1, fig.align = 'center'}\n",
     "\n",
     "\n print(plotListHM[['",tag,"']])",
@@ -345,13 +397,13 @@ chnkVec <- unique(c(
 ## Upload correlation class genes as gene cats
 ```
 
-```{r, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
+```{r knit_cor_plot_characterization_plot, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
 cat(paste(knit(text = chnkVec, quiet = T), collapse = '\n'))
 ```
 
 ## Median gene expression pattern for each correlation cluster {.tabset .tabset-fade .tabset-pills}
 
-```{r, echo=F, eval=TRUE, warning=FALSE, result="asis"}
+```{r add_cluster_measurements, echo=F, eval=TRUE, warning=FALSE, result="asis"}
 
 ###############################################################################
 
@@ -451,124 +503,8 @@ df.gmt[,2] <- gsub("RN20157_temp_cc_7", "kn_lab_categories__113", df.gmt[,2])
 ## Create median profile plots for n correlation clusters ##
 ```
 
-## Correlation cluster table {.tabset .tabset-fade .tabset-pills}
-```{r, echo=T, eval=TRUE, warning=FALSE, result="asis",include = TRUE}
-library(DT)
 
-colorVec <- rainbow(nrow(df.gmt))
-
-
-
-for (i in 1:nrow(df.gmt)){
-    tempVec <- as.vector(t(df.gmt[i,]))
-    tempVec <- unique(tempVec[tempVec != ""])
-    nameTag <- tempVec[1]
-    tempVec <- sort(tempVec[3:length(tempVec)])
-    catColor <- colorVec[i]
-    dfTemp <- data.frame(
-        Correlation_Cluster =  rep(
-            paste0(
-                '<p style="background-color:',catColor,';text-align:center">',gsub("_", " ", nameTag),'</p>'), 
-            length(tempVec)
-        ),
-        Correlation_Cluster_Genes = paste0(
-    '<a href="https://', urlString,'/',Obio@parameterList$project_id,'/gene-view?query=',tempVec, '&exact=true  target = "_blank">',tempVec,'</a>')
-    )
-    
-    dfTemp2 <- data.frame(
-        Correlation_Cluster =  rep(
-            gsub("_", " ", nameTag), 
-            length(tempVec)
-        ),
-        Correlation_Cluster_Genes = tempVec
-    )
-    
-    if (i ==1){
-        dfRes <- dfTemp
-        dfOut <- dfTemp2
-    } else {
-        dfRes <- rbind(dfRes, dfTemp)
-        dfOut <- rbind(dfOut, dfTemp2)
-    }
-}
-
-baseFN <- paste0(
-    Obio@parameterList$project_id, 
-    ".correlation.cluster.table.xlsx"
-)
-
-FNtabrel <- paste0("report_tables/", baseFN)
-tablink <- paste0('An Excel table containing the genes in each Pearson correlation cluster can be downloaded <a href = "',FNtabrel,'">here</a>. ')
-
-
-
-##############################################################################
-## Create marker gene table Excel                                           ##
-###############################################################################
-## Assemble DGE summary table                                                ##
-
-wb <- openxlsx::createWorkbook()
-hs1 <- openxlsx::createStyle(
-    fontColour = "#ffffff",
-    fgFill = "#000000",
-    halign = "CENTER",
-    textDecoration = "Bold"
-)
-sheetName <- "Correlation Clusters"
-  
-  openxlsx::addWorksheet(
-      wb, 
-      sheetName = sheetName
-  )
-  
-  
-  openxlsx::freezePane(wb, sheetName ,  firstActiveRow = 2)
-  openxlsx::writeData(wb, 1, dfOut, startRow = 1, startCol = 1, headerStyle = hs1)
-  ## Done adding to Excel workbook ##
-  
-## Save workbook ##
-baseFN <- paste0(
-   Obio@parameterList$project_id, 
-   ".Cluster.marker.table.xlsx"
-)
-FNtabrel <- paste0("report_figures/", baseFN)
-outPutFN <- paste0(
-     Obio@parameterList$reportTableDir,
-     baseFN
-)
-openxlsx::saveWorkbook(
-        wb,
-        outPutFN ,
-        overwrite = TRUE
-)
-    
-## Done creating marker gene table                                          ##
-##############################################################################
-
-tabLegend = paste0('**Table: ** Table showing the genes in each correlation cluster. An Excel version of this table can be downloaded <a href="',FNtabrel,'">here</a>')
-
-NewChnk <- paste0(
-        "## Correlation Cluster Gene Table", 
-        "\n```{r table, results='asis', echo=F, eval=TRUE, warning=FALSE, fig.cap='",
-        tabLegend,"'}\n",
-        "\n",
-        "\n datatable(dfRes,rownames = FALSE,  escape = FALSE)",
-        "\n cat(  '\n')",
-        "\n\n\n```\n"   
-    )
-    
-chnkVec <- c(
-            # chnkVec,
-            NewChnk
-)
-
-```
-
-```{r, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
-cat(paste(knit(text = chnkVec, quiet = T), collapse = '\n'))
-```
-
-```{r, echo=F, eval=TRUE, warning=FALSE, result="asis",include = FALSE}
+```{r function_block, echo=F, eval=TRUE, warning=FALSE, result="asis",include = FALSE}
 ###############################################################################
 ## Function Create cluster.timecourse.chart                                  ##
 ###############################################################################
@@ -892,7 +828,9 @@ setGeneric(
             ###########################################################################
                 
             catLink <- gsub("\\", "",as.vector(df.gmt[i,2]), fixed =T)
-            link <- paste0("An interactive heatmap depicting the genes in this category can be viewd [here](",catLink, "). ")
+            
+            #link <- paste0("An interactive heatmap depicting the genes in this category can be viewd [here](",catLink, "). ")
+            link <- ""
             
             
                 
@@ -940,7 +878,7 @@ setGeneric(
 ## End method createMedianProfilePlots()                                   ##
 ```
 
-```{r, echo=F, eval=TRUE, warning=FALSE, result="asis"}
+```{r median_cor_dat, echo=F, eval=TRUE, warning=FALSE, result="asis"}
 ###############################################################################
 ## Make category plots ##
 setwd(Obio@parameterList$localWorkDir)
@@ -996,213 +934,332 @@ plotList <- list()
 plotList <- df.median$plotList
 ```
 
+```{r cat_plot_medians_plot, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
+cat(paste(knit(text = chnkVec, quiet = T), collapse = '\n'))
+```
+
+## Correlation Cluster Table {.tabset .tabset-fade .tabset-pills}
+```{r, echo=T, eval=TRUE, warning=FALSE, result="asis",include = TRUE}
+library(DT)
+
+colorVec <- scales::hue_pal()(nrow(df.gmt))
+
+
+for (i in 1:nrow(df.gmt)){
+    tempVec <- as.vector(t(df.gmt[i,]))
+    tempVec <- unique(tempVec[tempVec != ""])
+    nameTag <- tempVec[1]
+    tempVec <- sort(tempVec[3:length(tempVec)])
+    catColor <- colorVec[i]
+    dfTemp <- data.frame(
+      Correlation_Cluster_Color =  rep(
+            paste0('<p style="background-color:',catColor,';text-align:center">_</p>'), 
+            length(tempVec)
+      ),
+    Correlation_Cluster_Name =  rep(
+           nameTag, 
+            length(tempVec)
+      ),
+    Correlation_Cluster_Genes = paste0(
+      '<a href="https://', urlString,'/',Obio@parameterList$project_id,'/gene-view?query=',tempVec, '&exact=true  target = "_blank">',tempVec,'</a>')
+    )
+    
+    dfTemp2 <- data.frame(
+        Correlation_Cluster =  rep(
+            gsub("_", " ", nameTag), 
+            length(tempVec)
+        ),
+        Correlation_Cluster_Genes = tempVec
+    )
+    
+    if (i ==1){
+        dfRes <- dfTemp
+        dfOut <- dfTemp2
+    } else {
+        dfRes <- rbind(dfRes, dfTemp)
+        dfOut <- rbind(dfOut, dfTemp2)
+    }
+}
+
+baseFN <- paste0(
+    Obio@parameterList$project_id, 
+    ".correlation.cluster.table.xlsx"
+)
+
+FNtabrel <- paste0("report_tables/", baseFN)
+tablink <- paste0('An Excel table containing the genes in each Pearson correlation cluster can be downloaded <a href = "',FNtabrel,'">here</a>. ')
+
+
+
+##############################################################################
+## Create marker gene table Excel                                           ##
+###############################################################################
+## Assemble DGE summary table                                                ##
+
+wb <- openxlsx::createWorkbook()
+hs1 <- openxlsx::createStyle(
+    fontColour = "#ffffff",
+    fgFill = "#000000",
+    halign = "CENTER",
+    textDecoration = "Bold"
+)
+sheetName <- "Correlation Clusters"
+  
+  openxlsx::addWorksheet(
+      wb, 
+      sheetName = sheetName
+  )
+  
+  
+  openxlsx::freezePane(wb, sheetName ,  firstActiveRow = 2)
+  openxlsx::writeData(wb, 1, dfOut, startRow = 1, startCol = 1, headerStyle = hs1)
+  ## Done adding to Excel workbook ##
+  
+## Save workbook ##
+baseFN <- paste0(
+   Obio@parameterList$project_id, 
+   ".Cluster.marker.table.xlsx"
+)
+FNtabrel <- paste0("report_tables/", baseFN)
+outPutFN <- paste0(
+     Obio@parameterList$reportTableDir,
+     baseFN
+)
+openxlsx::saveWorkbook(
+        wb,
+        outPutFN ,
+        overwrite = TRUE
+)
+    
+## Done creating marker gene table                                          ##
+##############################################################################
+
+tabLegend = paste0('**Table: ** Table showing the genes in each correlation cluster. An Excel version of this table can be downloaded <a href="',FNtabrel,'">here</a>')
+
+NewChnk <- paste0(
+        "### Correlation Cluster Gene Table", 
+        "\n```{r table, results='asis', echo=F, eval=TRUE, warning=FALSE, fig.cap='",
+        tabLegend,"'}\n",
+        "\n",
+        "\n DT::datatable(dfRes,rownames = FALSE,  escape = FALSE)",
+        "\n cat(  '\n')",
+        "\n\n\n```\n"   
+    )
+    
+chnkVec <- c(
+            # chnkVec,
+            NewChnk
+)
+
+```
+
 ```{r, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
 cat(paste(knit(text = chnkVec, quiet = T), collapse = '\n'))
 ```
 
 ## Category Enrichment Analysis on Gene Sets {.tabset .tabset-fade .tabset-pills}
-```{r, echo=F, eval=TRUE, warning=FALSE, result="asis",include = FALSE}
+```{r make_enrichment_plots, echo=F, eval=TRUE, warning=FALSE, result="asis",include = FALSE}
 
-# dfENRgmt <- df.gmt
-# 
-# plotList <- list()
-# chnkVec <- as.vector(NULL, mode = "character")
-# 
-# for (j in 1:nrow(dfENRgmt)){
-#     
-#     tag <- paste0("ENR_", j)
-#     Cname <- gsub("_", " ", dfENRgmt[j,1])
-#     
-#     geneVec <- as.vector(unique(dfENRgmt[j, 3:ncol(dfENRgmt)]))
-#     geneVec <- geneVec[geneVec != ""]
-#     geneVec <- na.omit(geneVec)
-#     
-#     ## Translate 
-#     # dfAnnoSel <- unique(
-#     #     dfAnno[dfAnno[,Obio@parameterList$primaryAlignmentGeneID] %in% geneVec, ]
-#     # )
-#     # 
-#     # posTestGeneSet <- unique(dfAnnoSel[,Obio@parameterList$geneIDcolumn])
-#     # 
-#     posTestGeneSet <- geneVec
-#     
-#     negTestGeneSet <- NULL
-#     
-#     ## Get background gene set ##
-#     #backgroundGeneVec <- row.names(OsC[["RNA"]]@counts)
-#     if ((length(posTestGeneSet) >= 3) |(length(negTestGeneSet) >= 3)){
-#         library(enrichR)
-#         topMaxCat <- 20
-#         dbs <- listEnrichrDbs()
-#         
-#         dbs <- c("GO_Biological_Process_2017")
-#         
-#         
-#         PosEnriched <- enrichr(posTestGeneSet, dbs)
-#         
-#         for (i in 1:length(dbs)){
-#             dfTemp <- PosEnriched[[dbs[i]]]
-#             
-#             if (i ==1){
-#                 dfPosEnriched <- dfTemp
-#             } else {
-#                 dfPosEnriched <- rbind(
-#                     dfPosEnriched,
-#                     dfTemp
-#                 )
-#             }
-#             
-#         }
-#         
-#         dfPosEnriched[["log10FDR"]] <- -1*log10(dfPosEnriched$Adjusted.P.value)
-#         dfPosEnriched <- dfPosEnriched[order(-dfPosEnriched$log10FDR),]
-#         dfPosEnriched <- na.omit(dfPosEnriched)
-#         
-#         ## Negative Side ##
-#         # NegEnriched <- enrichr(negTestGeneSet, dbs)
-#         # 
-#         # for (i in 1:length(dbs)){
-#         #     dfTemp <- NegEnriched[[dbs[i]]]
-#         #     
-#         #     if (i ==1){
-#         #         dfNegEnriched <- dfTemp
-#         #     } else {
-#         #         dfNegEnriched <- rbind(
-#         #             dfNegEnriched,
-#         #             dfTemp
-#         #         )
-#         #     }
-#         #     
-#         # }
-#         # 
-#         # 
-#         # dfNegEnriched[["log10FDR"]] <- -1*log10(dfNegEnriched$Adjusted.P.value)
-#         # dfNegEnriched <- dfNegEnriched[order(-dfPosEnriched$log10FDR),]
-#         # dfNegEnriched <- na.omit(dfNegEnriched)
-#         # 
-#         # dfNegSel <- dfNegEnriched
-#         # if (nrow(dfNegSel) > topMaxCat){
-#         #     dfNegSel <- dfNegSel[1:topMaxCat,]
-#         # }
-#         
-#         dfPosSel <- dfPosEnriched
-#         if (nrow(dfPosSel) > topMaxCat){
-#             dfPosSel <- dfPosSel[1:topMaxCat,]
-#         }
-#         
-#         if ((nrow(dfPosEnriched) > 0)){
-#             
-#             
-#             #dfNegSel$log10FDR <- -1* dfNegSel$log10FDR
-#             
-#             dfSel <- dfPosSel
-#             
-#             dfSel <- na.omit(dfSel)
-#             dfSel <- dfSel[order(dfSel$log10FDR),]
-#             dfSel$log10FDR <- round(dfSel$log10FDR, 2)
-#             
-#             dfSel[["Category"]] <- ""
-#             dfSel[dfSel$log10FDR >= 0, "Category"] <- "Enr."
-#             #dfSel[dfSel$log10FDR < 0, "Category"] <- "Depl."
-#             
-#             for (k in 1:nrow(dfSel)){
-#                 if (nchar(dfSel[k, "Term"]) > 50 & length(grep("\\(GO", as.vector(dfSel[k, "Term"]))) > 0){
-#                     part1 <- unlist(strsplit(as.vector(dfSel[k, "Term"]), "\\(GO"))[1]
-#                     part1 <- substr(part1, 1, 45)
-#                     part2 <- unlist(strsplit(as.vector(dfSel[k, "Term"]), "\\(GO"))[2]
-#                     part2 <- paste0("\\(GO", part2)
-#                     
-#                     if (nchar(part1) > 40 ){
-#                         dfSel[k, "Term"] <- paste0(part1, " \\n", part2)
-#                     } else { 
-#                         dfSel[k, "Term"] <- paste0(part1, " ", part2)
-#                     }
-#                 }
-#             }
-#             
-#             
-#             #dfSel$Term <- gsub("\\(GO", "\\\n\\(GO", dfSel$Term)
-#             
-#             dfSel$Term <- factor(dfSel$Term, levels = unique(dfSel$Term))
-#             
-#             #tag <- paste0("ENR_", j)
-#             #Cname <- gsub("_", " ", dfENRgmt[j,1])
-#             
-#             plotList[[tag]] <- ggplot(
-#                 data=dfSel, aes(x= Term, y=log10FDR, fill=Category, order=log10FDR)
-#             ) + geom_bar(stat="identity", colour="black"
-#             ) + coord_flip() +scale_fill_manual(values=c("grey"))  +  theme(
-#                 axis.text.y   = element_text(size=8),
-#                 axis.text.x   = element_text(size=8),
-#                 axis.title.y  = element_text(size=8),
-#                 axis.title.x  = element_text(size=8),
-#                 axis.line = element_line(colour = "black"),
-#                 panel.border = element_rect(colour = "black", fill=NA, size=1),
-#                 plot.title = element_text(hjust = 0.5, size = 12)
-#             )  + labs(title = paste0("Cluster ", Cname," enriched genes") ,y = "-log10(FDR)", x = ""
-#             ) + geom_hline(yintercept = c(-log10(0.05), log10(0.05)), color = "red", size=0.5, lty=2
-#             ) + geom_hline(yintercept = 0, color = "black", size=0.5
-#             ) + theme_bw()
-#             cat("  \n")
-#             
-#             
-#             
-#             ## Save to file ##
-#             FNbase <- paste0("Cluster_", Cname,".enriched.genes", VersionPdfExt)
-#             FN <- paste0(Obio@parameterList$reportFigDir, FNbase)
-#             FNrel <- paste0("report_figures/", FNbase)
-#             
-#            
-#             pdf(FN)
-#             print(plotList[[paste0("ENR_", j)]])
-#             dev.off()
-#             
-#             ## Create R markdown chunk ##
-#             # link <- paste0(
-#             #     "https://",urlString,"/",
-#             #     Obio@parameterList$project_id,
-#             #     "/category-view?category_type=GO-BP"
-#             # )
-#             
-#             
-#             figLegend <- paste0(
-#                 "**Figure ", 
-#                 figureCount, 
-#                 "**: GO-BP category enrichment analysis for genes that are <font color = \\'yellow\\'>higher</font> and <font color = \\'blue\\'>lower</font> expressed in Cluster ", 
-#                 Cname,
-#                 " as compared to all other clusters. Download a pdf of this figure [here](", FNrel, "). "
-# 
-# #To view these gene sets in the context of your data, go to [CategoryView > GO-BP](",link,") and find the above categories using the search box."
-#             )
-#             figureCount <- figureCount + 1 
-#             
-#             NewChnk <- paste0(
-#                 "### ", Cname,
-#                 "\n```{r enrichr_cluster_",
-#                 j,", results='asis', echo=F, eval=TRUE, warning=FALSE, fig.cap='",
-#                 figLegend,"'}\n",
-#                 "\n",
-#                 "\n print(plotList[['",tag,"']])",
-#                 "\n cat(  '\n')",
-#                 "\n\n\n```\n"   
-#             )
-#             
-#             chnkVec <- c(
-#                 chnkVec,
-#                 NewChnk
-#             )
-#         }
-#         
-#     }
-#     
-# }
+dfENRgmt <- df.gmt
+
+plotList <- list()
+chnkVec <- as.vector(NULL, mode = "character")
+
+for (j in 1:nrow(dfENRgmt)){
+
+    tag <- paste0("ENR_", j)
+    Cname <- gsub("_", " ", dfENRgmt[j,1])
+
+    geneVec <- as.vector(unique(dfENRgmt[j, 3:ncol(dfENRgmt)]))
+    geneVec <- geneVec[geneVec != ""]
+    geneVec <- na.omit(geneVec)
+
+    ## Translate
+    # dfAnnoSel <- unique(
+    #     dfAnno[dfAnno[,Obio@parameterList$primaryAlignmentGeneID] %in% geneVec, ]
+    # )
+    #
+    # posTestGeneSet <- unique(dfAnnoSel[,Obio@parameterList$geneIDcolumn])
+    #
+    posTestGeneSet <- geneVec
+
+    negTestGeneSet <- NULL
+
+    ## Get background gene set ##
+    #backgroundGeneVec <- row.names(OsC[["RNA"]]@counts)
+    if ((length(posTestGeneSet) >= 3) |(length(negTestGeneSet) >= 3)){
+        library(enrichR)
+        topMaxCat <- 20
+        dbs <- listEnrichrDbs()
+
+        dbs <- c("GO_Biological_Process_2017")
+
+
+        PosEnriched <- enrichr(posTestGeneSet, dbs)
+
+        for (i in 1:length(dbs)){
+            dfTemp <- PosEnriched[[dbs[i]]]
+
+            if (i ==1){
+                dfPosEnriched <- dfTemp
+            } else {
+                dfPosEnriched <- rbind(
+                    dfPosEnriched,
+                    dfTemp
+                )
+            }
+
+        }
+
+        dfPosEnriched[["log10FDR"]] <- -1*log10(dfPosEnriched$Adjusted.P.value)
+        dfPosEnriched <- dfPosEnriched[order(-dfPosEnriched$log10FDR),]
+        dfPosEnriched <- na.omit(dfPosEnriched)
+
+        ## Negative Side ##
+        # NegEnriched <- enrichr(negTestGeneSet, dbs)
+        #
+        # for (i in 1:length(dbs)){
+        #     dfTemp <- NegEnriched[[dbs[i]]]
+        #
+        #     if (i ==1){
+        #         dfNegEnriched <- dfTemp
+        #     } else {
+        #         dfNegEnriched <- rbind(
+        #             dfNegEnriched,
+        #             dfTemp
+        #         )
+        #     }
+        #
+        # }
+        #
+        #
+        # dfNegEnriched[["log10FDR"]] <- -1*log10(dfNegEnriched$Adjusted.P.value)
+        # dfNegEnriched <- dfNegEnriched[order(-dfPosEnriched$log10FDR),]
+        # dfNegEnriched <- na.omit(dfNegEnriched)
+        #
+        # dfNegSel <- dfNegEnriched
+        # if (nrow(dfNegSel) > topMaxCat){
+        #     dfNegSel <- dfNegSel[1:topMaxCat,]
+        # }
+
+        dfPosSel <- dfPosEnriched
+        if (nrow(dfPosSel) > topMaxCat){
+            dfPosSel <- dfPosSel[1:topMaxCat,]
+        }
+
+        if ((nrow(dfPosEnriched) > 0)){
+
+
+            #dfNegSel$log10FDR <- -1* dfNegSel$log10FDR
+
+            dfSel <- dfPosSel
+
+            dfSel <- na.omit(dfSel)
+            dfSel <- dfSel[order(dfSel$log10FDR),]
+            dfSel$log10FDR <- round(dfSel$log10FDR, 2)
+
+            dfSel[["Category"]] <- ""
+            dfSel[dfSel$log10FDR >= 0, "Category"] <- "Enr."
+            #dfSel[dfSel$log10FDR < 0, "Category"] <- "Depl."
+
+            for (k in 1:nrow(dfSel)){
+                if (nchar(dfSel[k, "Term"]) > 50 & length(grep("\\(GO", as.vector(dfSel[k, "Term"]))) > 0){
+                    part1 <- unlist(strsplit(as.vector(dfSel[k, "Term"]), "\\(GO"))[1]
+                    part1 <- substr(part1, 1, 45)
+                    part2 <- unlist(strsplit(as.vector(dfSel[k, "Term"]), "\\(GO"))[2]
+                    part2 <- paste0("\\(GO", part2)
+
+                    if (nchar(part1) > 40 ){
+                        dfSel[k, "Term"] <- paste0(part1, " \\n", part2)
+                    } else {
+                        dfSel[k, "Term"] <- paste0(part1, " ", part2)
+                    }
+                }
+            }
+
+
+            #dfSel$Term <- gsub("\\(GO", "\\\n\\(GO", dfSel$Term)
+
+            dfSel$Term <- factor(dfSel$Term, levels = unique(dfSel$Term))
+
+            #tag <- paste0("ENR_", j)
+            #Cname <- gsub("_", " ", dfENRgmt[j,1])
+
+            plotList[[tag]] <- ggplot(
+                data=dfSel, aes(x= Term, y=log10FDR, fill=Category, order=log10FDR)
+            ) + geom_bar(stat="identity", colour="black"
+            ) + coord_flip() +scale_fill_manual(values=c("grey"))  +  theme(
+                axis.text.y   = element_text(size=8),
+                axis.text.x   = element_text(size=8),
+                axis.title.y  = element_text(size=8),
+                axis.title.x  = element_text(size=8),
+                axis.line = element_line(colour = "black"),
+                panel.border = element_rect(colour = "black", fill=NA, size=1),
+                plot.title = element_text(hjust = 0.5, size = 12)
+            )  + labs(title = paste0("Cluster ", Cname," enriched genes") ,y = "-log10(FDR)", x = ""
+            ) + geom_hline(yintercept = c(-log10(0.05), log10(0.05)), color = "red", size=0.5, lty=2
+            ) + geom_hline(yintercept = 0, color = "black", size=0.5
+            ) + theme_bw()
+            cat("  \n")
+
+
+
+            ## Save to file ##
+            FNbase <- paste0("Cluster_", Cname,".enriched.genes", VersionPdfExt)
+            FN <- paste0(Obio@parameterList$reportFigDir, FNbase)
+            FNrel <- paste0("report_figures/", FNbase)
+
+
+            pdf(FN)
+            print(plotList[[paste0("ENR_", j)]])
+            dev.off()
+
+            ## Create R markdown chunk ##
+            # link <- paste0(
+            #     "https://",urlString,"/",
+            #     Obio@parameterList$project_id,
+            #     "/category-view?category_type=GO-BP"
+            # )
+
+
+            figLegend <- paste0(
+                "**Figure ",
+                figureCount,
+                "**: GO-BP category enrichment analysis for genes that are <font color = \\'yellow\\'>higher</font> and <font color = \\'blue\\'>lower</font> expressed in Cluster ",
+                Cname,
+                " as compared to all other clusters. Download a pdf of this figure [here](", FNrel, "). "
+
+#To view these gene sets in the context of your data, go to [CategoryView > GO-BP](",link,") and find the above categories using the search box."
+            )
+            figureCount <- figureCount + 1
+
+            NewChnk <- paste0(
+                "### ", Cname,
+                "\n```{r enrichr_cluster_",
+                j,", results='asis', echo=F, eval=TRUE, warning=FALSE, fig.cap='",
+                figLegend,"'}\n",
+                "\n",
+                "\n print(plotList[['",tag,"']])",
+                "\n cat(  '\n')",
+                "\n\n\n```\n"
+            )
+
+            chnkVec <- c(
+                chnkVec,
+                NewChnk
+            )
+        }
+
+    }
+
+}
 
 ```
 
-```{r, echo=T, eval=TRUE, warning=FALSE, results='asis'}
+```{r create-markdown-enrichment-chunks-dynamically, echo=T, eval=TRUE, warning=FALSE, results='asis'}
 ###############################################################################
 ## Do category enrichment on clusters                                        ##
-#cat(paste(knit(text = chnkVec, quiet = T), collapse = '\n'))
+cat(paste(knit(text = chnkVec, quiet = T), collapse = '\n'))
 ## Done doing enrichment on clusters                                         ##
 ###############################################################################
 

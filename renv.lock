@@ -705,6 +705,28 @@
       "Hash": "e89314121c52d1de7609ad5acc295501",
       "Requirements": []
     },
+    "biologicSeqTools": {
+      "Package": "biologicSeqTools",
+      "Version": "0.0.0.9000",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "decusInLabore",
+      "RemoteRepo": "biologicSeqTools",
+      "RemoteRef": "main",
+      "RemoteSha": "b662dd6b56729280864f9388b05977b5fcde6625",
+      "Hash": "74392ca88f0a6a8346844ec28091eb99",
+      "Requirements": [
+        "DBI",
+        "DESeq2",
+        "RMySQL",
+        "RSQLite",
+        "Seurat",
+        "dplyr",
+        "jsonlite",
+        "openxlsx"
+      ]
+    },
     "biologicSeqTools2": {
       "Package": "biologicSeqTools2",
       "Version": "0.0.0.9000",
@@ -1091,6 +1113,18 @@
       "Hash": "7067d90c1c780bfe80c0d497e3d7b49d",
       "Requirements": [
         "rlang"
+      ]
+    },
+    "enrichR": {
+      "Package": "enrichR",
+      "Version": "3.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "8cdcd06e4fa171911dc4d83feaa26467",
+      "Requirements": [
+        "ggplot2",
+        "httr",
+        "rjson"
       ]
     },
     "enrichplot": {
