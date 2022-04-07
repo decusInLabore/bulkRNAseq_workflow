@@ -494,11 +494,11 @@ setwd(Obio@parameterList$localWorkDir)
 ## Create settings JSON                                                      ##
 
 ## This project only ##
-dfSel <- Obio@dfDesign
-dfSel <- dfSel[dfSel$f_gender == "ZZ",c("sample.id", "f_gender")]
+
 
 projectJSON <- biologicSeqTools2::createSettingsJSON(
     obj = Obio,
+    publicDataset = FALSE,
     df.data = Obio@databaseTable,
     defaultXcolName = xdefault,
     defaultYcolName = ydefault,
@@ -835,7 +835,8 @@ if (createProjectRefDbTables){
         
     ## Upload to database ##
     createProjectRefDbTables <- T
-    if (createProjectRefDbTables){  
+    
+    if (length(UploadList) > 0 && createProjectRefDbTables){  
         for (i in 1:length(UploadList)){
             ###########################################################################
         ## check if cat name exist and delete if it does                         ##
