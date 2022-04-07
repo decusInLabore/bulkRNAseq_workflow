@@ -61,20 +61,20 @@ pipelineList <- list()
 ## Essential parameters ##
 
 # Make sure the final character is a slash /
-pipelineList[["folder"]] <- "/camp/stp/babs/working/boeings/Projects/lovellbadger/gunes.taylor/483_vis_E07_E10_E14_merged/"
+pipelineList[["folder"]] <- "/camp/stp/babs/working/boeings/Projects/pachnisv/franze.progatzky/475A_EGC_miRNAseq_RN21203_hairpin/"
 
 ## Path were the biologic spec file will be kept: ##
 pipelineList[["biologicSettingsFN"]] <- paste0(pipelineList[["folder"]], "workdir/bulkRNAseq_workflow/design/biologic.settings.file.csv")
 
 ## Project parameters                       ##
 ## This will be the name of the web project ##
-pipelineList[["project_id"]] <- "E7E10E14"
+pipelineList[["project_id"]] <- "RN21203hairpin"
 
 ## The LIMS ID will be used to retrieve project information
-pipelineList[["lims.id"]] <- "RN20094"
+pipelineList[["lims.id"]] <- "RN21203"
 
 ## This is the lab name ##
-pipelineList[["labname"]] <- "Lovel Badge"
+pipelineList[["labname"]] <- "Pachnis"
 
 ## This is the project under which this experiment will be organised in the db
 ## The project is the umbrella under which several experiments around a similar
@@ -82,7 +82,7 @@ pipelineList[["labname"]] <- "Lovel Badge"
 ## If a project name exists, this new experiment will be added to that umbrella
 ## project. If the project does not exists, it will be created. 
 
-pipelineList[["project_name"]] <- "Sex Determination in Chicken"
+pipelineList[["project_name"]] <- "Characterization of enteric glia cells related experiments"
 
 ## Parameters for the experiment
 ## If the parameters title, subtitle and abstract are set to NULL, 
@@ -98,23 +98,25 @@ pipelineList[["NtopGenes"]] <- 500
 
 ## Genes to calculate Pearson correlations for. The gene names need to be 
 ## present in the experiment.
-pipelineList[["corGeneVec"]] <- c(
-    "FOXL2", 
-    "DMRT1"
-)
+# pipelineList[["corGeneVec"]] <- c(
+#     "FOXL2", 
+#     "DMRT1"
+# )
+
+pipelineList[["corGeneVec"]] <- NULL
 
 
 # options: "bulk_rna_seq", "sc_rna_seq"
-pipelineList[["experiment.type"]] <- "bulk_rna_seq"
+pipelineList[["experiment.type"]] <- "mi_rna_seq"
 
 ## This should be the reference transcriptome ##
-pipelineList[["species"]] <- "gallus_gallus"
-pipelineList[["release"]] <- "release-95"
+pipelineList[["species"]] <- "mus_musculus"
+pipelineList[["release"]] <- "release-89"
 
 ###############################################################################
 ## Display parameters                                                        ##
-pipelineList[["count.table.headline"]] <- "TPM Values for all Samples"
-pipelineList[["count.table.sidelabel"]] <- "TPM"
+pipelineList[["count.table.headline"]] <- "Counts for all Samples"
+pipelineList[["count.table.sidelabel"]] <- "Counts"
 pipelineList[["heamap.headline.text"]] <- "Heatmap: Row-averaged Expr"
 ##                                                                           ##
 ###############################################################################
@@ -123,14 +125,15 @@ pipelineList[["heamap.headline.text"]] <- "Heatmap: Row-averaged Expr"
 ## Timecourse section: Set entries to NULL if not a timecourse experiment    ##
 
 ## designTScol entry needs to be present as column name in the design file 
-pipelineList[["designTScol"]] <- "f_timepoint"
-## Default: pipelineList[["designTScol"]] <- NULL
+#pipelineList[["designTScol"]] <- "f_timepoint"
+pipelineList[["designTScol"]] <- NULL
 
-pipelineList[["timecourse.units"]] <- "Embryonic Day"
+#pipelineList[["timecourse.units"]] <- "Embryonic Day"
 ## Default: pipelineList[["timecourse.units"]] <- NULL
 
-pipelineList[["timecourse.units"]] <- "Embryonic Day"
-## Default: pipelineList[["timecourse.units"]] <- NULL
+#pipelineList[["timecourse.units"]] <- "Embryonic Day"
+## Default: 
+pipelineList[["timecourse.units"]] <- NULL
 
 ## End timecourse section                                                    ##
 ###############################################################################
@@ -146,7 +149,7 @@ pipelineList[["Database Parameters	"]] <- ""
 
 ## Enter lab database name here
 ## One database per lab
-pipelineList[["primDataDB"]] <- "rll_data"
+pipelineList[["primDataDB"]] <- "vpl_data"
 
 ## These three can be left pre-set
 pipelineList[["ref.cat.db"]] <- "reference_categories_db_new"
@@ -154,7 +157,7 @@ pipelineList[["db.user"]] <- "babs"
 pipelineList[["host"]] <- "10.27.241.82"
 
 ## Add lab categories table, if available.
-pipelineList[["lab.categories.table"]] <- "rl_lab_categories"
+pipelineList[["lab.categories.table"]] <- "vp_lab_categories"
 ## Default if no lab database table is available
 # pipelineList[["lab.categories.table"]] <- NULL
 
@@ -247,18 +250,18 @@ pipelineList[["read.length"]] =  "100bp"
 ## Make sure to add a / at the end of the folder names
 ## Under normal circumstances this will be the NF-core output folder
 ## If set to NULL, it'll be assumed that a RSEM file will be provided 
-pipelineList[["pathToRSEMresultsFiles"]] <- c(
-    "/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/RN20094_E07/GRCg6a/processed_data/results/star_rsem/",
-    "/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/RN20152_E10/GRCg6a/processed_data/results/star_rsem/",
-    "/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/RN21119_E14/GRCg6a/processed_data/results/star_rsem/"
-)
+# pipelineList[["pathToRSEMresultsFiles"]] <- c(
+#     "/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/RN20094_E07/GRCg6a/processed_data/results/star_rsem/",
+#     "/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/RN20152_E10/GRCg6a/processed_data/results/star_rsem/",
+#     "/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/RN21119_E14/GRCg6a/processed_data/results/star_rsem/"
+# )
 
 ## This is the folder in which the [sample.id].genes.result files live
 RSEM_folder <- paste0(pipelineList[["folder"]], "basedata/")
 pipelineList[["RSEM_folder"]]  <- RSEM_folder 
 
 ## This is the name of the RSEM output file
-countTableFN <- paste0(pipelineList[["folder"]], "basedata/RN21224.count.data.txt")
+countTableFN <- paste0(pipelineList[["folder"]], "data/",pipelineList[["project_id"]],".count.data.txt")
 
 ## Save as parameter
 pipelineList[["countTableFN"]] <- countTableFN
@@ -269,7 +272,7 @@ pipelineList[["preProcessedCountTableFN"]] <- gsub("count.data", "count.data.pre
 ## TPM tables ##
 pipelineList[["TpmTableFN"]] <- paste0(
         pipelineList[["folder"]],
-        "basedata/",
+        "data/",
         pipelineList[["project_id"]],
         ".tpm.file.txt"
 )
@@ -470,7 +473,7 @@ if (dir.exists("/Volumes/babs/working/boeings/")){
 
 baseDesignFN <- paste0(
   pipelineList[["folder"]],
-  "basedata/base.design.txt"
+  "data/base.design.txt"
 )
 
 
@@ -551,21 +554,7 @@ if (length(pos) == 0){
 ###############################################################################
 ## Order dfDesign for displays.                                              ##
 
-pos <- grep("^f_timepoint$", names(dfDesign))
-library(dplyr)
 
-if (length(pos) == 1){
-    dfDesign <- dfDesign %>%
-        mutate(f_timepoint = as.numeric(f_timepoint)) %>%
-        arrange(f_gender, match(dataseries, c("WtFemale", "HetFemale", "HomFemale", "WtMale", "HomMale")), f_timepoint, f_replicate, .by_group = FALSE)  
-
-    dfDesign <- data.frame(dfDesign)
-} else {
-    dfDesign <- dfDesign %>%
-        arrange(f_gender, match(dataseries, c("WtFemale", "HetFemale", "HomFemale", "WtMale", "HomMale")), f_replicate, .by_group = FALSE)  
-
-    dfDesign <- data.frame(dfDesign)
-}
 ## Done with colors
 ##
 ###############################################################################
@@ -581,24 +570,7 @@ if (!dir.exists(paste0(pipelineList[["dataDir"]], "DEseq2External"))){
 }
 
 ## External DEseq2 results can be res(dds) and saved with write.table ##
-files <- paste0(
-    "/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/biologic/GRCg6a/",
-    list.files("/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/biologic/GRCg6a")
-)    
 
-files <- files[grep("rda$", files)]    
-
-for (i in 1:length(files)){
-    FNbase <- gsub("/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/biologic/GRCg6a/", "", files[i])
-    FNbase <- gsub("_results.rda", ".txt", FNbase)
-    dfTemp <- data.frame(readRDS(files[i]))
-    write.table(
-        dfTemp,
-        paste0(pipelineList[["dataDir"]], "DEseq2External/PE_", FNbase),
-        sep = "\t"
-    )
-    
-}
 
 
 ## Done                                                                      ##
@@ -606,14 +578,7 @@ for (i in 1:length(files)){
 
 ###############################################################################
 ## If applicable - add external input files                                  ##
-externalFiles <- list.files( paste0(pipelineList[["dataDir"]], "DEseq2External/"))
 
-if (length(externalFiles) > 0){
-    externalFiles <- gsub(".txt", "", externalFiles)
-    for (i in 1:length(externalFiles)){
-        dfDesign[[paste0("comp_", externalFiles[i])]] <- ""
-    }
-}
 ## Done adding external                                                      ##
 ###############################################################################
 
@@ -840,68 +805,145 @@ if (! is.null(pipelineList[["NFcoreSettingsFN"]]) | !is.null(pipelineList[["path
 
 
 ## Create RSEM count matrix if it doesn't exist yet ##
-if (!is.null(pipelineList[["pathToRSEMresultsFiles"]] )){
-    files <- unlist(
-        lapply(
-            pipelineList[["pathToRSEMresultsFiles"]], 
-            function(x)paste0(x, list.files(x))
-        )
-    )
-}
+hairpinFN <- "/camp/stp/babs/working/boeings/Projects/pachnisv/franze.progatzky/475_EGC_miRNAseq_RN21203/workdir/fitht_results/edgeR/miRBase_hairpin/hairpin_counts.csv"
 
-files <- files[grep(".genes.results", files)]
+dfHairpin <- read.csv(hairpinFN, stringsAsFactors = F)
+names(dfHairpin) <- gsub("\\.", "_", names(dfHairpin))
+row.names(dfHairpin) <- dfHairpin$X
+dfHairpin$X <- NULL
+dfHairpin <- data.frame(t(dfHairpin))
 
 
+p1 <- sapply(names(dfHairpin), function(x) unlist(strsplit(x, "_"))[1])
+p2 <- sapply(names(dfHairpin), function(x) unlist(strsplit(x, "_"))[2])
+p2 <- paste0(p2, "Hairpin")
+p3 <- sapply(names(dfHairpin), function(x) unlist(strsplit(x, "_"))[3])
+p3 <- gsub(".hairpin", "", p3)
 
-files = paste(
-    files,
-    collapse = " "
-)
+names(dfHairpin) <- paste0(p1, "_", p2, "_", p3)
+dfHairpin[["gene"]] <- row.names(dfHairpin)
+dfHairpin[["gene"]] <- gsub("_mir_", "_miR_", dfHairpin$gene)
 
-RSEM.CMD = paste(
-    "module load RSEM/1.3.3-foss-2021a;",
-    "rsem-generate-data-matrix ",
-    files,
-    " > ",
-    pipelineList[["preProcessedCountTableFN"]],
-    sep=""
-)
+dfCount <- dfHairpin
 
-## Run RSEM command
-## The above command might only work on the command line
-sink("../RSEM.command.sh")
-cat(RSEM.CMD)
-sink()
+#dfCount  <- dplyr::full_join(dfMature,  dfHairpin, by = "gene")
+dfCount[is.na(dfCount)] <- 0
+#dfCount[dfCount$mature_miRNA == 0, "mature_miRNA"] <- dfCount[dfCount$mature_miRNA == 0, "gene"]
+
+orderVec <- names(dfCount)
+orderVec <- orderVec[orderVec != "mature_miRNA"]
+orderVec <- orderVec[orderVec != "gene"]
+#orderVec <- c("mature_miRNA", sort(orderVec))
+
+dfCount <- dfCount[, orderVec]
+
+# row.names(dfCount) <- dfCount$mature_miRNA
+# dfCount$mature_miRNA <- NULL
+
+# FNcount <- "../../basedata/count.matrix.txt"
+# write.table(dfCount, FNcount,  sep="\t")
+# 
+# 
+# if (!is.null(pipelineList[["pathToRSEMresultsFiles"]] )){
+#     files <- unlist(
+#         lapply(
+#             pipelineList[["pathToRSEMresultsFiles"]], 
+#             function(x)paste0(x, list.files(x))
+#         )
+#     )
+# }
+# 
+# files <- files[grep(".genes.results", files)]
+# 
+# 
+# 
+# files = paste(
+#     files,
+#     collapse = " "
+# )
+# 
+# RSEM.CMD = paste(
+#     "module load RSEM/1.3.3-foss-2021a;",
+#     "rsem-generate-data-matrix ",
+#     files,
+#     " > ",
+#     pipelineList[["preProcessedCountTableFN"]],
+#     sep=""
+# )
+# 
+# ## Run RSEM command
+# ## The above command might only work on the command line
+# sink("../RSEM.command.sh")
+# cat(RSEM.CMD)
+# sink()
 
 #system(RSEM.CMD)
 ## Run RSEM shell script ##
 
-## Read resulting RSEM table
-dfRSEM <- read.delim(
-    pipelineList[["preProcessedCountTableFN"]], 
-    sep = "\t",
-    header = T,
-    stringsAsFactors = F
-)
+# hairpinFN <- "/camp/stp/babs/working/boeings/Projects/pachnisv/franze.progatzky/475_EGC_miRNAseq_RN21203/workdir/fitht_results/edgeR/miRBase_hairpin/hairpin_counts.csv"
+# 
+# dfHairpin <- read.csv(hairpinFN, stringsAsFactors = F)
+# names(dfHairpin) <- gsub("\\.", "_", names(dfHairpin))
+# row.names(dfHairpin) <- dfHairpin$X
+# dfHairpin$X <- NULL
+# dfHairpin <- data.frame(t(dfHairpin))
+# 
+# 
+# p1 <- sapply(names(dfHairpin), function(x) unlist(strsplit(x, "_"))[1])
+# p2 <- sapply(names(dfHairpin), function(x) unlist(strsplit(x, "_"))[2])
+# p2 <- paste0(p2, "Hairpin")
+# p3 <- sapply(names(dfHairpin), function(x) unlist(strsplit(x, "_"))[3])
+# p3 <- gsub(".hairpin", "", p3)
+# 
+# names(dfHairpin) <- paste0(p1, "_", p2, "_", p3)
+# dfHairpin[["gene"]] <- row.names(dfHairpin)
+# dfHairpin[["gene"]] <- gsub("_mir_", "_miR_", dfHairpin$gene)
+# 
+# dfCount  <- dplyr::full_join(dfMature,  dfHairpin, by = "gene")
+# dfCount[is.na(dfCount)] <- 0
+# dfCount[dfCount$mature_miRNA == 0, "mature_miRNA"] <- dfCount[dfCount$mature_miRNA == 0, "gene"]
+# 
+# orderVec <- names(dfCount)
+# orderVec <- orderVec[orderVec != "mature_miRNA"]
+# orderVec <- orderVec[orderVec != "gene"]
+# orderVec <- c("mature_miRNA", sort(orderVec))
+# 
+# dfCount <- dfCount[, orderVec]
+# 
+# row.names(dfCount) <- dfCount$mature_miRNA
+# dfCount$mature_miRNA <- NULL
+# 
+# FNcount <- "../../basedata/count.matrix.txt"
+# write.table(dfCount, FNcount,  sep="\t")
+# 
+# ## Read resulting RSEM table
+# dfRSEM <- read.delim(
+#     pipelineList[["preProcessedCountTableFN"]], 
+#     sep = "\t",
+#     header = T,
+#     stringsAsFactors = F
+# )
 
 ## Make sure it's integers:
-dfRSEM[,2:ncol(dfRSEM)] <- round(dfRSEM[,2:ncol(dfRSEM)])
+# dfRSEM[,2:ncol(dfRSEM)] <- round(dfRSEM[,2:ncol(dfRSEM)])
+# 
+# for (i in 1:length(pipelineList[["pathToRSEMresultsFiles"]])){
+#     names(dfRSEM) <- gsub(paste0("X", gsub("-", ".", gsub("/", ".", pipelineList[["pathToRSEMresultsFiles"]][[i]]))), "", names(dfRSEM))
+# }
+# 
+# names(dfRSEM) <- gsub(".genes.results", "", names(dfRSEM))
+# 
+# ## now change sampleIDs to sample.ids
+# 
+# dfTranslate <- unique(dfDesign[,c("sampleID", "sample.id")])
 
-for (i in 1:length(pipelineList[["pathToRSEMresultsFiles"]])){
-    names(dfRSEM) <- gsub(paste0("X", gsub("-", ".", gsub("/", ".", pipelineList[["pathToRSEMresultsFiles"]][[i]]))), "", names(dfRSEM))
-}
-
-names(dfRSEM) <- gsub(".genes.results", "", names(dfRSEM))
-
-## now change sampleIDs to sample.ids
-
-dfTranslate <- unique(dfDesign[,c("sampleID", "sample.id")])
+dfRSEM <- dfCount
 
 samplesPresent <- names(dfRSEM)[names(dfRSEM) != "X"]
-samplesNotPresent <- dfTranslate$sampleID[!(dfTranslate$sampleID %in% names(dfRSEM))]
+samplesNotPresent <- dfDesign$sample.id[!(dfDesign$sample.id %in% names(dfRSEM))]
 
 ## Updating dfDesign
-dfDesign <- dfDesign[dfDesign$sampleID %in% samplesPresent, ]
+dfDesign <- dfDesign[dfDesign$sample.id %in% samplesPresent, ]
 
 write.table(
     dfDesign,
@@ -914,21 +956,26 @@ write.table(
 dfTranslate <- unique(dfDesign[,c("sampleID", "sample.id")])
 
 ## Renaming RSEM columns
-for (i in 1:nrow(dfTranslate)){
-    names(dfRSEM) <- gsub(paste0("^", as.vector(dfTranslate[i,"sampleID"]), "$"), as.vector(dfTranslate[i,"sample.id"]), names(dfRSEM))
-}
-
-names(dfRSEM) <- gsub("X", "ENSGALG", names(dfRSEM))
-
-## Format: |gene_id column names X|sample.id[1]|sample.id[2]|sample.id[3]|...
-
 rsemOrder <- c(
-        "ENSGALG",
+        "ENSMUSG",
         paste0(
             as.vector(dfDesign$sample.id)
             #"_TPM"
         )
     )
+
+dfRSEM[["ENSMUSG"]] <- row.names(dfRSEM)
+
+
+# for (i in 1:nrow(dfTranslate)){
+#     names(dfRSEM) <- gsub(paste0("^", as.vector(dfTranslate[i,"sampleID"]), "$"), as.vector(dfTranslate[i,"sample.id"]), names(dfRSEM))
+# }
+# 
+# names(dfRSEM) <- gsub("X", "ENSGALG", names(dfRSEM))
+
+## Format: |gene_id column names X|sample.id[1]|sample.id[2]|sample.id[3]|...
+
+
     
 dfRSEM <- dfRSEM[, rsemOrder]
     
@@ -964,57 +1011,58 @@ write.table(dfRSEM, pipelineList[["countTableFN"]], sep = "\t", row.names=F)
 
 
 #if (!is.null(pipelineList[["RSEM_folder"]])){
-if (!is.null(pipelineList[["pathToRSEMresultsFiles"]] )){
-    files <- unlist(
-        lapply(
-            pipelineList[["pathToRSEMresultsFiles"]], 
-            function(x)paste0(x, list.files(x))
-        )
-    )
-}
-
-
-files <- files[grep(".genes.results", files)]
-
-samples <- sapply(
-    files, 
-    function(x)
-    strsplit(x, "/")
-)
+# if (!is.null(pipelineList[["pathToRSEMresultsFiles"]] )){
+#     files <- unlist(
+#         lapply(
+#             pipelineList[["pathToRSEMresultsFiles"]], 
+#             function(x)paste0(x, list.files(x))
+#         )
+#     )
+# }
+# 
+# 
+# files <- files[grep(".genes.results", files)]
+# 
+# samples <- sapply(
+#     files, 
+#     function(x)
+#     strsplit(x, "/")
+# )
+#     
+#     samples <- unlist(sapply(
+#         samples, 
+#         function(x)
+#         x[length(x)]
+#     ))
+#     
+#     samples <- as.vector(gsub(".genes.results", "", samples))
+#     
+#     dfTables <- biologicSeqTools2::create.tpm.and.fpkm.tables(
+#         files = files,
+#         samples = samples
+#     )
+#     
+#     dfTPM <- dfTables$df.tpm
+#     
+#     ## Exchange names ##
+#     dfTranslate <- unique(dfDesign[,c("sampleID", "sample.id")])
+# 
+#     ## Renaming RSEM columns
+#     for (i in 1:nrow(dfTranslate)){
+#         names(dfTPM) <- gsub(paste0("^", as.vector(dfTranslate[i,"sampleID"]), "_TPM"), paste0(as.vector(dfTranslate[i,"sample.id"]),"_TPM"), names(dfTPM))
+#     }
+# 
+#     # Order dfTPM according design file ##
+#     tpmOrder <- c(
+#         "gene_id",
+#         paste0(
+#             as.vector(dfDesign$sample.id),
+#             "_TPM"
+#         )
+#     )
     
-    samples <- unlist(sapply(
-        samples, 
-        function(x)
-        x[length(x)]
-    ))
-    
-    samples <- as.vector(gsub(".genes.results", "", samples))
-    
-    dfTables <- biologicSeqTools2::create.tpm.and.fpkm.tables(
-        files = files,
-        samples = samples
-    )
-    
-    dfTPM <- dfTables$df.tpm
-    
-    ## Exchange names ##
-    dfTranslate <- unique(dfDesign[,c("sampleID", "sample.id")])
-
-    ## Renaming RSEM columns
-    for (i in 1:nrow(dfTranslate)){
-        names(dfTPM) <- gsub(paste0("^", as.vector(dfTranslate[i,"sampleID"]), "_TPM"), paste0(as.vector(dfTranslate[i,"sample.id"]),"_TPM"), names(dfTPM))
-    }
-
-    # Order dfTPM according design file ##
-    tpmOrder <- c(
-        "gene_id",
-        paste0(
-            as.vector(dfDesign$sample.id),
-            "_TPM"
-        )
-    )
-    
-    dfTPM <- dfTPM[, tpmOrder]
+    dfTPM <- dfRSEM
+    names(dfTPM) <- gsub("ENSMUSG", "gene_id", names(dfTPM))
     
     write.table(
         dfTPM,
