@@ -22,6 +22,7 @@ cd bulkRNAseq_workflow
 ## Prepare required files
 ### Sample specification sheet
 The easiest is create a basedesign file with the following columns:
+* |sampleID| sequencing facility sample id, optional
 * |sample.id|  suggestion for a format: [dataseries] _ [sample.group] _ [replicate]
 * |sample.group|
 * |dataseries|
@@ -34,7 +35,7 @@ The easiest is create a basedesign file with the following columns:
 * sample.group_colors may be specified in a sample.group_color column with one entry per 
 * sample.group
 
-Load design file from file:
+Once done, save this file in 
 
 This file can be saved in projectFolder/data/base.design.txt
 
@@ -50,4 +51,11 @@ To run the script after editing, use the following R-version, if possible:
 module purge;source /camp/stp/babs/working/software/modulepath_new_software_tree_2018-08-13;module load pandoc/2.2.3.2-foss-2016b;ml R/4.0.3-foss-2020a
 ```
 
-Once done, save the script. 
+Once done, save and run the script.
+
+Section 1 of this script will create the *bulkRNAseq_workflow/design/biologic.settings.file.csv* file
+This file contains all settings for the default data analysis and visualization. 
+
+Section 2 of this script will create a design file for a Crick experiment. 
+
+
