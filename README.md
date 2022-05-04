@@ -45,4 +45,7 @@ Open the bulkRNAseq_workflow/PartA_Automatic_Setup.Rmd script in a R-editor such
 
 Edit the entries according to your project. 
 
+To run the script after editing, use the following R-version, if possible:
+module purge;source /camp/stp/babs/working/software/modulepath_new_software_tree_2018-08-13;module load pandoc/2.2.3.2-foss-2016b;ml R/4.0.3-foss-2020a
+
 Once done, save the script. 
