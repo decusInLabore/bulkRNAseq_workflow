@@ -22,7 +22,7 @@ cd bulkRNAseq_workflow
 ## Prepare required files
 ### Sample specification sheet
 The easiest is create a basedesign file with the following columns:
-* |sample.id|
+* |sample.id|  suggestion for a format: [dataseries] _ [sample.group] _ [replicate]
 * |sample.group|
 * |dataseries|
 * |comp_1|comp_2|...|comp_N|
