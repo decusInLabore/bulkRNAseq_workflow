@@ -1351,6 +1351,39 @@ write.table(
 )
 
 
+###############################################################################
+## Add NF-core RSEM count table                                              ##
+dfRSEM <- read.delim(
+    pipelineList$preProcessedCountTableFN, 
+    sep="\t",
+    stringsAsFactors=F
+)
+
+## Translate sampleID names to gene id names ##
+dfTranslate <- unique(dfDesign[,c("sampleID", "sample.id")])
+
+## Renaming TPM columns
+for (i in 1:nrow(dfTranslate)){
+    names(dfRSEM) <- gsub(paste0("^", as.vector(dfTranslate[i,"sampleID"])), paste0(as.vector(dfTranslate[i,"sample.id"])), names(dfRSEM))
+}
+    
+# Select relevant columns and order dfTPM according design file ##
+rsemOrder <- c(
+    "gene_id",
+    paste0(
+        as.vector(dfDesign$sample.id)
+    )
+)
+
+dfRSEM <- unique(dfRSEM[, rsemOrder])
+
+write.table(
+    dfRSEM,
+    pipelineList[["countTableFN"]],
+    sep = "\t",
+    row.names = F
+)
+
 
 
 

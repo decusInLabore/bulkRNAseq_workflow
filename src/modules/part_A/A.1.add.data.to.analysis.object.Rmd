@@ -77,17 +77,41 @@ Obio@dfModel <- dfModel
 #     print("Count file not found")
 # }
 
-mRSEM <- biologicSeqTools2::readAndPrepareCountMatrix(
-    count.data.fn = Obio@projectDetailList$countTableFN,
-    string.to.be.deleted.in.raw.counts.columns = paste0("X",  gsub("/", ".", Obio@parameterList$workdir), "RSEM.Ensembl."),
-    df.design = Obio@dfDesign
-)
 
-Obio@RSEMcountMatrix <- mRSEM
-
-
-##                                                                           ##
 ###############################################################################
+## Add rsem file if available                                                 ##
+if (!is.null(Obio@parameterList$countTableFN)){
+    dRSEM <- read.delim(
+        Obio@parameterList$countTableFN, 
+        header =T, 
+        sep = "\t",
+        stringsAsFactors = F
+    )
+    
+    row.names(dfRSEM) <- dfRSEM$gene_id
+    
+    dfRSEM$gene_id <- NULL
+    
+    Obio@RSEMcountMatrix <- data.matrix(dfRSEM)
+    
+    
+    designSampleIDs <- unique(Obio@dfDesign$sample.id)
+    dfRsemSampleIDs <- unique(colnames(Obio@RSEMcountMatrix))
+    check <- !(designSampleIDs %in% dfRsemSampleIDs)
+
+    if (sum(check) > 0){
+      stop("Sample IDs in dfDesign don't match the column names in the count file")
+    }
+
+} else {
+    print("RSEM file not (correctly) specified")
+}
+
+
+## Done                                                                      ##
+###############################################################################
+
+
 
 ###############################################################################
 ## Add tpm file if available                                                 ##
@@ -122,6 +146,7 @@ if (!is.null(Obio@projectDetailList$TpmTableFN)){
 
 ###############################################################################
 ## Add DGE files, if available                                               ##
+
 
 ## Done                                                                      ##
 ###############################################################################

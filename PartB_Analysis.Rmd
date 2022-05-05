@@ -112,7 +112,7 @@ load(FN)
 ```
 
 <!-- Essential: Add RSEM count matrix and TPM matrix ------------------------->
-```{r child = 'src/modules/part_A/A.1.add.data.to.analysis.object.Rmd', eval=FALSE}
+```{r child = 'src/modules/part_A/A.1.add.data.to.analysis.object.Rmd', eval=TRUE}
 ```
 
 <!-- Optional: Add alignment summary to report-------------------------------->
