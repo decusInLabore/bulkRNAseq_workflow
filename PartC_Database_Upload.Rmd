@@ -284,6 +284,8 @@ doQuery(Obio, query = query4)
 # ))
 
 
+#pos1 <- grep("_TPM", names)
+
 sample.order <- unique(paste0(
   "norm_counts_",
   Obio@dfDesign$sample.id
@@ -708,6 +710,12 @@ if (nrow(dfTest) == 0){
 ###############################################################################
 
 ###############################################################################
+
+
+## Done with uploading settings JSON                                         ##
+###############################################################################
+
+###############################################################################
 ## Add experiment                                                            ##
 
 ## Check if experiment exists already ##
@@ -746,7 +754,32 @@ if (nrow(dfTest) == 0){
         lab = paste0(Obio@parameterList$labname, " Lab"),
         lead_scientist = "Lead Scientist"
     ) 
+    
+    dfUpload[["created_at"]] = timeStamp
+    
+    dfUpload[["updated_at"]] <- timeStamp
+    
+    biologicSeqTools2::upload.datatable.to.database(
+        host = Obio@dbDetailList$host,
+        user = Obio@dbDetailList$db.user,
+        password = db.pwd,
+        prim.data.db = "operational",
+        dbTableName = "experiments",
+        df.data = dfUpload,
+        db.col.parameter.list =  biologicSeqTools2::inferDBcategories(dfUpload),
+        increment = 1,
+        new.table = FALSE,
+        first.row.name.index = 1,
+        startOnlyWithConnectionCount1 = FALSE,
+        cols2Index = NULL,
+        indexName = NULL,
+        mode = "MySQL",
+        addRowNamesColumn = FALSE
+    )
 }
+
+
+
 
 
 ###############################################################################

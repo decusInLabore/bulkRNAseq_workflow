@@ -111,7 +111,12 @@ load(FN)
 ```{r child = 'src/modules/part_B/B.2.retrieve.reference.gene.sets.Rmd', eval=TRUE}
 ```
 
+<!-- Essential: Add RSEM count matrix and TPM matrix ------------------------->
+```{r child = 'src/modules/part_A/A.1.add.data.to.analysis.object.Rmd', eval=FALSE}
+```
+
 <!-- Optional: Add alignment summary to report-------------------------------->
+<!-- Modify - copy nf-core outputs            -------------------------------->
 ```{r child = 'src/modules/part_B/B.3.alignment.summary.Rmd', eval=FALSE}
 ```
 

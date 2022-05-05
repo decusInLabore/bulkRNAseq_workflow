@@ -33,6 +33,7 @@ if (!is.null(Obio@projectDetailList$designFN)){
 }
 
 ## Add: check for essential columns ##
+Obio@dfDesign <- data.frame(NULL)
 Obio@dfDesign <- dfDesign
 
 ##                                                                           ##
@@ -53,6 +54,7 @@ if (!is.null(Obio@projectDetailList$modelFN)){
 }
 
 ## Add: check for essential columns ##
+Obio@dfModel <- data.frame(NULL)
 Obio@dfModel <- dfModel
 
 ##                                                                           ##
@@ -64,20 +66,20 @@ Obio@dfModel <- dfModel
 
 ###############################################################################
 ## Add rsem file and check                                                   ##
-if (!is.null(Obio@projectDetailList$countTableFN)){
-    dfCount <- read.delim(
-        Obio@projectDetailList$countTableFN, 
-        header =T, 
-        sep = "\t",
-        stringsAsFactors = F
-    )
-} else {
-    print("Count file not found")
-}
+# if (!is.null(Obio@projectDetailList$countTableFN)){
+#     dfCount <- read.delim(
+#         Obio@projectDetailList$countTableFN, 
+#         header =T, 
+#         sep = "\t",
+#         stringsAsFactors = F
+#     )
+# } else {
+#     print("Count file not found")
+# }
 
 mRSEM <- biologicSeqTools2::readAndPrepareCountMatrix(
     count.data.fn = Obio@projectDetailList$countTableFN,
-    string.to.be.deleted.in.raw.counts.columns = '',
+    string.to.be.deleted.in.raw.counts.columns = paste0("X",  gsub("/", ".", Obio@parameterList$workdir), "RSEM.Ensembl."),
     df.design = Obio@dfDesign
 )
 
@@ -91,7 +93,7 @@ Obio@RSEMcountMatrix <- mRSEM
 ## Add tpm file if available                                                 ##
 if (!is.null(Obio@projectDetailList$TpmTableFN)){
     dfTPM <- read.delim(
-        Obio@projectDetailList$countTableFN, 
+        Obio@projectDetailList$TpmTableFN, 
         header =T, 
         sep = "\t",
         stringsAsFactors = F
@@ -103,7 +105,7 @@ if (!is.null(Obio@projectDetailList$TpmTableFN)){
 
 
     designSampleIDs <- unique(Obio@dfDesign$sample.id)
-    dfTPMSampleIDs <- unique(names(Obio@dfTPM))
+    dfTPMSampleIDs <- gsub("_TPM", "",unique(names(Obio@dfTPM)))
     check <- !(designSampleIDs %in% dfTPMSampleIDs)
 
     if (sum(check) > 0){
