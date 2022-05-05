@@ -92,7 +92,7 @@ if (!is.null(Obio@parameterList$countTableFN)){
     
     dfRSEM$gene_id <- NULL
     
-    Obio@RSEMcountMatrix <- data.matrix(dfRSEM)
+    Obio@RSEMcountMatrix <- data.matrix(round(dfRSEM))
     
     
     designSampleIDs <- unique(Obio@dfDesign$sample.id)
