@@ -23,6 +23,7 @@ knitr::opts_chunk$set(
     warning = FALSE
 )
 
+# R to use
 # module purge;source /camp/stp/babs/working/software/modulepath_new_software_tree_2018-08-13;module load pandoc/2.2.3.2-foss-2016b;ml R/4.0.3-foss-2020a
 
 if (!require("remotes")){
@@ -61,20 +62,21 @@ pipelineList <- list()
 ## Essential parameters ##
 
 # Make sure the final character is a slash /
-pipelineList[["folder"]] <- "/camp/stp/babs/working/boeings/Projects/pachnisv/franze.progatzky/475A_EGC_miRNAseq_RN21203_hairpin/"
+pipelineList[["folder"]] <- "/camp/stp/babs/working/boeings/Projects/anastasioud/frederick.clasen/483_P2RN21224_bulkRNAseq_RN21224_part2/"
 
 ## Path were the biologic spec file will be kept: ##
+## Default setting:
 pipelineList[["biologicSettingsFN"]] <- paste0(pipelineList[["folder"]], "workdir/bulkRNAseq_workflow/design/biologic.settings.file.csv")
 
 ## Project parameters                       ##
 ## This will be the name of the web project ##
-pipelineList[["project_id"]] <- "RN21203hairpin"
+pipelineList[["project_id"]] <- "P2RN21224"
 
 ## The LIMS ID will be used to retrieve project information
-pipelineList[["lims.id"]] <- "RN21203"
+pipelineList[["lims.id"]] <- "RN21224"
 
 ## This is the lab name ##
-pipelineList[["labname"]] <- "Pachnis"
+pipelineList[["labname"]] <- "Anastasiou"
 
 ## This is the project under which this experiment will be organised in the db
 ## The project is the umbrella under which several experiments around a similar
@@ -82,7 +84,7 @@ pipelineList[["labname"]] <- "Pachnis"
 ## If a project name exists, this new experiment will be added to that umbrella
 ## project. If the project does not exists, it will be created. 
 
-pipelineList[["project_name"]] <- "Characterization of enteric glia cells related experiments"
+pipelineList[["project_name"]] <- "Dietary Effects on Liver Metabolism"
 
 ## Parameters for the experiment
 ## If the parameters title, subtitle and abstract are set to NULL, 
@@ -103,11 +105,12 @@ pipelineList[["NtopGenes"]] <- 500
 #     "DMRT1"
 # )
 
+## Genes to calculate a correlaiton coefficient for:
 pipelineList[["corGeneVec"]] <- NULL
 
 
-# options: "bulk_rna_seq", "sc_rna_seq"
-pipelineList[["experiment.type"]] <- "mi_rna_seq"
+# options: "bulk_rna_seq", "sc_rna_seq", "mi_rna_seq"
+pipelineList[["experiment.type"]] <- "bulk_rna_seq"
 
 ## This should be the reference transcriptome ##
 pipelineList[["species"]] <- "mus_musculus"
@@ -115,8 +118,8 @@ pipelineList[["release"]] <- "release-89"
 
 ###############################################################################
 ## Display parameters                                                        ##
-pipelineList[["count.table.headline"]] <- "Counts for all Samples"
-pipelineList[["count.table.sidelabel"]] <- "Counts"
+pipelineList[["count.table.headline"]] <- "TPM-values for all Samples"
+pipelineList[["count.table.sidelabel"]] <- "TPM"
 pipelineList[["heamap.headline.text"]] <- "Heatmap: Row-averaged Expr"
 ##                                                                           ##
 ###############################################################################
@@ -125,8 +128,9 @@ pipelineList[["heamap.headline.text"]] <- "Heatmap: Row-averaged Expr"
 ## Timecourse section: Set entries to NULL if not a timecourse experiment    ##
 
 ## designTScol entry needs to be present as column name in the design file 
-#pipelineList[["designTScol"]] <- "f_timepoint"
-pipelineList[["designTScol"]] <- NULL
+pipelineList[["designTScol"]] <- "timepoint"
+# Default setting
+# pipelineList[["designTScol"]] <- NULL
 
 #pipelineList[["timecourse.units"]] <- "Embryonic Day"
 ## Default: pipelineList[["timecourse.units"]] <- NULL
@@ -149,20 +153,27 @@ pipelineList[["Database Parameters	"]] <- ""
 
 ## Enter lab database name here
 ## One database per lab
-pipelineList[["primDataDB"]] <- "vpl_data"
+## Naming convention: Initials of the lab head followed by l for lab
+## For the dimitris anastasiou lab it would be dal_data, but you can also 
+## chose anastasioud_data, if you prefer. 
+
+pipelineList[["primDataDB"]] <- "dal_data"
 
 ## These three can be left pre-set
 pipelineList[["ref.cat.db"]] <- "reference_categories_db_new"
+
+## Default settings
 pipelineList[["db.user"]] <- "babs"
 pipelineList[["host"]] <- "10.27.241.82"
 
 ## Add lab categories table, if available.
-pipelineList[["lab.categories.table"]] <- "vp_lab_categories"
+## The current format for lab category tables is [lab head initials]_lab_categories
+pipelineList[["lab.categories.table"]] <- "da_lab_categories"
 ## Default if no lab database table is available
 # pipelineList[["lab.categories.table"]] <- NULL
 
 ## Set additional reference tables ##
-
+## Default settings:
 dfRef <- cbind(
     c(
         "Hallmark Signatures",
@@ -220,19 +231,19 @@ pipelineList[["GSEAtestEnrichmentGmtFile"]] <- NULL
 pipelineList[["NFcoreSettingsFN"]] <- pipelineList[["designFN"]] <- paste0(
     pipelineList[["folder"]], 
     "workdir/bulkRNAseq_workflow/design/", 
-    pipelineList[["project_id"]],".NFcore.samplesheet.file.txt"
+    pipelineList[["project_id"]],".NFcore.samplesheet.file.csv"
 )
 
 
 ## Specify the folders in which FASTQ sequencing files are located
 ## If specified, make sure that pathToSeqStorageFolder has a backslash at the end
-# pipelineList[["pathToSeqStorageFolder"]] <- c(
-#     "path/to/folder/1",
-#     "path/to/folder/2"
-# )
+pipelineList[["pathToSeqStorageFolder"]] <- c(
+    "/camp/stp/sequencing/outputs/babs/data/anastasioud/jack.carruthers/RN21224/primary_data/220304_A01366_0154_BH7WKNDMXY/fastq/",
+    "/camp/stp/sequencing/outputs/babs/data/anastasioud/jack.carruthers/RN21224/primary_data/220117_A01366_0128_BH5VNMDMXY/fastq/"
+)
 
 ## Default setting if no alignment is required:
-pipelineList[["pathToSeqStorageFolder"]] <- NULL
+# pipelineList[["pathToSeqStorageFolder"]] <- NULL
 
 ## Alignment parameters ##
 pipelineList[["stranded"]] <- TRUE
@@ -427,6 +438,8 @@ dfObio[is.na(dfObio)] <- ""
 
 write.table(dfObio, pipelineList[["biologicSettingsFN"]]  , row.names=FALSE, col.names=FALSE, sep=",")
 
+print(paste0("Check settings file ", pipelineList[["biologicSettingsFN"]], " for accuracy."))
+
 ## Done 
 ###############################################################################
 ## End Section 1                                                             ##
@@ -487,6 +500,9 @@ dfDesign <- read.delim(
 
 ## For the option below to work, the sample names need to follow the convention
 # dataseries_saplegroup_replicate
+
+## The function below requires the sampleID to be in the format:
+# [dataseries]_[sampleGroup]_[replicate]
 dfDesign <- biologicSeqTools2::completeDesignBasedOnSampleID(dfDesign)
 
 dfDesign[["f_replicate"]] <- paste0("R", sapply(dfDesign$sample.id, function(x) unlist(strsplit(x, "_"))[3]))
@@ -548,6 +564,90 @@ if (length(pos) == 0){
     dfDesign <- merge(dfDesign, dfGroupColors, by.x = "sample.group", "sample.group")
 
 }
+
+# ###############################################################################
+# ## Create Design File                                                        ##
+#
+###############################################################################
+## Organizing FASTQ files                                                    ##
+baseMount <- gsub(
+    "boeings/",
+    "",
+    hpc.mount
+)
+
+returnList <- biologicSeqTools2::organizeFastqFiles(
+    baseMount = baseMount,
+    pathToSeqStorageFolder = pipelineList$pathToSeqStorageFolder,
+    fastqOutputDir = Obio@parameterList$fastqDir,
+    localWorkDir = Obio@parameterList$localWorkDir,
+    checkFileExists = FALSE
+)
+
+shellscriptVec <- returnList$shellscriptVec
+concatenationRequired <- returnList$concatenationRequired
+
+Obio <- add2vec(
+     obj = Obio,
+     slot_name = "scriptVec",
+     value = shellscriptVec
+)
+#
+# ## Done organizing FASTQ files                                               ##
+# ###############################################################################
+#
+#
+#
+# ###############################################################################
+# ## Assemble design file                                                      ##
+#
+if (concatenationRequired){
+    print("Concatenation script executed?")
+    pathToSeqStorageFolder <- pipelineList$fastqDir
+} else {
+    pathToSeqStorageFolder <- pipelineList$pathToSeqStorageFolder
+}
+
+
+#################################################################################
+## If concatenation required, generate new input files                         ##
+if (concatenationRequired){
+    system("concat.file.name")
+}
+
+## Done                                                                        ##
+#################################################################################
+
+# ###############################################################################
+# ## Create Design File                                                        ##
+#
+dfDesign2 <- createDesignFileCrickASFsamples(
+    pathToSeqStorageFolder = pathToSeqStorageFolder,
+    FNsampleAnnotation = paste0(
+         pipelineList$localWorkDir,
+        "sample.ids.txt"
+    ),
+    paired.end = pipelineList$paired.end,
+    baseMount = baseMount,
+    fastqDir = Obio@parameterList$localFastqDir
+
+)
+
+dfDesign2 <- dfDesign2[dfDesign2$NGS != "",]
+
+dfDesign2 <- unique(dfDesign2[,c("sample.id", "original.NGS", "NGS" )]) 
+dfDesign2 <- dfDesign2[dfDesign2$sample.id %in% dfDesign$sample.id, ]
+
+dfDesign$NGX <- NULL
+dfDesign$original.NGS <- NULL
+
+dfDesign <- merge(
+    dfDesign,
+    dfDesign2,
+    by.x = "sample.id",
+    by.y = "sample.id"
+)
+
 ##                                                                           ##
 ###############################################################################
 
@@ -754,13 +854,136 @@ file.exists(pipelineList[["modelFN"]])
 ###############################################################################
 ## Create NF-core samplesheet file                                           ##
 ## Instructions: https://nf-co.re/rnaseq/usage
-## sample,fastq_1,fastq_2,strandedness
+## sample,fastq_1,fastq_2, strandedness
+# Column 	Description
+# sample 	Custom sample name. This entry will be identical for multiple sequencing libraries/runs from the same sample. Spaces in sample names are automatically converted to underscores (_).
+# fastq_1 	Full path to FastQ file for Illumina short reads 1. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".
+# fastq_2 	Full path to FastQ file for Illumina short reads 2. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".
+# strandedness 	Sample strand-specificity. Must be one of unstranded, forward or reverse.
+
+## Get strandedness setting
+if (pipelineList[["stranded"]]){
+    strandedness <- "forward"
+} else {
+    strandedness <- "unstranded"
+}
 
 if (! is.null(pipelineList[["NFcoreSettingsFN"]]) | !is.null(pipelineList[["pathToSeqStorageFolder"]])){
-    files <- list.files(
+    
+        fileNames <- as.vector(unlist(sapply(pipelineList$pathToSeqStorageFolder, function(x) paste0(x, list.files(x)))))
+        files <- as.vector(unlist(sapply(pipelineList$pathToSeqStorageFolder, function(x) list.files(x))))
+        sampleIDs <- sapply(
+                    files, 
+                    function(x)
+                      unlist(
+                        strsplit(
+                            x,
+                            "_"
+                        )
+                      )[1]
+        )
         
-    )
+        dfTemp <- data.frame(
+            fileNames, 
+            files, 
+            sampleIDs
+        )
+        
+        dfTemp2 <- unique(dfDesign[,c("sampleID", "sample.id")])
+        dfTemp2 <- dfTemp2[dfTemp2$sampleID %in% dfTemp$sampleIDs, ]
+        dfTemp <- merge(
+            dfTemp, 
+            dfTemp2, 
+            by.x = "sampleIDs",
+            by.y = "sampleID"
+        )
+        
+        dfTemp[["base"]] <- dfTemp$files
+        dfTemp[grep("_R1_", dfTemp$files), "base"] <-  sapply(as.vector( dfTemp[grep("_R1_", dfTemp$files), "base"]), function(x) unlist(strsplit(x, "_R1_"))[1])
+        dfTemp[grep("_R2_", dfTemp$files), "base"] <-  sapply(as.vector( dfTemp[grep("_R2_", dfTemp$files), "base"]), function(x) unlist(strsplit(x, "_R2_"))[1])
+        
+        if (pipelineList[["paired.end"]]){
+            dfR1 <- dfTemp[grep("_R1_", dfTemp$files),]
+            dfR2 <- dfTemp[grep("_R2_", dfTemp$files),]
+            
+            dfR1 <- dfR1[dfR1$base %in% dfR2$base, ]
+            dfR2 <- dfR2[dfR2$base %in% dfR1$base, ]
+            
+            ## Order ##
+            for (i in 1:nrow(dfR1)){
+                sample <- dfR1[i, "sample.id"]
+                fastq_1 <- dfR1[i, "fileNames"]
+                
+                ## Find fastq 2
+                baseID <- dfR1[i, "base"]
+                
+                pos <- grep(paste0("^",baseID,"$"), dfR2$base)
+                fastq_2 <- dfR2[pos, "fileNames"]
+                
+                
+                newRow <- data.frame(sample, fastq_1, fastq_2, strandedness)
+                
+                if (i==1){
+                    dfRes <- newRow
+                } else {
+                    dfRes <- rbind(
+                        dfRes, 
+                        newRow
+                    )
+                }
+            }
+            
+            dfRes <- dfRes[order(dfRes$sample), ]
+            
+            ## Save nextflow sample sheet ##
+            write.csv(
+                dfRes, 
+                pipelineList$NFcoreSettingsFN,
+                row.names = FALSE
+            )
+            
+        } else {
+            ## Single end nextflow sample sheet ##
+            dfR1 <- dfTemp[grep("_R1_", dfTemp$files),]
+            
+            ## Order ##
+            for (i in 1:nrow(dfR1)){
+                sample <- dfR1[i, "sample.id"]
+                fastq_1 <- dfR1[i, "fileNames"]
+                
+                fastq_2 <- ""
+                
+                
+                newRow <- data.frame(sample, fastq_1, fastq_2, strandedness)
+                
+                if (i==1){
+                    dfRes <- newRow
+                } else {
+                    dfRes <- rbind(
+                        dfRes, 
+                        newRow
+                    )
+                }
+            }
+            
+            
+            
+            
+        }
+       
+        ## Save nextflow sample sheet ##
+        dfRes <- dfRes[order(dfRes$sample), ]
+        
+        write.csv(
+            dfRes, 
+            pipelineList$NFcoreSettingsFN,
+            row.names = FALSE
+        )
+    
 }
+
+
+
 
 ## Done                                                                      ##
 ###############################################################################
@@ -804,38 +1027,38 @@ if (! is.null(pipelineList[["NFcoreSettingsFN"]]) | !is.null(pipelineList[["path
 
 
 
-## Create RSEM count matrix if it doesn't exist yet ##
-hairpinFN <- "/camp/stp/babs/working/boeings/Projects/pachnisv/franze.progatzky/475_EGC_miRNAseq_RN21203/workdir/fitht_results/edgeR/miRBase_hairpin/hairpin_counts.csv"
-
-dfHairpin <- read.csv(hairpinFN, stringsAsFactors = F)
-names(dfHairpin) <- gsub("\\.", "_", names(dfHairpin))
-row.names(dfHairpin) <- dfHairpin$X
-dfHairpin$X <- NULL
-dfHairpin <- data.frame(t(dfHairpin))
-
-
-p1 <- sapply(names(dfHairpin), function(x) unlist(strsplit(x, "_"))[1])
-p2 <- sapply(names(dfHairpin), function(x) unlist(strsplit(x, "_"))[2])
-p2 <- paste0(p2, "Hairpin")
-p3 <- sapply(names(dfHairpin), function(x) unlist(strsplit(x, "_"))[3])
-p3 <- gsub(".hairpin", "", p3)
-
-names(dfHairpin) <- paste0(p1, "_", p2, "_", p3)
-dfHairpin[["gene"]] <- row.names(dfHairpin)
-dfHairpin[["gene"]] <- gsub("_mir_", "_miR_", dfHairpin$gene)
-
-dfCount <- dfHairpin
-
-#dfCount  <- dplyr::full_join(dfMature,  dfHairpin, by = "gene")
-dfCount[is.na(dfCount)] <- 0
-#dfCount[dfCount$mature_miRNA == 0, "mature_miRNA"] <- dfCount[dfCount$mature_miRNA == 0, "gene"]
-
-orderVec <- names(dfCount)
-orderVec <- orderVec[orderVec != "mature_miRNA"]
-orderVec <- orderVec[orderVec != "gene"]
-#orderVec <- c("mature_miRNA", sort(orderVec))
-
-dfCount <- dfCount[, orderVec]
+# ## Create RSEM count matrix if it doesn't exist yet ##
+# hairpinFN <- "/camp/stp/babs/working/boeings/Projects/pachnisv/franze.progatzky/475_EGC_miRNAseq_RN21203/workdir/fitht_results/edgeR/miRBase_hairpin/hairpin_counts.csv"
+# 
+# dfHairpin <- read.csv(hairpinFN, stringsAsFactors = F)
+# names(dfHairpin) <- gsub("\\.", "_", names(dfHairpin))
+# row.names(dfHairpin) <- dfHairpin$X
+# dfHairpin$X <- NULL
+# dfHairpin <- data.frame(t(dfHairpin))
+# 
+# 
+# p1 <- sapply(names(dfHairpin), function(x) unlist(strsplit(x, "_"))[1])
+# p2 <- sapply(names(dfHairpin), function(x) unlist(strsplit(x, "_"))[2])
+# p2 <- paste0(p2, "Hairpin")
+# p3 <- sapply(names(dfHairpin), function(x) unlist(strsplit(x, "_"))[3])
+# p3 <- gsub(".hairpin", "", p3)
+# 
+# names(dfHairpin) <- paste0(p1, "_", p2, "_", p3)
+# dfHairpin[["gene"]] <- row.names(dfHairpin)
+# dfHairpin[["gene"]] <- gsub("_mir_", "_miR_", dfHairpin$gene)
+# 
+# dfCount <- dfHairpin
+# 
+# #dfCount  <- dplyr::full_join(dfMature,  dfHairpin, by = "gene")
+# dfCount[is.na(dfCount)] <- 0
+# #dfCount[dfCount$mature_miRNA == 0, "mature_miRNA"] <- dfCount[dfCount$mature_miRNA == 0, "gene"]
+# 
+# orderVec <- names(dfCount)
+# orderVec <- orderVec[orderVec != "mature_miRNA"]
+# orderVec <- orderVec[orderVec != "gene"]
+# #orderVec <- c("mature_miRNA", sort(orderVec))
+# 
+# dfCount <- dfCount[, orderVec]
 
 # row.names(dfCount) <- dfCount$mature_miRNA
 # dfCount$mature_miRNA <- NULL
@@ -937,50 +1160,50 @@ dfCount <- dfCount[, orderVec]
 # 
 # dfTranslate <- unique(dfDesign[,c("sampleID", "sample.id")])
 
-dfRSEM <- dfCount
-
-samplesPresent <- names(dfRSEM)[names(dfRSEM) != "X"]
-samplesNotPresent <- dfDesign$sample.id[!(dfDesign$sample.id %in% names(dfRSEM))]
-
-## Updating dfDesign
-dfDesign <- dfDesign[dfDesign$sample.id %in% samplesPresent, ]
-
-write.table(
-    dfDesign,
-    pipelineList[["designFN"]] , 
-    sep = "\t",
-    row.names = F
-)
-
-
-dfTranslate <- unique(dfDesign[,c("sampleID", "sample.id")])
-
-## Renaming RSEM columns
-rsemOrder <- c(
-        "ENSMUSG",
-        paste0(
-            as.vector(dfDesign$sample.id)
-            #"_TPM"
-        )
-    )
-
-dfRSEM[["ENSMUSG"]] <- row.names(dfRSEM)
-
-
-# for (i in 1:nrow(dfTranslate)){
-#     names(dfRSEM) <- gsub(paste0("^", as.vector(dfTranslate[i,"sampleID"]), "$"), as.vector(dfTranslate[i,"sample.id"]), names(dfRSEM))
-# }
+# dfRSEM <- dfCount
 # 
-# names(dfRSEM) <- gsub("X", "ENSGALG", names(dfRSEM))
-
-## Format: |gene_id column names X|sample.id[1]|sample.id[2]|sample.id[3]|...
-
-
-    
-dfRSEM <- dfRSEM[, rsemOrder]
-    
-
-write.table(dfRSEM, pipelineList[["countTableFN"]], sep = "\t", row.names=F)
+# samplesPresent <- names(dfRSEM)[names(dfRSEM) != "X"]
+# samplesNotPresent <- dfDesign$sample.id[!(dfDesign$sample.id %in% names(dfRSEM))]
+# 
+# ## Updating dfDesign
+# dfDesign <- dfDesign[dfDesign$sample.id %in% samplesPresent, ]
+# 
+# write.table(
+#     dfDesign,
+#     pipelineList[["designFN"]] , 
+#     sep = "\t",
+#     row.names = F
+# )
+# 
+# 
+# dfTranslate <- unique(dfDesign[,c("sampleID", "sample.id")])
+# 
+# ## Renaming RSEM columns
+# rsemOrder <- c(
+#         "ENSMUSG",
+#         paste0(
+#             as.vector(dfDesign$sample.id)
+#             #"_TPM"
+#         )
+#     )
+# 
+# dfRSEM[["ENSMUSG"]] <- row.names(dfRSEM)
+# 
+# 
+# # for (i in 1:nrow(dfTranslate)){
+# #     names(dfRSEM) <- gsub(paste0("^", as.vector(dfTranslate[i,"sampleID"]), "$"), as.vector(dfTranslate[i,"sample.id"]), names(dfRSEM))
+# # }
+# # 
+# # names(dfRSEM) <- gsub("X", "ENSGALG", names(dfRSEM))
+# 
+# ## Format: |gene_id column names X|sample.id[1]|sample.id[2]|sample.id[3]|...
+# 
+# 
+#     
+# dfRSEM <- dfRSEM[, rsemOrder]
+#     
+# 
+# write.table(dfRSEM, pipelineList[["countTableFN"]], sep = "\t", row.names=F)
 
 
 ## Format of the RSEM read count matrix:
@@ -1061,15 +1284,15 @@ write.table(dfRSEM, pipelineList[["countTableFN"]], sep = "\t", row.names=F)
 #         )
 #     )
     
-    dfTPM <- dfRSEM
-    names(dfTPM) <- gsub("ENSMUSG", "gene_id", names(dfTPM))
-    
-    write.table(
-        dfTPM,
-        pipelineList[["TpmTableFN"]],
-        sep = "\t",
-        row.names = F
-    )
+    # dfTPM <- dfRSEM
+    # names(dfTPM) <- gsub("ENSMUSG", "gene_id", names(dfTPM))
+    # 
+    # write.table(
+    #     dfTPM,
+    #     pipelineList[["TpmTableFN"]],
+    #     sep = "\t",
+    #     row.names = F
+    # )
 #}
 
 
@@ -1098,29 +1321,96 @@ write.table(dfRSEM, pipelineList[["countTableFN"]], sep = "\t", row.names=F)
 ###############################################################################
 ## Create analysis scripts                                                   ##
 
-
+## Option A: Bash scripts
+## Add design file to the object
+Obio@dfDesign <- dfDesign
 
 ## Set genome paths
 Obio <- biologicSeqTools2::setCrickGenomeAndGeneNameTable(Obio)
-#Obio <- createAnalysisFolders(
-#    Obio
-#)
+Obio <- createAnalysisFolders(
+   Obio
+)
 #Obio <- setDataBaseParameters(Obio)
 
 ## This can be upgraded to web retrieval of annotation data 
-#Obio <- addGeneAnnotation(Obio)
+Obio <- addGeneAnnotation(Obio)
 
+Obio <- biologicSeqTools2::createbulkRNASeqAnalysisBashScripts(
+    obj = Obio,
+    scriptVecSlot = "scriptVec"
+)
+#setwd(sDir)
+
+## Run analysis BASH script ##
+
+## Option B: NF-core scripts
 # sDir <- getwd()
 # setwd(Obio@parameterList$localWorkDir)
 # 
 # 
-# Obio <- biologicSeqTools2::createbulkRNASeqAnalysisBashScripts(
-#     obj = Obio,
+###############################################################################
+## (7c) createbulkRNASeqAnalysisNFcoreScript                                 ##
+#' @title createbulkRNASeqAnalysisNFcoreScript 
+#'
+#' @description Creates NF-core script
+#' @param agree TBD
+#' @keywords TBD
+#' @export
+#'
+#'
+# createbulkRNASeqAnalysisNFcoreScript <- function(
+#     obj = "biologic object",
 #     scriptVecSlot = "scriptVec"
-# )
-# setwd(sDir)
+# 
+# ){
+#     tempShellScriptVector <- as.vector(NULL, mode = "character")
+#     tempShellScriptVector <- c(
+#         tempShellScriptVector,
+#         "###############################################################################",
+#         "\n",
+#         "## Creating NF-core bulk RNA-Seq cript                                       ##",
+#         "\n",
+#         "module purge",
+#         "module load Nextflow/21.10.3",
+#         "module load Singularity/3.6.4",
+#         "",
+#         "export NXF_WORK=`echo $PWD/work/ | sed 's:^/camp/stp/babs/working/:/camp/stp/babs/scratch/:'`",
+#         "if [ ! -d '$NXF_WORK' ]; then",
+#         "    ln -s $NXF_WORK .",
+#         "fi",
+#         "export NXF_SINGULARITY_CACHEDIR=/camp/apps/misc/stp/babs/nf-core/singularity/rnaseq/3.6/",
+#         "",
+#         "sbatch --time=12:00:00 --wrap ' \\",
+#         "nextflow run nf-core/rnaseq \\",
+#         "-r 3.6 \\",
+#         paste0("--input ", pipelineList$NFcoreSettingsFN, " \\"),
+#         paste0("--outdir ", pipelineList$localWorkDir, " \\"),
+#         "-profile crick \\",
+#         "--aligner star_rsem \\",
+#         paste0("--rsem_index ", gsub("/genome$", "", obj@parameterList$genomeIndex), " \\"),
+#         "--email stefan.boeing@crick.ac.uk \\",
+#         paste0("--fasta ", obj@parameterList$genomeFa, " \\"),
+#         paste0("--gtf ", obj@parameterList$GTFfile, " \\"),
+#         paste0("' --job-name=NFCR_",
+#             obj@parameterList$project_id, " -c 12 --mem-per-cpu=7000 -o NFC.slurm"
+#         )
+#     )
+#     
+#     sink(paste0(pipelineList$localWorkDir, "nf.core.script.sh"))
+#     
+#     scriptVec <- tempShellScriptVector
+#     for (i in 1:length(scriptVec)){
+#         cat(scriptVec[i])
+#         cat("\n")
+#     }
+# 
+#     sink()
+# }
 
-## Run analysis BASH script ##
+## Done
+##########################################
+
+
 ## Done creating analysis bash scripts                                       ##
 ###############################################################################
 ```
