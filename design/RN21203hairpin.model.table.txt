@@ -1,5 +1,0 @@
-"comparison"	"comparisonID"	"test"	"type"	"model"	"reducedModel"	"normalizeAllSamplesTogether"	"betaPrior"
-"EGC_HpgyrusHP_vs_EGC_NaiveHP"	"comp_1"	"Wald"	"DGE"	"~ condition"	""	FALSE	TRUE
-"nonEGC_Hpgyrus_vs_nonEGC_NaiveHP"	"comp_2"	"Wald"	"DGE"	"~ condition"	""	FALSE	TRUE
-"EGC_HpgyrusHP_vs_nonEGC_Hpgyrus"	"comp_3"	"Wald"	"DGE"	"~ condition"	""	FALSE	TRUE
-"EGC_NaiveHP_vs_nonEGC_NaiveHP"	"comp_4"	"Wald"	"DGE"	"~ condition"	""	FALSE	TRUE
