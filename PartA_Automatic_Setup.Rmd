@@ -294,7 +294,7 @@ pipelineList[["countTableFN"]] <- countTableFN
 ## Save as parameter
 # NF-core pre-processed count1s
 pipelineList[["preProcessedCountTableFN"]] <- paste0(pipelineList[["folder"]], "workdir/star_rsem/rsem.merged.gene_counts.tsv")
-pipelineList[["preProcessedTPMTableFN"]] <- paste0(pipelineList[["folder"]], "workdir/star_rsem/rsem.merged.gene_counts.tsv")
+pipelineList[["preProcessedTPMTableFN"]] <- paste0(pipelineList[["folder"]], "workdir/star_rsem/rsem.merged.gene_tpm.tsv")
 
 
 
