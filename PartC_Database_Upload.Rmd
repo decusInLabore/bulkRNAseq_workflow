@@ -730,6 +730,88 @@ if (is.null(Obio@parameterList$project_id)){
 ###############################################################################
 ## Check if an entry for this project exist already. If it does > update     ##
 
+###############################################################################
+## Upload JSON
+
+dfUpload <- data.frame(
+        name = Obio@parameterList$projectName,
+        project_id = Obio@parameterList$project_code,
+        experiment_code = Obio@parameterList$project_id,
+        main_question =  "Project Question", #Obio@parameterList$main_question,
+        description = "Project Description",#Obio@parameterList$description,
+        lab = paste0(Obio@parameterList$labname, " Lab"),
+        lead_scientist = "Lead Scientist"
+    ) 
+###############################################################################
+## Check if an entry for this project exist already. If it does > update     ##
+
+dbDB <- DBI::dbConnect(
+    drv = RMySQL::MySQL(), 
+    user = Obio@dbDetailList$db.user, 
+    password = db.pwd, 
+    host = Obio@dbDetailList$host, 
+    dbname = "operational"
+)
+
+query <- paste0("SELECT* FROM experiments WHERE experiment_code = '",Obio@parameterList$project_id,"';")
+
+dfTest <- DBI::dbGetQuery(dbDB, query)
+DBI::dbDisconnect(dbDB)
+
+timeStamp <- format(as.POSIXlt(Sys.time()),'%Y-%m-%d %H:%M:%S')
+
+if (nrow(dfTest) ==1){
+    dfUpload[["id"]] = as.vector(dfTest[1,"id"])
+    dfUpload[["created_at"]] = as.vector(dfTest[1,"created_at"])
+    ## Delete original row ##
+    dbDB <- DBI::dbConnect(
+        drv = RMySQL::MySQL(), 
+        user = Obio@dbDetailList$db.user, 
+        password = db.pwd, 
+        host = Obio@dbDetailList$host, 
+        dbname = "operational"
+    )
+    query <- paste0("DELETE FROM experiments WHERE experiment_code = '",Obio@parameterList$project_id,"';")
+    res <- DBI::dbGetQuery(dbDB, query)
+    DBI::dbDisconnect(dbDB)
+    
+    
+} else {
+    dfUpload[["created_at"]] = timeStamp
+}
+
+dfUpload[["updated_at"]] <- timeStamp
+dfUpload <- dfUpload[,names(dfTest)]
+##                                                                           ##
+###############################################################################
+
+biologicSeqTools2::upload.datatable.to.database(
+    host = Obio@dbDetailList$host,
+    user = Obio@dbDetailList$db.user,
+    password = db.pwd,
+    prim.data.db = "operational",
+    dbTableName = "experiments",
+    df.data = dfUpload,
+    db.col.parameter.list = list(
+            "INT(10) NULL DEFAULT NULL" = c("id"),
+            "LONGTEXT NULL DEFAULT NULL" = c("^main_questio$", "^description$","^main_question$"),
+            "VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci" = c("^name$", "^project_code$", "^experiment_code$", "^project_id$", "^lab$", "^lead_scientist$"),
+            "TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP" = c("created_at", "updated_at")
+        ),
+    increment = 5000,
+    new.table = FALSE,
+    first.row.name.index = 1,
+    startOnlyWithConnectionCount1 = FALSE,
+    cols2Index = NULL,
+    indexName = NULL,
+    mode = "MySQL",
+    addRowNamesColumn = FALSE
+)
+
+## Done with uploading settings JSON                                         ##
+###############################################################################
+
+
 dbDB <- DBI::dbConnect(
     drv = RMySQL::MySQL(), 
     user = Obio@dbDetailList$db.user, 

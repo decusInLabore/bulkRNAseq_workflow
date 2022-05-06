@@ -54,6 +54,13 @@ In this script all input files will be checked and/or created.
 ```{r, echo=T, eval=TRUE, warning=FALSE, results="asis"}
 
 ###############################################################################
+###############################################################################
+## Start by navigating into projectFolder/bulkRNAseq_workflow                ##
+###############################################################################
+###############################################################################
+
+
+###############################################################################
 ## Part 1 Create Parameter File                                              ##
 
 pipelineList <- list()
@@ -309,6 +316,33 @@ pipelineList[["TpmTableFN"]] <- paste0(
 )
 
 
+###############################################################################
+## Folder for external DEseq2 results                                        ##
+
+pipelineList[["DEseq2External_DGE"]]  <- paste0(pipelineList[["dataDir"]], "DEseq2External_DGE")
+pipelineList[["DEseq2External_LRT"]]  <- paste0(pipelineList[["dataDir"]], "DEseq2External_LRT")
+  
+if (!dir.exists(pipelineList[["DEseq2External_DGE"]])){
+    dir.create(pipelineList[["DEseq2External_DGE"]], recursive = T)
+}
+
+if (!dir.exists(pipelineList[["DEseq2External_LRT"]])){
+    dir.create(pipelineList[["DEseq2External_LRT"]], recursive = T)
+}
+
+# If you have existing results from a dds object, place the DGE results in 
+# the data/DEseq2External_DGE folder like this:
+
+# library(DESeq2)
+# res <- results(dds, contrast = contrast.vector)
+# res = data.frame(res)
+# write.table(res, "data/DEseq2External_DGE/A_Conditon_vs_B_Condition.txt", sep="\t")
+
+# The name of the text file should reflext the name of the comparison as it is
+# to appear in the data viewer. 
+
+##                                                                           ##
+###############################################################################
 
 
 
@@ -330,7 +364,6 @@ pipelineList[["TpmTableFN"]] <- paste0(
 
 ## sample selections to model file
 
-pipelineList[["DEseq2_LRT_result_folder"]] <- NULL
 
 ###############################################################################
 ## Create folder structure                                                   ##
@@ -525,7 +558,7 @@ dfDesign <- read.delim(
 # [dataseries]_[sampleGroup]_[replicate]
 dfDesign <- biologicSeqTools2::completeDesignBasedOnSampleID(dfDesign)
 
-dfDesign[["f_replicate"]] <- paste0("R", sapply(dfDesign$sample.id, function(x) unlist(strsplit(x, "_"))[3]))
+#dfDesign[["f_replicate"]] <- paste0("R", sapply(dfDesign$sample.id, function(x) unlist(strsplit(x, "_"))[3]))
 
 ## Check: Make sure the above required columns are present:
 names(dfDesign)
@@ -705,6 +738,10 @@ if (!dir.exists(paste0(pipelineList[["dataDir"]], "DEseq2External"))){
 
 ###############################################################################
 ## If applicable - add external input files                                  ##
+
+## Each DESeq2 comparison should be saved in a separate text file containing 
+## the DESeq2::res(dds) output for that comparison. It should be saved in the 
+## data/DEseq2External folder
 
 ## Done adding external                                                      ##
 ###############################################################################

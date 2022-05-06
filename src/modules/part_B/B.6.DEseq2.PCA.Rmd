@@ -191,17 +191,9 @@ Obio <- doLinearFittings(
 #         replace = TRUE
 #     )
 # } else {
-    mode = "calculate_LRT"
- 
-    dfDGE <- Obio@dfModel
-    dfDGE <- dfDGE[dfDGE$test == "LRT",]
-  
-    if (nrow(dfDGE) > 0){
-        Obio <- biologicSeqTools2::LRTanalysis(
-            obj = Obio,
-            createNewResultTable = TRUE
-        )
-    }
+
+
+    
 #}
 
 
@@ -209,9 +201,19 @@ Obio <- doLinearFittings(
 ## Function load DGE results from file
 loadDESeq2outputFromFile <- function(
     Obio,
-    replace = TRUE
+    DEseq2resultDir = "Obio@parameterList$DEseq2External_DGE",
+    replace = FALSE,
+    mode = NULL # Can be DGE or LRT
 ){
-    DEseq2resultDir <- Obio@projectDetailList$DESeq2_result_folder
+    
+    if (is.null(mode)){
+        if (DEseq2resultDir == "DEseq2External_LRT"){
+            mode = "LRT"
+        } else {
+            mode = "DGE"
+        }
+    }
+  
     allfiles <- paste0(DEseq2resultDir, "/", list.files(DEseq2resultDir))
     allfiles <- allfiles[grep(".txt", allfiles)]
     contrastNames <- gsub(paste0(DEseq2resultDir, "/"), "", allfiles)
@@ -234,100 +236,161 @@ loadDESeq2outputFromFile <- function(
       colName <- contrastNames[i]
       res <- read.delim(allfiles[i], header = T, sep="\t")
       
+      res[["gene_id"]] <- row.names(res)
       ################################
       ## This project only 
-      dfAdd <- unique(dfAnno[dfAnno[,Obio@parameterList$geneIDcolumn] %in% res$symbol,  ])
-      res <- merge(
-          res,
-          dfAdd,
-          by.x = "symbol",
-          by.y = Obio@parameterList$geneIDcolumn
-      )
       
       
-      selVec <- c("X", "baseMean", "log2FoldChange", "lfcSE", "stat", "pvalue", "padj")
+      selVec <- c("gene_id", "baseMean", "log2FoldChange", "lfcSE",  "pvalue", "padj")
+      
       if (!sum(selVec %in% names(res)) == length(selVec)){
           stop(paste0("Check DESeq2 input files. Mandantory columns: ", paste0(selVec, collapse = ", ")))
       }
       
       res <- unique(res[,selVec])
-      names(res) <- gsub("^X$", Obio@parameterList$primaryAlignmentGeneID, names(res))
+      names(res) <- gsub("^gene_id$", Obio@parameterList$primaryAlignmentGeneID, names(res))
       
       res <- res[!(duplicated(res[,Obio@parameterList$primaryAlignmentGeneID])),]
       res[is.na(res)] <- 0
+      res <- res[res$baseMean > 0,]
+      res$baseMean <- log2(res$baseMean)
       ## Done 
       ################################
       
       
-      row.names(res) <- res[,Obio@parameterList$primaryAlignmentGeneID]
+      #row.names(res) <- res[,Obio@parameterList$primaryAlignmentGeneID]
       
       names(res) = paste(names(res), colName, sep="_")
       res[[Obio@parameterList$primaryAlignmentGeneID]] = rownames(res)
       
+      ## log2 the base mean for lrt applications
       
-      names(res) = gsub("log2FoldChange", "logFC", names(res))
-      names(res) = gsub(
-        "logFC",
-        paste("contrast_", i, "_logFC", sep=""),
-        names(res)
-      )
       
-      names(res) = gsub(
-        "padj",
-        paste("contrast_", i, "_padj", sep=""),
-        names(res)
-      )
-      
-      names(res) = gsub(
-        "stat",
-        paste("contrast_", i, "_stat", sep=""),
-        names(res)
-      )
-      
-      res$baseMean <- log2(res$baseMean)
-      names(res) = gsub(
-        "baseMean",
-        paste("contrast_", i, "_lg2BaseMean", sep=""),
-        names(res)
-      )
-      
-      #Remove all rows without a padj
-      padj.col = grep("padj", names(res))[1]
-      res[,padj.col][is.na(res[,padj.col])] = ""
-      res = res[res[,padj.col] != "", ]
-      res[,padj.col] <- as.numeric(res[,padj.col])
-      
-      ## Add log10p column ##
-      padj  <- names(res)[grep("_padj_", names(res))]
-      lg10p <- gsub("padj", "lg10p", padj)
-      
-      for (z in 1:length(padj)){
-        preprocess <- as.numeric(res[,padj[z]])
-        minNum <- min(preprocess[preprocess != 0])
-        preprocess[preprocess == 0] <- minNum
-        
-        # if (length(grep("padj_LRT", padj[i])) > 0){
-        #     preprocess <- as.numeric(res[,padj[z]])
-        #     minNum <- min(preprocess[preprocess != 0])
-        #     preprocess[preprocess == 0] <- minNum
-        # } else {
-        #     preprocess <- as.numeric(res[,padj[z]])
-        # }
-        
-        temp <- -1*log10(preprocess)
-        #temp[temp >= 50] = 50
-        res[,lg10p[z]] <- temp
+      if (mode == "DGE"){
+          names(res) = gsub("log2FoldChange", "logFC", names(res))
+          names(res) = gsub(
+            "logFC",
+            paste("contrast_", i, "_logFC", sep=""),
+            names(res)
+          )
+          
+          names(res) = gsub(
+            "padj",
+            paste("contrast_", i, "_padj", sep=""),
+            names(res)
+          )
+          
+          names(res) = gsub(
+            "stat",
+            paste("contrast_", i, "_stat", sep=""),
+            names(res)
+          )
+          
+          res$baseMean <- log2(res$baseMean)
+          names(res) = gsub(
+            "baseMean",
+            paste("contrast_", i, "_lg2BaseMean", sep=""),
+            names(res)
+          )
+          
+          #Remove all rows without a padj
+          padj.col = grep("padj", names(res))[1]
+          res[,padj.col][is.na(res[,padj.col])] = ""
+          res = res[res[,padj.col] != "", ]
+          res[,padj.col] <- as.numeric(res[,padj.col])
+          
+          ## Add log10p column ##
+          padj  <- names(res)[grep("_padj_", names(res))]
+          lg10p <- gsub("padj", "lg10p", padj)
+          
+          for (z in 1:length(padj)){
+            preprocess <- as.numeric(res[,padj[z]])
+            minNum <- min(preprocess[preprocess != 0])
+            preprocess[preprocess == 0] <- minNum
+            
+            # if (length(grep("padj_LRT", padj[i])) > 0){
+            #     preprocess <- as.numeric(res[,padj[z]])
+            #     minNum <- min(preprocess[preprocess != 0])
+            #     preprocess[preprocess == 0] <- minNum
+            # } else {
+            #     preprocess <- as.numeric(res[,padj[z]])
+            # }
+            
+            temp <- -1*log10(preprocess)
+            #temp[temp >= 50] = 50
+            res[,lg10p[z]] <- temp
+          }
+          
+          col.vector = c(
+            Obio@parameterList$primaryAlignmentGeneID,
+            names(res)[grep("contrast", names(res))]
+          )
+          
+          res = res[,col.vector]
+          
+          ## Make all numeric columns numeric ##
+          res[,grep("contrast_", names(res))] <- apply(res[,grep("contrast_", names(res))], 2, as.numeric)
       }
       
-      col.vector = c(
-        Obio@parameterList$primaryAlignmentGeneID,
-        names(res)[grep("contrast", names(res))]
-      )
-      
-      res = res[,col.vector]
-      
-      ## Make all numeric columns numeric ##
-      res[,grep("contrast_", names(res))] <- apply(res[,grep("contrast_", names(res))], 2, as.numeric)
+      if (mode == "LRT"){
+               #res[[Obio@parameterList$primaryAlignmentGeneID]] = rownames(res)
+
+                res$stat <- NULL
+
+                
+                names(res) = gsub(
+                    "baseMean",
+                    paste0("contrast_L_lg2BaseMean_"),
+                    names(res)
+                )
+
+                names(res) = gsub(
+                    "padj",
+                    paste0("contrast_L_padj_"),
+                    names(res)
+                )
+
+
+
+                #Remove all rows without a padj
+                padj.col = grep("padj", names(res))[1]
+                res[,padj.col][is.na(res[,padj.col])] = ""
+                res = res[res[,padj.col] != "", ]
+                res[,padj.col] <- as.numeric(res[,padj.col])
+
+                ## Add log10p column ##
+                padj  <- names(res)[grep("_padj_", names(res))]
+                lg10p <- gsub("padj", "lg10p", padj)
+
+                for (z in 1:length(padj)){
+                    preprocess <- as.numeric(res[,padj[z]])
+                    minNum <- min(preprocess[preprocess != 0])
+                    preprocess[preprocess == 0] <- minNum
+
+                    # if (length(grep("padj_LRT", padj[i])) > 0){
+                    #     preprocess <- as.numeric(res[,padj[z]])
+                    #     minNum <- min(preprocess[preprocess != 0])
+                    #     preprocess[preprocess == 0] <- minNum
+                    # } else {
+                    #     preprocess <- as.numeric(res[,padj[z]])
+                    # }
+
+                    temp <- -1*log10(preprocess)
+                    #temp[temp >= 50] = 50
+                    res[,lg10p[z]] <- temp
+                }
+
+                col.vector = c(
+                    obj@parameterList$primaryAlignmentGeneID,
+                    names(res)[grep("contrast", names(res))]
+                )
+
+                res = res[,col.vector]
+
+                ## Make all numeric columns numierc ##
+                ## Make all numeric columns numierc ##
+                res[,grep("contrast_", names(res))] <- apply(res[,grep("contrast_", names(res))], 2, as.numeric)
+      } # end LRT mode
       
       if (i == 1){
         dfContrastTable <- res
@@ -349,29 +412,109 @@ loadDESeq2outputFromFile <- function(
     dfContrastTable<- dfContrastTable[rowSums(dfContrastTable[,2:ncol(dfContrastTable)]) != 0, ]
     
     if (replace){
-        Obio@DEseq2contrastTable <- data.frame(NULL)
+        if (mode == "LRT"){
+            Obio@DEseq2LRTtable <- data.frame(NULL)
+        } else {
+            Obio@DEseq2contrastTable <- data.frame(NULL)
+        }
+        
+    } else if (!is.null(Obio@DEseq2contrastTable)){
+        if (mode == "LRT"){
+            Obio@DEseq2LRTtable <- merge(
+                Obio@DEseq2LRTtable,
+                dfContrastTable,
+                by.x = Obio@parameterList$primaryAlignmentGeneID,
+                by.y = Obio@parameterList$primaryAlignmentGeneID,
+                all = TRUE
+            )
+            Obio@DEseq2LRTtable[is.na(Obio@DEseq2LRTtable)] <- 0  
+        } else {
+            Obio@DEseq2contrastTable <- merge(
+                Obio@DEseq2contrastTable,
+                dfContrastTable,
+                by.x = Obio@parameterList$primaryAlignmentGeneID,
+                by.y = Obio@parameterList$primaryAlignmentGeneID,
+                all = TRUE
+            )
+            Obio@DEseq2contrastTable[is.na(Obio@DEseq2contrastTable)] <- 0  
+        }
+        
+    } else {
+        if (mode == "LRT"){
+            Obio@DEseq2LRTtable <- dfContrastTable
+        } else {
+            Obio@DEseq2contrastTable <- dfContrastTable
+        }
+        
     }
     
-    Obio@DEseq2contrastTable <- dfContrastTable
-    print("DESeq2 results loaded into Obio@DEseq2contrastTable")
+    if (mode == "LRT"){
+      print("DESeq2 results loaded into Obio@DEseq2LRTtable")
+    } else {
+      print("DESeq2 results loaded into Obio@DEseq2contrastTable")
+    }
     
     return(Obio)
 }
 
-## Done 
-#############################################################
+## Done with function                                                        ##
+###############################################################################
 
-## If mode is not calculate DGE, a dge table needs to be provided
-# if (!is.null(Obio@projectDetailList$DEseq2_DGE_result_folder) && Obio@projectDetailList$DEseq2_DGE_result_folder != ""){
-#     mode = "load_DGE_from_file"
-#     Obio <- loadDESeq2outputFromFile(
-#         Obio,
-#         replace = TRUE
-#     )
-#} else {
-    mode = "calculate_DGE"
+
     
-    ## Pairwise differential gene expression ##
+###############################################################################
+## Add or calculate LRT results                                              ##
+calculate_LRT <- TRUE
+
+pos <- grep("LRT_", names(Obio@dfDesign))
+if (length(pos) == 0){
+    calculate_LRT <- FALSE
+}
+
+if (calculate_LRT){
+  dfDGE <- Obio@dfModel
+    dfDGE <- dfDGE[dfDGE$test == "LRT",]
+  
+    if (nrow(dfDGE) > 0){
+        Obio <- biologicSeqTools2::LRTanalysis(
+            obj = Obio,
+            createNewResultTable = TRUE
+        )
+    }
+} 
+
+## Add additional, external LRT files, if available
+lrtFilesToAdd <- NULL
+if (!is.null(Obio@parameterList$DEseq2External_LRT)){
+    lrtFilesToAdd <- list.files(Obio@parameterList$DEseq2External_LRT)
+}    
+    
+if (length(lrtFilesToAdd) > 0){
+    Obio <- loadDESeq2outputFromFile(
+        Obio,
+        replace = TRUE,
+        mode = "LRT",
+        DEseq2resultDir = Obio@parameterList$DEseq2External_LRT
+    )
+} 
+
+
+## Done adding and/or calculating LRT results                                 ##
+################################################################################
+  
+
+################################################################################
+## Add calculate DGE results                                                  ##
+    
+calculate_DGE <- TRUE
+
+pos <- grep("comp_", names(Obio@dfDesign))
+if (length(pos) == 0){
+    calculate_DGE <- FALSE
+}
+
+if (calculate_DGE){
+  ## Pairwise differential gene expression ##
     ## If working on projects prior to fall 2018, make sure
     ## Obio@parameterList$DEseq2betaPrior is set to true.
     dfDGE <- Obio@dfModel
@@ -383,7 +526,26 @@ loadDESeq2outputFromFile <- function(
             createNewResultTable = TRUE
         )
     }
-#}
+  
+}    
+
+## If mode is not calculate DGE, a dge table needs to be provided
+dgeFilesToAdd <- NULL
+if (!is.null(Obio@parameterList$DEseq2External_DGE)){
+    dgeFilesToAdd <- list.files(Obio@parameterList$DEseq2External_DGE)
+}    
+    
+if (length(dgeFilesToAdd) > 0){
+    Obio <- loadDESeq2outputFromFile(
+        Obio,
+        replace = FALSE,
+        mode = "DGE",
+        DEseq2resultDir = Obio@parameterList$DEseq2External_DGE
+    )
+}     
+
+## Done adding and/or calculating LRT results                                 ##
+################################################################################
 
 
 
