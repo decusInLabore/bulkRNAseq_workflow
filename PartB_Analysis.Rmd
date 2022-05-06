@@ -165,7 +165,7 @@ load(FN)
 
 
 <!-- Optional 12: (output only): LRT Analysis Chapter/Module -->
-```{r child = 'src/modules/part_B/B.14.LRT.plots.Rmd', eval=FALSE}
+```{r child = 'src/modules/part_B/B.14.LRT.plots.Rmd', eval=TRUE}
 ```
 
 <!-- Optional 13: (output only): Documentation Chapter/Module -->
