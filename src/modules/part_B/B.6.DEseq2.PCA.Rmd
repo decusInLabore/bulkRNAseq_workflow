@@ -475,7 +475,7 @@ loadDESeq2outputFromFile <- function(
 ###############################################################################
 ## Add or calculate LRT results                                              ##
 if (!is.null(Obio@parameterList$calculate_DGE) && is.logical(Obio@parameterList$calculate_DGE)) {
-    calculate_LRT <- Obio@parameterlist$calculate_LRT
+    calculate_LRT <- Obio@parameterList$calculate_LRT
 } else {
     calculate_LRT <- TRUE 
 }
