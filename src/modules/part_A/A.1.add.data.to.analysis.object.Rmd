@@ -81,7 +81,7 @@ Obio@dfModel <- dfModel
 ###############################################################################
 ## Add rsem file if available                                                 ##
 if (!is.null(Obio@parameterList$countTableFN)){
-    dRSEM <- read.delim(
+    dfRSEM <- read.delim(
         Obio@parameterList$countTableFN, 
         header =T, 
         sep = "\t",
@@ -100,11 +100,10 @@ if (!is.null(Obio@parameterList$countTableFN)){
     check <- !(designSampleIDs %in% dfRsemSampleIDs)
 
     if (sum(check) > 0){
-      stop("Sample IDs in dfDesign don't match the column names in the count file")
+        stop("Sample IDs in dfDesign don't match the column names in the count file")
+    } else {
+        print("RSEM file not (correctly) specified")
     }
-
-} else {
-    print("RSEM file not (correctly) specified")
 }
 
 

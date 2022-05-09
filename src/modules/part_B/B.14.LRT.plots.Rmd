@@ -134,6 +134,6 @@ if (length(lrtVec) > 0){
 `r sectionDisplay`
 
 ```{r lrt_plot, echo=FALSE, eval=TRUE, warning=FALSE, results="asis"}
-cat(paste(knit(text = chnkVec, quiet = T), collapse = '\n'))
+cat(paste(knitr::knit(text = chnkVec, quiet = T), collapse = '\n'))
 ```
 

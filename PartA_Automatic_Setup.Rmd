@@ -69,7 +69,7 @@ pipelineList <- list()
 ## Essential parameters ##
 
 # Make sure the final character is a slash /
-pipelineList[["folder"]] <- "/camp/stp/babs/working/boeings/Projects/anastasioud/frederick.clasen/483_P2RN21224_bulkRNAseq_RN21224_part2/"
+pipelineList[["folder"]] <- "/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/"
 
 ## Path were the biologic spec file will be kept: ##
 ## Default setting:
@@ -77,13 +77,13 @@ pipelineList[["biologicSettingsFN"]] <- paste0(pipelineList[["folder"]], "workdi
 
 ## Project parameters                       ##
 ## This will be the name of the web project ##
-pipelineList[["project_id"]] <- "P2RN21224"
+pipelineList[["project_id"]] <- "RN21220test"
 
 ## The LIMS ID will be used to retrieve project information
-pipelineList[["lims.id"]] <- "RN21224"
+pipelineList[["lims.id"]] <- "RN21220"
 
 ## This is the lab name ##
-pipelineList[["labname"]] <- "Anastasiou"
+pipelineList[["labname"]] <- "Gould"
 
 ## This is the project under which this experiment will be organised in the db
 ## The project is the umbrella under which several experiments around a similar
@@ -91,7 +91,7 @@ pipelineList[["labname"]] <- "Anastasiou"
 ## If a project name exists, this new experiment will be added to that umbrella
 ## project. If the project does not exists, it will be created. 
 
-pipelineList[["project_name"]] <- "Dietary Effects on Liver Metabolism"
+pipelineList[["project_name"]] <- "Drosophila Nervous System Development"
 
 ## Parameters for the experiment
 ## If the parameters title, subtitle and abstract are set to NULL, 
@@ -120,7 +120,9 @@ pipelineList[["corGeneVec"]] <- NULL
 pipelineList[["experiment.type"]] <- "bulk_rna_seq"
 
 ## This should be the reference transcriptome ##
-pipelineList[["species"]] <- "mus_musculus"
+## options for pipelineList[["species"]] 
+## "homo_sapiens", "mus_musculus", "drosophila_melongaster", "dani_rerio"
+pipelineList[["species"]] <- "drosophila_melanogaster"
 pipelineList[["release"]] <- "release-89"
 
 ###############################################################################
@@ -142,7 +144,7 @@ pipelineList[["designTScol"]] <- "timepoint"
 #pipelineList[["timecourse.units"]] <- "Embryonic Day"
 ## Default: pipelineList[["timecourse.units"]] <- NULL
 
-pipelineList[["timecourse.units"]] <- "Week"
+pipelineList[["timecourse.units"]] <- "Days"
 ## Default: 
 #pipelineList[["timecourse.units"]] <- NULL
 
@@ -164,7 +166,7 @@ pipelineList[["Database Parameters	"]] <- ""
 ## For the dimitris anastasiou lab it would be dal_data, but you can also 
 ## chose anastasioud_data, if you prefer. 
 
-pipelineList[["primDataDB"]] <- "dal_data"
+pipelineList[["primDataDB"]] <- "agl_data"
 
 ## These three can be left pre-set
 pipelineList[["ref.cat.db"]] <- "reference_categories_db_new"
@@ -175,7 +177,7 @@ pipelineList[["host"]] <- "10.27.241.82"
 
 ## Add lab categories table, if available.
 ## The current format for lab category tables is [lab head initials]_lab_categories
-pipelineList[["lab.categories.table"]] <- "da_lab_categories"
+pipelineList[["lab.categories.table"]] <- "ag_lab_categories"
 ## Default if no lab database table is available
 # pipelineList[["lab.categories.table"]] <- NULL
 
@@ -254,8 +256,8 @@ pipelineList[["NFcoreSettingsFN"]] <- pipelineList[["designFN"]] <- paste0(
 ## Specify the folders in which FASTQ sequencing files are located
 ## If specified, make sure that pathToSeqStorageFolder has a backslash at the end
 pipelineList[["pathToSeqStorageFolder"]] <- c(
-    "/camp/stp/sequencing/outputs/babs/data/anastasioud/jack.carruthers/RN21224/primary_data/220304_A01366_0154_BH7WKNDMXY/fastq/",
-    "/camp/stp/sequencing/outputs/babs/data/anastasioud/jack.carruthers/RN21224/primary_data/220117_A01366_0128_BH5VNMDMXY/fastq/"
+    "/camp/stp/babs/inputs/sequencing/data/goulda/adrien.franchet/RN21220/primary_data/211203_A01366_0104_AH3WVGDMXY/fastq/",
+    "/camp/stp/babs/inputs/sequencing/data/goulda/adrien.franchet/RN21220/primary_data/211130_A01366_0101_BH3YWKDMXY/fastq/"
 )
 
 ## Default setting if no alignment is required:
@@ -285,23 +287,47 @@ pipelineList[["TrimGaloreMinQuality"]] = 20
 #     "/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/RN21119_E14/GRCg6a/processed_data/results/star_rsem/"
 # )
 
+# pipelineList[["pathToRSEMresultsFiles"]] <- c(
+#     paste0(pipelineList[["folder"]], "workdir/star_rsem/")
+# )
+
 pipelineList[["pathToRSEMresultsFiles"]] <- c(
-    paste0(pipelineList[["folder"]], "workdir/star_rsem/")
+    paste0("/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472_brains_from_drosophila_larvae_RN21220/workdir/", "RSEM/Ensembl/")
 )
 
 
 ## This is the folder in which the [sample.id].genes.result files live
-RSEM_folder <- paste0(pipelineList[["folder"]], "basedata/")
+#RSEM_folder <- paste0(pipelineList[["folder"]], "basedata/")
+RSEM_folder <- paste0("/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472_brains_from_drosophila_larvae_RN21220/workdir/", "RSEM/")
 pipelineList[["RSEM_folder"]]  <- RSEM_folder 
 
-## This is the name of the RSEM output file
+## This is the name of the RSEM output original 
+originalCountTableFN <- "/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472_brains_from_drosophila_larvae_RN21220/workdir/RSEM/RN21220.count.data.txt"
+df <- read.delim(
+    originalCountTableFN, 
+    header=T, 
+    sep = "\t",
+    stringsAsFactor=F
+)
+names(df) <- gsub("X", "gene_id", names(df))
+
 countTableFN <- paste0(pipelineList[["folder"]], "data/",pipelineList[["project_id"]],".count.data.txt")
+
+write.table(
+    df, 
+    countTableFN,
+    sep = "\t"
+)
+
+
+
+
 pipelineList[["countTableFN"]] <- countTableFN
 
 ## Save as parameter
 # NF-core pre-processed count1s
-pipelineList[["preProcessedCountTableFN"]] <- paste0(pipelineList[["folder"]], "workdir/star_rsem/rsem.merged.gene_counts.tsv")
-pipelineList[["preProcessedTPMTableFN"]] <- paste0(pipelineList[["folder"]], "workdir/star_rsem/rsem.merged.gene_tpm.tsv")
+#pipelineList[["preProcessedCountTableFN"]] <- paste0(pipelineList[["folder"]], "workdir/star_rsem/rsem.merged.gene_counts.tsv")
+#pipelineList[["preProcessedTPMTableFN"]] <- paste0(pipelineList[["folder"]], "workdir/star_rsem/rsem.merged.gene_tpm.tsv")
 
 
 
@@ -430,7 +456,7 @@ pipelineList[["modelFN"]] <- paste0(pipelineList[["folder"]], "/workdir/bulkRNAs
 ## To create pipelineJSON, remove reference list ##
 dfRefTab <- data.frame(pipelineList[["ReferenceTable"]])
 
-pipelineList[["ReferenceTable"]] <- NULL
+#pipelineList[["ReferenceTable"]] <- NULL
 
 #pipelineJson <- jsonlite::toJSON(pipelineList)
 
@@ -539,7 +565,7 @@ if (dir.exists("/Volumes/babs/working/boeings/")){
 
 baseDesignFN <- paste0(
   pipelineList[["folder"]],
-  "data/base.design.txt"
+  "workdir/bulkRNAseq_workflow/design/base.design.txt"
 )
 
 
@@ -1457,6 +1483,7 @@ write.table(
 #'
 createbulkRNASeqAnalysisNFcoreScript <- function(
     obj = "biologic object",
+    NFcoreSettingsFN = "path/to/NF/core/settings",
     scriptVecSlot = "scriptVec"
 
 ){
@@ -1480,8 +1507,8 @@ createbulkRNASeqAnalysisNFcoreScript <- function(
         "sbatch --time=12:00:00 --wrap ' \\",
         "nextflow run nf-core/rnaseq \\",
         "-r 3.6 \\",
-        paste0("--input ", pipelineList$NFcoreSettingsFN, " \\"),
-        paste0("--outdir ", pipelineList$localWorkDir, " \\"),
+        paste0("--input ", NFcoreSettingsFN, " \\"),
+        paste0("--outdir ", obj@parameterList$localWorkDir, " \\"),
         "-profile crick \\",
         "--aligner star_rsem \\",
         paste0("--rsem_index ", gsub("/genome$", "", obj@parameterList$genomeIndex), " \\"),
@@ -1506,6 +1533,12 @@ createbulkRNASeqAnalysisNFcoreScript <- function(
 
 ## Done
 ##########################################
+
+createbulkRNASeqAnalysisNFcoreScript(
+    obj = Obio,
+    NFcoreSettingsFN = pipelineList$NFcoreSettingsFN,
+    scriptVecSlot = "scriptVec"
+)
 
 print(paste0("run NF-core script ", paste0(pipelineList$localWorkDir, "nf.core.script.sh")))
 
