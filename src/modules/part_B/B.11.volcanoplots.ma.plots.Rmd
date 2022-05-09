@@ -78,7 +78,10 @@ MAplotList <- list()
 VplotList <- list()
 
 ## Create dfMAplots ##
-contrastSel <- names(dfMainData)[grep("contrast_[0-9]{1,2}", names(dfMainData))]
+contrastSel <- c(
+  names(dfMainData)[grep("contrast_[0-9]{1,2}", names(dfMainData))],
+  names(dfMainData)[grep("contrast_D[0-9]{1,2}", names(dfMainData))]
+)
 MAselVec <- c(
     contrastSel[grep("lg2BaseMean", contrastSel)],
     contrastSel[grep("logFC", contrastSel)]
