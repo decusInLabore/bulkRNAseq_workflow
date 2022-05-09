@@ -366,8 +366,8 @@ if (!dir.exists(pipelineList[["DEseq2External_LRT"]])){
 
 ## Set to false if no DGE results specified in the design file are to be 
 # calculated.
-pipelineList[["calculate_DGE"]] <- TRUE
-pipelineList[["calculate_LRT"]] <- TRUE
+pipelineList[["calculate_DGE"]] <- FALSE
+pipelineList[["calculate_LRT"]] <- FALSE
 
 # If you have existing results from a dds object, place the DGE results in 
 # the data/DEseq2External_DGE folder like this:
