@@ -241,6 +241,8 @@ loadDESeq2outputFromFile <- function(
       pos <- grep("gene_id", names(res))
       if (length(pos) == 0){
           res[["gene_id"]] <- row.names(res)  
+      } else if (length(pos) == 1){
+          row.names(res) <- res$gene_id
       }
       
       ################################
@@ -254,9 +256,8 @@ loadDESeq2outputFromFile <- function(
       }
       
       res <- unique(res[,selVec])
-      names(res) <- gsub("^gene_id$", Obio@parameterList$primaryAlignmentGeneID, names(res))
       
-      res <- res[!(duplicated(res[,Obio@parameterList$primaryAlignmentGeneID])),]
+      res <- res[!(duplicated(res[,"gene_id"])),]
       res[is.na(res)] <- 0
       res <- res[res$baseMean > 0,]
       res$baseMean <- log2(res$baseMean)
@@ -267,7 +268,9 @@ loadDESeq2outputFromFile <- function(
       #row.names(res) <- res[,Obio@parameterList$primaryAlignmentGeneID]
       
       names(res) = paste(names(res), colName, sep="_")
-      res[[Obio@parameterList$primaryAlignmentGeneID]] = rownames(res)
+      names(res) <- gsub(paste0("gene_id_", colName), "gene_id", names(res))
+      names(res) <- gsub("^gene_id$", Obio@parameterList$primaryAlignmentGeneID, names(res))
+      #res[[Obio@parameterList$primaryAlignmentGeneID]] = rownames(res)
       
       ## log2 the base mean for lrt applications
       
@@ -419,8 +422,10 @@ loadDESeq2outputFromFile <- function(
     if (replace){
         if (mode == "LRT"){
             Obio@DEseq2LRTtable <- data.frame(NULL)
+            Obio@DEseq2LRTtable <- dfContrastTable
         } else {
             Obio@DEseq2contrastTable <- data.frame(NULL)
+            Obio@DEseq2contrastTable <- dfContrastTable
         }
         
     } else if (!is.null(Obio@DEseq2contrastTable)){
