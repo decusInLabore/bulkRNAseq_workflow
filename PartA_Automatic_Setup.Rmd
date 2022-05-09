@@ -245,6 +245,10 @@ pipelineList[["GSEAtestEnrichmentGmtFile"]] <- NULL
 
 ###############################################################################
 ## Add Sequencing parameters                                                 ##
+###############################################################################
+###############################################################################
+## This section is only required to create the NF core design file           ##
+###############################################################################
 
 pipelineList[["NFcoreSettingsFN"]] <- pipelineList[["designFN"]] <- paste0(
     pipelineList[["folder"]], 
@@ -276,20 +280,14 @@ pipelineList[["ModuleTrimGalore"]] = "Trim_Galore/0.4.2-foss-2016b"
 pipelineList[["TrimGaloreMinLength"]] = 25
 pipelineList[["TrimGaloreMinQuality"]] = 20
 
+ 
+###############################################################################
+## End sequencig section                                                     ##
+###############################################################################
 
-## Folders in which relevant genes.results.files are kept
-## Make sure to add a / at the end of the folder names
-## Under normal circumstances this will be the NF-core output folder
-## If set to NULL, it'll be assumed that a RSEM file will be provided 
-# pipelineList[["pathToRSEMresultsFiles"]] <- c(
-#     "/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/RN20094_E07/GRCg6a/processed_data/results/star_rsem/",
-#     "/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/RN20152_E10/GRCg6a/processed_data/results/star_rsem/",
-#     "/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/RN21119_E14/GRCg6a/processed_data/results/star_rsem/"
-# )
 
-# pipelineList[["pathToRSEMresultsFiles"]] <- c(
-#     paste0(pipelineList[["folder"]], "workdir/star_rsem/")
-# )
+###############################################################################
+## Add path to RSEM count file                                               ##
 
 pipelineList[["pathToRSEMresultsFiles"]] <- c(
     paste0("/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472_brains_from_drosophila_larvae_RN21220/workdir/", "RSEM/Ensembl/")
@@ -329,9 +327,12 @@ pipelineList[["countTableFN"]] <- countTableFN
 #pipelineList[["preProcessedCountTableFN"]] <- paste0(pipelineList[["folder"]], "workdir/star_rsem/rsem.merged.gene_counts.tsv")
 #pipelineList[["preProcessedTPMTableFN"]] <- paste0(pipelineList[["folder"]], "workdir/star_rsem/rsem.merged.gene_tpm.tsv")
 
+## Done adding count data table                                              ##
+###############################################################################
 
 
-## Default pipelineList[["pathToRSEMresultsFiles"]] <- NULL
+###############################################################################
+## Add path to count data file                                               ##
 
 ## TPM tables ##
 pipelineList[["TpmTableFN"]] <- paste0(
@@ -341,9 +342,16 @@ pipelineList[["TpmTableFN"]] <- paste0(
         ".tpm.file.txt"
 )
 
+##                                                                           ##
+###############################################################################
 
 ###############################################################################
 ## Folder for external DEseq2 results                                        ##
+
+pipelineList[["dataDir"]] <- paste0(
+    pipelineList[["folder"]],
+    "data/"
+)
 
 pipelineList[["DEseq2External_DGE"]]  <- paste0(pipelineList[["dataDir"]], "DEseq2External_DGE")
 pipelineList[["DEseq2External_LRT"]]  <- paste0(pipelineList[["dataDir"]], "DEseq2External_LRT")
@@ -355,6 +363,11 @@ if (!dir.exists(pipelineList[["DEseq2External_DGE"]])){
 if (!dir.exists(pipelineList[["DEseq2External_LRT"]])){
     dir.create(pipelineList[["DEseq2External_LRT"]], recursive = T)
 }
+
+## Set to false if no DGE results specified in the design file are to be 
+# calculated.
+pipelineList[["calculate_DGE"]] <- TRUE
+pipelineList[["calculate_LRT"]] <- TRUE
 
 # If you have existing results from a dds object, place the DGE results in 
 # the data/DEseq2External_DGE folder like this:
@@ -749,11 +762,11 @@ if (length(pos) == 0){
 ## Create external DEseq2 folder                                             ##
 
 ## External DEseq2 results can be saved in the /data/DEseq2external folder
-pipelineList[["dataDir"]]
-    
-if (!dir.exists(paste0(pipelineList[["dataDir"]], "DEseq2External"))){
-    dir.create(paste0(pipelineList[["dataDir"]], "DEseq2External"), recursive = T)
-}
+# pipelineList[["dataDir"]]
+#     
+# if (!dir.exists(paste0(pipelineList[["dataDir"]], "DEseq2External"))){
+#     dir.create(paste0(pipelineList[["dataDir"]], "DEseq2External"), recursive = T)
+# }
 
 ## External DEseq2 results can be res(dds) and saved with write.table ##
 
@@ -1307,6 +1320,12 @@ if (! is.null(pipelineList[["NFcoreSettingsFN"]]) | !is.null(pipelineList[["path
 ##           format: 
 
 ## End Part 2A                                                               ##
+###############################################################################
+
+
+###############################################################################
+## The section below is only required if you haven't prepared the files      ##
+## yet                                                                       ##
 ###############################################################################
 
 ###############################################################################

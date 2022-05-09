@@ -286,7 +286,6 @@ loadDESeq2outputFromFile <- function(
             names(res)
           )
           
-          res$baseMean <- log2(res$baseMean)
           names(res) = gsub(
             "baseMean",
             paste("contrast_", i, "_lg2BaseMean", sep=""),
@@ -464,7 +463,14 @@ loadDESeq2outputFromFile <- function(
     
 ###############################################################################
 ## Add or calculate LRT results                                              ##
-calculate_LRT <- TRUE
+if (!is.null(Obio@parameterList$calculate_DGE) && is.logical(Obio@parameterList$calculate_DGE)) {
+    calculate_LRT <- Obio@parameterlist$calculate_LRT
+} else {
+    calculate_LRT <- TRUE 
+}
+
+
+
 
 pos <- grep("LRT_", names(Obio@dfDesign))
 if (length(pos) == 0){
@@ -505,8 +511,13 @@ if (length(lrtFilesToAdd) > 0){
 
 ################################################################################
 ## Add calculate DGE results                                                  ##
-    
-calculate_DGE <- TRUE
+
+if (!is.null(Obio@parameterList$calculate_DGE) && is.logical(Obio@parameterList$calculate_DGE)) {
+    calculate_DGE <- Obio@parameterList$calculate_DGE
+} else {
+    calculate_DGE <- TRUE  
+}
+
 
 pos <- grep("comp_", names(Obio@dfDesign))
 if (length(pos) == 0){
