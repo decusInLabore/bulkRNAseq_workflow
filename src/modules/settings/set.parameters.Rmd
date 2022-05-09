@@ -93,6 +93,9 @@ projectDetailList <- list(
     "DEseq2External_DGE" = as.vector(dfObio$DEseq2External_DGE[1]),
     "DEseq2External_LRT" = as.vector(dfObio$DEseq2External_LRT[1]),
     
+    "calculate_DGE" = as.logical(dfObio$calculate_DGE[1]),
+    "calculate_LRT" = as.logical(dfObio$calculate_LRT[1]),
+    
     "designFN" = as.vector(dfObio$designFN[1]),
     "DGEmodelFN" = as.vector(dfObio$DGEmodelFN[1]),
     "DEseq2betaPrior" = as.logical(dfObio$DEseq2betaPrior[1]),
