@@ -381,7 +381,7 @@ loadDESeq2outputFromFile <- function(
                 }
 
                 col.vector = c(
-                    obj@parameterList$primaryAlignmentGeneID,
+                    Obio@parameterList$primaryAlignmentGeneID,
                     names(res)[grep("contrast", names(res))]
                 )
 
