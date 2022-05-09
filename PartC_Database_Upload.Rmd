@@ -781,7 +781,7 @@ if (nrow(dfTest) ==1){
 }
 
 dfUpload[["updated_at"]] <- timeStamp
-dfUpload <- dfUpload[,names(dfTest)]
+#dfUpload <- dfUpload[,names(dfTest)]
 ##                                                                           ##
 ###############################################################################
 
@@ -840,6 +840,9 @@ if (nrow(dfTest) == 0){
     dfUpload[["created_at"]] = timeStamp
     
     dfUpload[["updated_at"]] <- timeStamp
+    
+    dfUpload[["id"]] <- 0
+    dfUpload <- dfUpload[,names(dfTest)]
     
     biologicSeqTools2::upload.datatable.to.database(
         host = Obio@dbDetailList$host,
