@@ -236,7 +236,13 @@ loadDESeq2outputFromFile <- function(
       colName <- contrastNames[i]
       res <- read.delim(allfiles[i], header = T, sep="\t")
       
-      res[["gene_id"]] <- row.names(res)
+      
+      ## In case gene_ids were saved in row names
+      pos <- grep("gene_id", names(res))
+      if (length(pos) == 0){
+          res[["gene_id"]] <- row.names(res)  
+      }
+      
       ################################
       ## This project only 
       
@@ -270,25 +276,25 @@ loadDESeq2outputFromFile <- function(
           names(res) = gsub("log2FoldChange", "logFC", names(res))
           names(res) = gsub(
             "logFC",
-            paste("contrast_", i, "_logFC", sep=""),
+            paste("contrast_D", i, "_logFC", sep=""),
             names(res)
           )
           
           names(res) = gsub(
             "padj",
-            paste("contrast_", i, "_padj", sep=""),
+            paste("contrast_D", i, "_padj", sep=""),
             names(res)
           )
           
           names(res) = gsub(
             "stat",
-            paste("contrast_", i, "_stat", sep=""),
+            paste("contrast_D", i, "_stat", sep=""),
             names(res)
           )
           
           names(res) = gsub(
             "baseMean",
-            paste("contrast_", i, "_lg2BaseMean", sep=""),
+            paste("contrast_D", i, "_lg2BaseMean", sep=""),
             names(res)
           )
           
