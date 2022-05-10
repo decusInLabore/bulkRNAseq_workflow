@@ -216,7 +216,8 @@ loadDESeq2outputFromFile <- function(
   
     allfiles <- paste0(DEseq2resultDir, "/", list.files(DEseq2resultDir))
     allfiles <- allfiles[grep(".txt", allfiles)]
-    contrastNames <- gsub(paste0(DEseq2resultDir, "/"), "", allfiles)
+    allfiles <- gsub("//", "/", allfiles)
+    contrastNames <- gsub(gsub("//", "/", paste0(DEseq2resultDir, "/")), "", allfiles)
     contrastNames <- gsub(".txt", "", contrastNames)
 
 
@@ -418,18 +419,13 @@ loadDESeq2outputFromFile <- function(
     # head(dfContrastTable)
     
     dfContrastTable<- dfContrastTable[rowSums(dfContrastTable[,2:ncol(dfContrastTable)]) != 0, ]
+    names(dfContrastTable) <- gsub("__", "_", names(dfContrastTable))
     
-    if (replace){
-        if (mode == "LRT"){
+    if (mode == "LRT"){
+        if (replace){
             Obio@DEseq2LRTtable <- data.frame(NULL)
             Obio@DEseq2LRTtable <- dfContrastTable
-        } else {
-            Obio@DEseq2contrastTable <- data.frame(NULL)
-            Obio@DEseq2contrastTable <- dfContrastTable
-        }
-        
-    } else if (!is.null(Obio@DEseq2contrastTable)){
-        if (mode == "LRT"){
+        } else if (nrow(Obio@DEseq2LRTtable) > 0){
             Obio@DEseq2LRTtable <- merge(
                 Obio@DEseq2LRTtable,
                 dfContrastTable,
@@ -437,8 +433,17 @@ loadDESeq2outputFromFile <- function(
                 by.y = Obio@parameterList$primaryAlignmentGeneID,
                 all = TRUE
             )
-            Obio@DEseq2LRTtable[is.na(Obio@DEseq2LRTtable)] <- 0  
+            Obio@DEseq2LRTtable[is.na(Obio@DEseq2LRTtable)] <- 0 
         } else {
+            Obio@DEseq2LRTtable <- dfContrastTable
+        }
+    }
+    
+    if (mode == "DGE"){
+        if (replace){
+            Obio@DEseq2contrastTable <- data.frame(NULL)
+            Obio@DEseq2contrastTable <- dfContrastTable
+        } else if (nrow(Obio@DEseq2contrastTable) > 0){
             Obio@DEseq2contrastTable <- merge(
                 Obio@DEseq2contrastTable,
                 dfContrastTable,
@@ -446,17 +451,14 @@ loadDESeq2outputFromFile <- function(
                 by.y = Obio@parameterList$primaryAlignmentGeneID,
                 all = TRUE
             )
-            Obio@DEseq2contrastTable[is.na(Obio@DEseq2contrastTable)] <- 0  
-        }
-        
-    } else {
-        if (mode == "LRT"){
-            Obio@DEseq2LRTtable <- dfContrastTable
+            Obio@DEseq2contrastTable[is.na(Obio@DEseq2contrastTable)] <- 0 
         } else {
             Obio@DEseq2contrastTable <- dfContrastTable
         }
-        
     }
+    
+    
+    
     
     if (mode == "LRT"){
       print("DESeq2 results loaded into Obio@DEseq2LRTtable")

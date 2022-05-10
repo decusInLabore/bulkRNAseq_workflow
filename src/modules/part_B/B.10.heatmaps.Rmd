@@ -119,15 +119,17 @@ designColNames <- sapply(dfSelections$padjSelections, function(x) unlist(strspli
 
 dfModelSel <- dfModel[dfModel$comparison %in% designColNames,]
 
-## replace all entries found in dfModel to comparisonID
-for (i in 1:nrow(dfModelSel)){
-    designColNames <- gsub(paste0("^", as.vector(dfModel[i, "comparison"]), "$"), as.vector(dfModel[i, "comparisonID"]),designColNames )
-}
+dfSelections[["designColumn"]] <- ""
+    if (nrow(dfModelSel) > 0){
+    ## replace all entries found in dfModel to comparisonID
+    for (i in 1:nrow(dfModelSel)){
+        designColNames <- gsub(paste0("^", as.vector(dfModel[i, "comparison"]), "$"), as.vector(dfModel[i, "comparisonID"]),designColNames )
+    }
+    
+    dfSelections[["designColumn"]]  <-  designColNames 
+} 
 
-dfSelections[["designColumn"]]  <-  designColNames 
- 
 
-dfSelections$designColumn[!(dfSelections$designColumn %in% names(dfDesign))] <- ""
 
 for (k in 1:nrow(dfSelections)){
     dfDataTable <- dfMainData

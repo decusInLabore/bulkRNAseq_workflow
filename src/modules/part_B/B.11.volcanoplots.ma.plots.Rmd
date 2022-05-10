@@ -342,7 +342,7 @@ for (i in 1:length(contrastVec)){
     ##                                                                       ##
     ###########################################################################
     
-    selLg2BM<- selVec[grep("lg2BaseMean_", names(dfPlotData))]
+    selLg2BM <- selVec[grep("lg2BaseMean_", names(dfPlotData))]
     selLogFC <- selVec[grep("_logFC_", names(dfPlotData))]
     
      
@@ -406,7 +406,7 @@ for (i in 1:length(contrastVec)){
     
    
     xAxis <- selLogFC[grep(contrastVec[i], selLogFC)]
-    yAxis <- selLg2BM[grep(contrastVec[i], selLg10p)]
+    yAxis <- selLg10p[grep(contrastVec[i], selLg10p)]
     
     link2 <- paste0('<a href="https://biologic.crick.ac.uk/',project_id,'/scatterplot?x_axis=',xAxis,'&y_axis=',yAxis,'&cat_id=ag_lab_categories__10" target="_blank">here</a>.')
     
