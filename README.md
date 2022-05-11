@@ -17,9 +17,15 @@ cd bulkRNAseq_workflow
 
 ```
 
-# Option 1: Starting from raw FASTQ-files
+This workflow can be run in three modes: 
+* Option 1: Starting from raw fastq files, performing the alignment, differential gene expression analysis and interactive visualization
+* Option 2: Starting from a (RSEM-) read count matrix performing differential gene expression analysis and interactive visualization 
+* Option 3: Starting from DEseq2 output files to create an interactive data visulization
 
-## Prepare required files
+# Required input files
+## Required for all options
+
+## Only required for option 1
 ### Sample specification sheet
 The easiest is create a basedesign file with the following columns:
 * |sampleID| sequencing facility sample id, optional
@@ -31,7 +37,6 @@ The easiest is create a basedesign file with the following columns:
 * |f_experimental_factor_1|f_experimental_factor_2|...
 * |dataseries_colors| may be specified in a dataseries_color column with a unique
  hex code (#FF0000) for each dataseries
-
 * sample.group_colors may be specified in a sample.group_color column with one entry per 
 * sample.group
 
