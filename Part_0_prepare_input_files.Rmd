@@ -57,21 +57,6 @@ upload.to.database <- TRUE
 ###############################################################################
 ###############################################################################
 
-###############################################################################
-## Option: create design file for Crick experiment                           ##
-## Requirement: sample.ids.txt file with columns sampleID, sample.id
-
-if (dir.exists("/Volumes/babs/working/boeings/")){
-    hpc.mount <- "/Volumes/babs/working/boeings/"
-} else if (dir.exists("Y:/working/boeings/")){
-    hpc.mount <- "Y:/working/boeings/"
-} else if (dir.exists("/camp/stp/babs/working/boeings/")){
-    hpc.mount <- "/camp/stp/babs/working/boeings/"
-} else {
-    hpc.mount <- ""
-}
-
-
 
 ###############################################################################
 ## Create a design file                                                      ##
@@ -84,12 +69,14 @@ if (dir.exists("/Volumes/babs/working/boeings/")){
 
 # sample.group_colors may be specified in a sample.group_color column with one entry per 
 # sample.group
+# dataseries
+
+# Save this file in [project_folder]/bulkRNAseq_workflow/design/base.design.txt
 
 # Load design file from file:
 
 baseDesignFN <- paste0(
-  pipelineList[["folder"]],
-  "workdir/bulkRNAseq_workflow/design/base.design.txt"
+  "design/base.design2.txt"
 )
 
 
@@ -101,26 +88,16 @@ dfDesign <- read.delim(
     stringsAsFactors = F
 )
 
-## For the option below to work, the sample names need to follow the convention
-# dataseries_saplegroup_replicate
 
-## The function below requires the sampleID to be in the format:
+# In case your sample.id names are organised in the following format:
 # [dataseries]_[sampleGroup]_[replicate]
-dfDesign <- biologicSeqTools2::completeDesignBasedOnSampleID(dfDesign)
+# You can use the function below to auto-complete the sample sheet
+# dfDesign <- biologicSeqTools2::completeDesignBasedOnSampleID(dfDesign)
 
-#dfDesign[["f_replicate"]] <- paste0("R", sapply(dfDesign$sample.id, function(x) unlist(strsplit(x, "_"))[3]))
 
 ## Check: Make sure the above required columns are present:
 names(dfDesign)
 
-## add additional columns
-# The function below requires a sample name structure of 
-# dataseries, sampleGroup, replicate. 
-# There should be no underscores, but the two in the above example. 
-# dfDesign <- biologicSeqTools2::completeDesignBasedOnSampleID(dfBaseDesign)
-
-## Make sure colors are specified
-dfDesign$sample.groups <- NULL
 
 ###############################################################################
 ## Add dataseries color, if not provided in base design file                 ##
@@ -168,142 +145,13 @@ if (length(pos) == 0){
 
 }
 
-# ###############################################################################
-# ## Create Design File                                                        ##
-# #
-# ###############################################################################
-# ## Organizing FASTQ files                                                    ##
-# baseMount <- gsub(
-#     "boeings/",
-#     "",
-#     hpc.mount
-# )
-# 
-# returnList <- biologicSeqTools2::organizeFastqFiles(
-#     baseMount = baseMount,
-#     pathToSeqStorageFolder = pipelineList$pathToSeqStorageFolder,
-#     fastqOutputDir = pipelineList$fastqDir,
-#     localWorkDir = pipelineList$localWorkDir,
-#     checkFileExists = FALSE
-# )
-# 
-# shellscriptVec <- returnList$shellscriptVec
-# concatenationRequired <- returnList$concatenationRequired
-# 
-# # Obio <- biologicSeqTools2::add2vec(
-# #      obj = Obio,
-# #      slot_name = "scriptVec",
-# #      value = shellscriptVec
-# # )
-# #
-# # ## Done organizing FASTQ files                                               ##
-# # ###############################################################################
-# #
-# #
-# #
-# # ###############################################################################
-# # ## Assemble design file                                                      ##
-# #
-# if (concatenationRequired){
-#     print("Concatenation script executed?")
-#     pathToSeqStorageFolder <- pipelineList$fastqDir
-# } else {
-#     pathToSeqStorageFolder <- pipelineList$pathToSeqStorageFolder
-# }
-# 
-# 
-# #################################################################################
-# ## If concatenation required, generate new input files                         ##
-# if (concatenationRequired){
-#     system("concat.file.name")
-# }
-# 
-# ## Done                                                                        ##
-# #################################################################################
-# 
-# # ###############################################################################
-# # ## Create Design File                                                        ##
-# #
-# dfDesign2 <- biologicSeqTools2::createDesignFileCrickASFsamples(
-#     pathToSeqStorageFolder = pathToSeqStorageFolder,
-#     FNsampleAnnotation = paste0(
-#          pipelineList$localWorkDir,
-#         "sample.ids.txt"
-#     ),
-#     paired.end = pipelineList$paired.end,
-#     baseMount = baseMount,
-#     fastqDir = pipelineList$fastqDir
-# 
-# )
-# 
-# dfDesign2 <- dfDesign2[dfDesign2$NGS != "",]
-# 
-# dfDesign2 <- unique(dfDesign2[,c("sample.id", "original.NGS", "NGS" )]) 
-# dfDesign2 <- dfDesign2[dfDesign2$sample.id %in% dfDesign$sample.id, ]
-# 
-# dfDesign$NGS <- NULL
-# dfDesign$original.NGS <- NULL
-# 
-# dfDesign <- merge(
-#     dfDesign,
-#     dfDesign2,
-#     by.x = "sample.id",
-#     by.y = "sample.id"
-# )
-# 
-# 
-# write.table(
-#     dfDesign,
-#     pipelineList[["designFN"]] , 
-#     sep = "\t",
-#     row.names = F
-# )
-##                                                                           ##
-###############################################################################
 
-###############################################################################
-## Order dfDesign for displays.                                              ##
-
-
-## Done with colors
-##
-###############################################################################
-
-###############################################################################
-## Create external DEseq2 folder                                             ##
-
-## External DEseq2 results can be saved in the /data/DEseq2external folder
-# pipelineList[["dataDir"]]
-#     
-# if (!dir.exists(paste0(pipelineList[["dataDir"]], "DEseq2External"))){
-#     dir.create(paste0(pipelineList[["dataDir"]], "DEseq2External"), recursive = T)
-# }
-
-## External DEseq2 results can be res(dds) and saved with write.table ##
-
-
-
-## Done                                                                      ##
-###############################################################################
-
-###############################################################################
-## If applicable - add external input files                                  ##
-
-## Each DESeq2 comparison should be saved in a separate text file containing 
-## the DESeq2::res(dds) output for that comparison. It should be saved in the 
-## data/DEseq2External folder
-
-## Done adding external                                                      ##
-###############################################################################
-
-## Save design file for the workflow in PartB ##
-
-## Additon for backwards compatibility - to be phased out. 
-dfDesign[["FASTQ"]] <- dfDesign$sample.id
+## Save the design file and make sure its specified in the Setup function.
+designFN <- "Y:/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/workdir/bulkRNAseq_workflow/design/RN21220test2.design.table.txt"
 
 write.table(
     dfDesign,
-    pipelineList[["designFN"]] , 
+    designFN, 
     sep = "\t",
     row.names = F
 )
@@ -450,483 +298,98 @@ if (length(comparison) > 0){
 
 dfModel[is.na(dfModel)] <- ""
 
+modelFN <- "Y:/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/workdir/bulkRNAseq_workflow/design/RN21220test2.model.table.txt"
 
-write.table(dfModel ,pipelineList[["modelFN"]] , row.names = FALSE, sep = "\t")
+write.table(
+    dfModel ,
+    modelFN , 
+    row.names = FALSE, 
+    sep = "\t"
+)
 
-## Here model is loaded from file
- 
-#model.file <- "design/dge.model.table.txt"
-
-file.exists(pipelineList[["modelFN"]])
-
-## Write model to file
 
 ## Done model file                                                           ##
 ###############################################################################
 
-
 ###############################################################################
-## Create NF-core samplesheet file                                           ##
-## Instructions: https://nf-co.re/rnaseq/usage
-## sample,fastq_1,fastq_2, strandedness
-# Column 	Description
-# sample 	Custom sample name. This entry will be identical for multiple sequencing libraries/runs from the same sample. Spaces in sample names are automatically converted to underscores (_).
-# fastq_1 	Full path to FastQ file for Illumina short reads 1. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".
-# fastq_2 	Full path to FastQ file for Illumina short reads 2. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".
-# strandedness 	Sample strand-specificity. Must be one of unstranded, forward or reverse.
+## RSEM count file                                                           ##
+###############################################################################
 
-## Get strandedness setting
-if (pipelineList[["stranded"]]){
-    strandedness <- "reverse"
+countTableFN = "Y:/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/data/RN21220test.count.data.txt"
+
+dfCount <- read.delim(
+    countTableFN, 
+    header=T,
+    sep="\t",
+    stringsAsFactors = F
+)
+
+
+checkNames <- names(dfCount)
+checkNames <- checkNames[checkNames != "gene_id"]
+designNames <- unique(dfDesign$sample.id)
+
+if (sum(checkNames %in% designNames) != length(checkNames)){
+    exit("Check if the sample.ids given in the Count file match those in the design file.")
 } else {
-    strandedness <- "unstranded"
-}
-
-if (! is.null(pipelineList[["NFcoreSettingsFN"]]) | !is.null(pipelineList[["pathToSeqStorageFolder"]])){
-    
-        fileNames <- as.vector(unlist(sapply(pipelineList$pathToSeqStorageFolder, function(x) paste0(x, list.files(x)))))
-        files <- as.vector(unlist(sapply(pipelineList$pathToSeqStorageFolder, function(x) list.files(x))))
-        sampleIDs <- sapply(
-                    files, 
-                    function(x)
-                      unlist(
-                        strsplit(
-                            x,
-                            "_"
-                        )
-                      )[1]
-        )
-        
-        dfTemp <- data.frame(
-            fileNames, 
-            files, 
-            sampleIDs
-        )
-        
-        dfTemp2 <- unique(dfDesign[,c("sampleID", "sample.id")])
-        dfTemp2 <- dfTemp2[dfTemp2$sampleID %in% dfTemp$sampleIDs, ]
-        dfTemp <- merge(
-            dfTemp, 
-            dfTemp2, 
-            by.x = "sampleIDs",
-            by.y = "sampleID"
-        )
-        
-        dfTemp[["base"]] <- dfTemp$files
-        dfTemp[grep("_R1_", dfTemp$files), "base"] <-  sapply(as.vector( dfTemp[grep("_R1_", dfTemp$files), "base"]), function(x) unlist(strsplit(x, "_R1_"))[1])
-        dfTemp[grep("_R2_", dfTemp$files), "base"] <-  sapply(as.vector( dfTemp[grep("_R2_", dfTemp$files), "base"]), function(x) unlist(strsplit(x, "_R2_"))[1])
-        
-        if (pipelineList[["paired.end"]]){
-            dfR1 <- dfTemp[grep("_R1_", dfTemp$files),]
-            dfR2 <- dfTemp[grep("_R2_", dfTemp$files),]
-            
-            dfR1 <- dfR1[dfR1$base %in% dfR2$base, ]
-            dfR2 <- dfR2[dfR2$base %in% dfR1$base, ]
-            
-            ## Order ##
-            for (i in 1:nrow(dfR1)){
-                sample <- dfR1[i, "sample.id"]
-                fastq_1 <- dfR1[i, "fileNames"]
-                
-                ## Find fastq 2
-                baseID <- dfR1[i, "base"]
-                
-                pos <- grep(paste0("^",baseID,"$"), dfR2$base)
-                fastq_2 <- dfR2[pos, "fileNames"]
-                
-                
-                newRow <- data.frame(sample, fastq_1, fastq_2, strandedness)
-                
-                if (i==1){
-                    dfRes <- newRow
-                } else {
-                    dfRes <- rbind(
-                        dfRes, 
-                        newRow
-                    )
-                }
-            }
-            
-            dfRes <- dfRes[order(dfRes$sample), ]
-            
-            ## Save nextflow sample sheet ##
-            write.csv(
-                dfRes, 
-                pipelineList$NFcoreSettingsFN,
-                row.names = FALSE,
-                quote=FALSE
-            )
-            
-        } else {
-            ## Single end nextflow sample sheet ##
-            dfR1 <- dfTemp[grep("_R1_", dfTemp$files),]
-            
-            ## Order ##
-            for (i in 1:nrow(dfR1)){
-                sample <- dfR1[i, "sample.id"]
-                fastq_1 <- dfR1[i, "fileNames"]
-                
-                fastq_2 <- ""
-                
-                
-                newRow <- data.frame(sample, fastq_1, fastq_2, strandedness)
-                
-                if (i==1){
-                    dfRes <- newRow
-                } else {
-                    dfRes <- rbind(
-                        dfRes, 
-                        newRow
-                    )
-                }
-            }
-            
-            
-            
-            
-        }
-       
-        ## Save nextflow sample sheet ##
-        dfRes <- dfRes[order(dfRes$sample), ]
-        
-        write.csv(
-            dfRes, 
-            pipelineList$NFcoreSettingsFN,
-            row.names = FALSE,
-            quote = FALSE
-        )
-    
+    print("Count file ok. ")
 }
 
 
+## Adjust TPM file order to the order given in the design file
+countOrder <- c(
+    "gene_id",
+    paste0(
+        as.vector(dfDesign$sample.id)
+    )
+)
 
+dfCount <- unique(dfTPM[, countOrder])
 
-## Done                                                                      ##
-###############################################################################
+write.table(
+    dfCount,
+    countTableFN,
+    sep = "\t",
+    row.names = F
+)
 
-###############################################################################
-## Part 2A: Use to start from fastq files                                    ##
-
-###############################################################################
-## Create analysis scripts                                                   ##
-# sDir <- getwd()
-# setwd(Obio@parameterList$localWorkDir)
-# 
-# Obio <- biologicSeqTools2::createbulkRNASeqAnalysisBashScripts(
-#     obj = Obio,
-#     scriptVecSlot = "scriptVec"
-# )
-# setwd(sDir)
-
-## Run analysis BASH script ##
-## Done creating analysis bash scripts                                       ##
-###############################################################################
-
-## End Part 2A                                                               ##
-###############################################################################
-
-###############################################################################
-## Part 2B: Start from (RSEM) read count matrix                              ##
-
-
-## In this experiment a summary RSEM file needs to be created.
-
-## RSEM genes.result files are located here:
-#E07
-#/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/RN20094_E07/GRCg6a/processed_data/results/star_rsem
-
-#E10
-#/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/RN20152_E10/GRCg6a/processed_data/results/star_rsem
-
-#E14
-#/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/RN21119_E14/GRCg6a/processed_data/results/star_rsem
-
-
-
-# ## Create RSEM count matrix if it doesn't exist yet ##
-# hairpinFN <- "/camp/stp/babs/working/boeings/Projects/pachnisv/franze.progatzky/475_EGC_miRNAseq_RN21203/workdir/fitht_results/edgeR/miRBase_hairpin/hairpin_counts.csv"
-# 
-# dfHairpin <- read.csv(hairpinFN, stringsAsFactors = F)
-# names(dfHairpin) <- gsub("\\.", "_", names(dfHairpin))
-# row.names(dfHairpin) <- dfHairpin$X
-# dfHairpin$X <- NULL
-# dfHairpin <- data.frame(t(dfHairpin))
-# 
-# 
-# p1 <- sapply(names(dfHairpin), function(x) unlist(strsplit(x, "_"))[1])
-# p2 <- sapply(names(dfHairpin), function(x) unlist(strsplit(x, "_"))[2])
-# p2 <- paste0(p2, "Hairpin")
-# p3 <- sapply(names(dfHairpin), function(x) unlist(strsplit(x, "_"))[3])
-# p3 <- gsub(".hairpin", "", p3)
-# 
-# names(dfHairpin) <- paste0(p1, "_", p2, "_", p3)
-# dfHairpin[["gene"]] <- row.names(dfHairpin)
-# dfHairpin[["gene"]] <- gsub("_mir_", "_miR_", dfHairpin$gene)
-# 
-# dfCount <- dfHairpin
-# 
-# #dfCount  <- dplyr::full_join(dfMature,  dfHairpin, by = "gene")
-# dfCount[is.na(dfCount)] <- 0
-# #dfCount[dfCount$mature_miRNA == 0, "mature_miRNA"] <- dfCount[dfCount$mature_miRNA == 0, "gene"]
-# 
-# orderVec <- names(dfCount)
-# orderVec <- orderVec[orderVec != "mature_miRNA"]
-# orderVec <- orderVec[orderVec != "gene"]
-# #orderVec <- c("mature_miRNA", sort(orderVec))
-# 
-# dfCount <- dfCount[, orderVec]
-
-# row.names(dfCount) <- dfCount$mature_miRNA
-# dfCount$mature_miRNA <- NULL
-
-# FNcount <- "../../basedata/count.matrix.txt"
-# write.table(dfCount, FNcount,  sep="\t")
-# 
-# 
-# if (!is.null(pipelineList[["pathToRSEMresultsFiles"]] )){
-#     files <- unlist(
-#         lapply(
-#             pipelineList[["pathToRSEMresultsFiles"]], 
-#             function(x)paste0(x, list.files(x))
-#         )
-#     )
-# }
-# 
-# files <- files[grep(".genes.results", files)]
-# 
-# 
-# 
-# files = paste(
-#     files,
-#     collapse = " "
-# )
-# 
-# RSEM.CMD = paste(
-#     "module load RSEM/1.3.3-foss-2021a;",
-#     "rsem-generate-data-matrix ",
-#     files,
-#     " > ",
-#     pipelineList[["preProcessedCountTableFN"]],
-#     sep=""
-# )
-# 
-# ## Run RSEM command
-# ## The above command might only work on the command line
-# sink("../RSEM.command.sh")
-# cat(RSEM.CMD)
-# sink()
-
-#system(RSEM.CMD)
-## Run RSEM shell script ##
-
-# hairpinFN <- "/camp/stp/babs/working/boeings/Projects/pachnisv/franze.progatzky/475_EGC_miRNAseq_RN21203/workdir/fitht_results/edgeR/miRBase_hairpin/hairpin_counts.csv"
-# 
-# dfHairpin <- read.csv(hairpinFN, stringsAsFactors = F)
-# names(dfHairpin) <- gsub("\\.", "_", names(dfHairpin))
-# row.names(dfHairpin) <- dfHairpin$X
-# dfHairpin$X <- NULL
-# dfHairpin <- data.frame(t(dfHairpin))
-# 
-# 
-# p1 <- sapply(names(dfHairpin), function(x) unlist(strsplit(x, "_"))[1])
-# p2 <- sapply(names(dfHairpin), function(x) unlist(strsplit(x, "_"))[2])
-# p2 <- paste0(p2, "Hairpin")
-# p3 <- sapply(names(dfHairpin), function(x) unlist(strsplit(x, "_"))[3])
-# p3 <- gsub(".hairpin", "", p3)
-# 
-# names(dfHairpin) <- paste0(p1, "_", p2, "_", p3)
-# dfHairpin[["gene"]] <- row.names(dfHairpin)
-# dfHairpin[["gene"]] <- gsub("_mir_", "_miR_", dfHairpin$gene)
-# 
-# dfCount  <- dplyr::full_join(dfMature,  dfHairpin, by = "gene")
-# dfCount[is.na(dfCount)] <- 0
-# dfCount[dfCount$mature_miRNA == 0, "mature_miRNA"] <- dfCount[dfCount$mature_miRNA == 0, "gene"]
-# 
-# orderVec <- names(dfCount)
-# orderVec <- orderVec[orderVec != "mature_miRNA"]
-# orderVec <- orderVec[orderVec != "gene"]
-# orderVec <- c("mature_miRNA", sort(orderVec))
-# 
-# dfCount <- dfCount[, orderVec]
-# 
-# row.names(dfCount) <- dfCount$mature_miRNA
-# dfCount$mature_miRNA <- NULL
-# 
-# FNcount <- "../../basedata/count.matrix.txt"
-# write.table(dfCount, FNcount,  sep="\t")
-# 
-# ## Read resulting RSEM table
-# dfRSEM <- read.delim(
-#     pipelineList[["preProcessedCountTableFN"]], 
-#     sep = "\t",
-#     header = T,
-#     stringsAsFactors = F
-# )
-
-## Make sure it's integers:
-# dfRSEM[,2:ncol(dfRSEM)] <- round(dfRSEM[,2:ncol(dfRSEM)])
-# 
-# for (i in 1:length(pipelineList[["pathToRSEMresultsFiles"]])){
-#     names(dfRSEM) <- gsub(paste0("X", gsub("-", ".", gsub("/", ".", pipelineList[["pathToRSEMresultsFiles"]][[i]]))), "", names(dfRSEM))
-# }
-# 
-# names(dfRSEM) <- gsub(".genes.results", "", names(dfRSEM))
-# 
-# ## now change sampleIDs to sample.ids
-# 
-# dfTranslate <- unique(dfDesign[,c("sampleID", "sample.id")])
-
-# dfRSEM <- dfCount
-# 
-# samplesPresent <- names(dfRSEM)[names(dfRSEM) != "X"]
-# samplesNotPresent <- dfDesign$sample.id[!(dfDesign$sample.id %in% names(dfRSEM))]
-# 
-# ## Updating dfDesign
-# dfDesign <- dfDesign[dfDesign$sample.id %in% samplesPresent, ]
-# 
-# write.table(
-#     dfDesign,
-#     pipelineList[["designFN"]] , 
-#     sep = "\t",
-#     row.names = F
-# )
-# 
-# 
-# dfTranslate <- unique(dfDesign[,c("sampleID", "sample.id")])
-# 
-# ## Renaming RSEM columns
-# rsemOrder <- c(
-#         "ENSMUSG",
-#         paste0(
-#             as.vector(dfDesign$sample.id)
-#             #"_TPM"
-#         )
-#     )
-# 
-# dfRSEM[["ENSMUSG"]] <- row.names(dfRSEM)
-# 
-# 
-# # for (i in 1:nrow(dfTranslate)){
-# #     names(dfRSEM) <- gsub(paste0("^", as.vector(dfTranslate[i,"sampleID"]), "$"), as.vector(dfTranslate[i,"sample.id"]), names(dfRSEM))
-# # }
-# # 
-# # names(dfRSEM) <- gsub("X", "ENSGALG", names(dfRSEM))
-# 
-# ## Format: |gene_id column names X|sample.id[1]|sample.id[2]|sample.id[3]|...
-# 
-# 
-#     
-# dfRSEM <- dfRSEM[, rsemOrder]
-#     
-# 
-# write.table(dfRSEM, pipelineList[["countTableFN"]], sep = "\t", row.names=F)
-
-
-## Format of the RSEM read count matrix:
-
-## TPM table ##
-## Option A: Specify the folder in which the RSEM genes.result files reside
-
-## Option B: Specify TPM file directly. The TPM file needs to have the following 
-##           format: 
-
-## End Part 2A                                                               ##
+## Done adding count file                                                    ##
 ###############################################################################
 
 
 ###############################################################################
-## The section below is only required if you haven't prepared the files      ##
-## yet                                                                       ##
+## TPM File                                                                  ##
 ###############################################################################
-
-###############################################################################
-## Part 2C: I have a read-count matrix, a TPM file, and DESeq2 differential  ##
-##          gene expression outputs                                          ##
-
-## RSEM_folder
-## The RSEM folder points to the folder containing the [sampleID].genes.result files
-# pipelineList[["RSEM_folder"]] <- paste0(pipelineList[["folder"]], "workdir/RSEM/Ensembl/")
-
 
 ## TPM file ##
 ## The tpm file should contain the following columns:
-## first column: primary gene alignment ID, named either "X" or "ENSG|ENSMUSG|or whatever species
-## second to N-th column: one column for each sample as liste in Obio@dfDesign$sample.id. Can be extended by a
-## _TPM suffix. 
+## first column: primary gene alignment ID column name gene_id.
+## The column names aside from the gene_id column should match the sample.id entries in the design file.
+## Suggestion: save the tpm file in [project_folder]/data/gene.tpm.file.txt
 
+## Example: process NF-core output TPM file
+TpmTableFN = "Y:/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/data/RN21220test.tpm.file.txt"
 
-
-if (!is.null(pipelineList[["pathToRSEMresultsFiles"]] )){
-    files <- unlist(
-        lapply(
-            pipelineList[["pathToRSEMresultsFiles"]],
-            function(x)paste0(x, list.files(x))
-        )
-    )
-}
-
-
-files <- files[grep(".genes.results", files)]
-
-samples <- sapply(
-    files,
-    function(x)
-    strsplit(x, "/")
-)
-
-    samples <- unlist(sapply(
-        samples,
-        function(x)
-        x[length(x)]
-    ))
-
-    samples <- as.vector(gsub(".genes.results", "", samples))
-
-    dfTables <- biologicSeqTools2::create.tpm.and.fpkm.tables(
-        files = files,
-        samples = samples
-    )
-
-    dfTPM <- dfTables$df.tpm
-
-    ## Exchange names ##
-    dfTranslate <- unique(dfDesign[,c("sampleID", "sample.id")])
-
-    ## Renaming RSEM columns
-    for (i in 1:nrow(dfTranslate)){
-        names(dfTPM) <- gsub(paste0("^", as.vector(dfTranslate[i,"sampleID"]), "_TPM"), paste0(as.vector(dfTranslate[i,"sample.id"]),"_TPM"), names(dfTPM))
-    }
-
-    # Order dfTPM according design file ##
-    tpmOrder <- c(
-        "gene_id",
-        paste0(
-            as.vector(dfDesign$sample.id),
-            "_TPM"
-        )
-    )
-
-#dfTPM <- dfRSEM
-names(dfTPM) <- gsub("ENSMUSG", "gene_id", names(dfTPM))
-names(dfTPM) <- gsub("_TPM", "", names(dfTPM))
-
-###############################################################################
-## Add NF-core TPM table                                                     ##
 dfTPM <- read.delim(
-    pipelineList[["preProcessedTPMTableFN"]], 
+    TpmTableFN, 
+    header=T,
     sep="\t",
-    stringsAsFactors=F
+    stringsAsFactors = F
 )
 
-## Translate sampleID names to gene id names ##
-dfTranslate <- unique(dfDesign[,c("sampleID", "sample.id")])
 
-## Renaming TPM columns
-for (i in 1:nrow(dfTranslate)){
-    names(dfTPM) <- gsub(paste0("^", as.vector(dfTranslate[i,"sampleID"]), "_TPM"), paste0(as.vector(dfTranslate[i,"sample.id"]),"_TPM"), names(dfTPM))
+checkNames <- names(dfTPM)
+checkNames <- checkNames[checkNames != "gene_id"]
+designNames <- unique(dfDesign$sample.id)
+
+if (sum(checkNames %in% designNames) != length(checkNames)){
+    exit("Check if the sample.ids given in the Tpm file match those in the design file.")
+} else {
+    print("TPM file ok. ")
 }
-    
-# Select relevant columns and order dfTPM according design file ##
+
+
+## Adjust TPM file order to the order given in the design file
 tpmOrder <- c(
     "gene_id",
     paste0(
@@ -938,54 +401,22 @@ dfTPM <- unique(dfTPM[, tpmOrder])
 
 write.table(
     dfTPM,
-    pipelineList[["TpmTableFN"]],
-    sep = "\t",
-    row.names = F
-)
-
-
-###############################################################################
-## Add NF-core RSEM count table                                              ##
-dfRSEM <- read.delim(
-    pipelineList$preProcessedCountTableFN, 
-    sep="\t",
-    stringsAsFactors=F
-)
-
-## Translate sampleID names to gene id names ##
-dfTranslate <- unique(dfDesign[,c("sampleID", "sample.id")])
-
-## Renaming TPM columns
-for (i in 1:nrow(dfTranslate)){
-    names(dfRSEM) <- gsub(paste0("^", as.vector(dfTranslate[i,"sampleID"])), paste0(as.vector(dfTranslate[i,"sample.id"])), names(dfRSEM))
-}
-    
-# Select relevant columns and order dfTPM according design file ##
-rsemOrder <- c(
-    "gene_id",
-    paste0(
-        as.vector(dfDesign$sample.id)
-    )
-)
-
-dfRSEM <- unique(dfRSEM[, rsemOrder])
-
-write.table(
-    dfRSEM,
-    pipelineList[["countTableFN"]],
+    TpmTableFN,
     sep = "\t",
     row.names = F
 )
 
 
 
-
-
-
-## End Part 2C                                                               ##
+## Done adding TPM file                                                      ##
 ###############################################################################
 
+###############################################################################
+## External DEseq2 results                                                   ##
+###############################################################################
 
+## DGE Type ##
 
+## LRT Type ##
 
 ```  

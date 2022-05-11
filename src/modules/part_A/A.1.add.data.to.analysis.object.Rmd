@@ -49,13 +49,12 @@ if (!is.null(Obio@projectDetailList$modelFN)){
         stringsAsFactors = F
     )
     dfModel[is.na(dfModel)] <- ""
-} else {
-    stop("Error: Now model file specified")
-}
+    Obio@dfModel <- data.frame(NULL)
+    Obio@dfModel <- dfModel
+} 
 
 ## Add: check for essential columns ##
-Obio@dfModel <- data.frame(NULL)
-Obio@dfModel <- dfModel
+
 
 ##                                                                           ##
 ###############################################################################

@@ -1,0 +1,1 @@
+"comparison"	"comparisonID"	"test"	"type"	"model"	"reducedModel"	"normalizeAllSamplesTogether"	"betaPrior"

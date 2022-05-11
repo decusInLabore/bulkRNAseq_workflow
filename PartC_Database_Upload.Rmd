@@ -104,13 +104,7 @@ if (dir.exists("/Volumes/babs/working/boeings/")){
     hpc.mount <- ""
 }
 
-# FN <- paste0(hpc.mount, "Projects/reference_data/documentation/BC.parameters.txt")
-# dbTable <- read.delim(
-#     FN, 
-#     sep = "\t",
-#     stringsAsFactors = F
-# )
-# db.pwd <- as.vector(dbTable[1,1])
+
 
 ## Loading the BABS password ##
 if (upload.results.to.database){
@@ -701,8 +695,24 @@ if (nrow(dfTest) == 0){
         addRowNamesColumn = FALSE
     )
     
+    ## Get new project id ##
+    dbDB <- DBI::dbConnect(
+        drv = RMySQL::MySQL(), 
+        user = Obio@dbDetailList$db.user, 
+        password = db.pwd, 
+        host = Obio@dbDetailList$host, 
+        dbname = "operational"
+    )
+    
+    query <- paste0("SELECT * FROM projects WHERE name = '",Obio@projectDetailList$projectName,"';")
+    
+    dfTest <- DBI::dbGetQuery(dbDB, query)
+    DBI::dbDisconnect(dbDB)
+    
+    Obio@parameterList$project_code <- dfTest$id[1]
+    
 } else {
-  Obio@parameterList$project_code <- dfTest$project_code[1]
+  Obio@parameterList$project_code <- dfTest$id[1]
 }
 
 
@@ -794,7 +804,7 @@ biologicSeqTools2::upload.datatable.to.database(
     df.data = dfUpload,
     db.col.parameter.list = list(
             "INT(10) NULL DEFAULT NULL" = c("id"),
-            "LONGTEXT NULL DEFAULT NULL" = c("^main_questio$", "^description$","^main_question$"),
+            "LONGTEXT NULL DEFAULT NULL" = c("^main_questio$", "^description$","^main_question$","^experiment_settings$"),
             "VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci" = c("^name$", "^project_code$", "^experiment_code$", "^project_id$", "^lab$", "^lead_scientist$"),
             "TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP" = c("created_at", "updated_at")
         ),

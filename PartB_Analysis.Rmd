@@ -91,6 +91,16 @@ shinyBaseServerURL <- "shiny-bioinformatics.crick.ac.uk"
 
 ###############################################################################
 ## Load biologic object from part A                                          ##
+
+## Check if only one project is present ##
+checkFiles <- list.files("..")
+pos <- grep("bioLOGIC.Robj$", checkFiles)
+
+if (length(pos) > 1){
+    eMessage <- paste0("More than one bioLOGIC.Robj file is present in ", getwd(), ". Please move the obsolete biologic.Robj file to a different folder.")
+    exit(eMessage)
+}
+
 FN <- paste0("../", list.files("..")[grep("bioLOGIC.Robj", list.files(".."))])
 load(FN)
 ## Done                                                                      ##
