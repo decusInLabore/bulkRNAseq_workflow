@@ -35,6 +35,9 @@ labname <- Obio@parameterList$labname
 dfDesign <- Obio@dfDesign
 dfPCA <- Obio@dfPCA
 
+## Use provided PCA file if available ##
+
+
 dds <- Obio@ObjDds
 ```
 

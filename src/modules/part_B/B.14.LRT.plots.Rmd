@@ -97,7 +97,7 @@ for (i in 1:length(lrtVec)){
         '**Figure ',
         figureCount,
         '** -log10 p-value of the likelihood ratio rest vs. Base Mean/Intensity plot. Donwolad a pdf of this figure <a href="',FNrel,'" target="_blank">here</a>',
-        'An interactive version of this figure can be found <a href="',link,'" target="_blank">here</a>.'
+        'An interactive version of this figure can be found <a href="',link,'" target="_blank">here</a>. '
     )
  
     figureCount <- figureCount + 1

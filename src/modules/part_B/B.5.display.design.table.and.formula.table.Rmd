@@ -10,21 +10,28 @@ VersionPdfExt <- VersionPdfExt <- paste0(".",chnkPrefix,"V", gsub("-", "", Sys.D
 ## Display Design File
 ```{r designFile, echo=TRUE, eval=TRUE, warning=FALSE, fig.cap="**Table 1:** Design table for this experiment outlining original file names, sample names and group definitions for differential gene expression analysis"}
 dfDesign <- Obio@dfDesign
-dfModel <- Obio@dfModel
+
 
 selVec <- c(
     names(dfDesign)[grep('sampleID', names(dfDesign))],
     names(dfDesign)[grep('original.sample.name', names(dfDesign))],
     names(dfDesign)[grep('sample.id', names(dfDesign))],
+    names(dfDesign)[grep('^sample.group$', names(dfDesign))],
+    names(dfDesign)[grep('^dataseries$', names(dfDesign))],
     names(dfDesign)[grep('^f_', names(dfDesign))],
     names(dfDesign)[grep('comp_', names(dfDesign))],
     names(dfDesign)[grep('LRT_', names(dfDesign))]
     
 )
 
-selVec <- selVec[selVec %in% names(Obio@dfDesign)]
 
-dfDesign <- unique(dfDesign[,selVec])
+selVec <- selVec[selVec %in% names(Obio@dfDesign)]    
+
+
+if (length(selVec) > 1){
+    dfDesign <- unique(dfDesign[,selVec])
+}
+    
 colnames <- gsub("_", " ", names(dfDesign))
 colnames <- gsub("comp", "DGE", colnames)
 colnames <- gsub("^f_", "Factor_", colnames)
@@ -52,7 +59,7 @@ DT::datatable(
 
 ## Display Formula Table
 ```{r formulaFile, echo=TRUE, eval=TRUE, warning=FALSE, fig.cap="**Table 1:** Design table for this experiment outlining original file names, sample names and group definitions for differential gene expression analysis"}
-#dfModel <- Obio@dfModel
+dfModel <- Obio@dfModel
 # selVec <- c(
 #     names(dfDesign)[grep('sampleID', names(dfDesign))],
 #     names(dfDesign)[grep('original.sample.name', names(dfDesign))],
@@ -72,19 +79,20 @@ DT::datatable(
 # colnames <- gsub("original.sample.name", "original", colnames)
 
 
-
-DT::datatable(
-    dfModel,
-    #colnames = colnames,
-    rownames = FALSE,
-    options = list(
-        initComplete = htmlwidgets::JS(
-            "function(settings, json) {",
-            "$(this.api().table().header()).css({'background-color': '#000', 'color': '#fff'});",
-            "}"
-        ),
-    order = list(list(3, 'asc'), list(2, 'desc'))
-    )
-) 
+if (nrow(dfModel) > 0){
+    DT::datatable(
+        dfModel,
+        #colnames = colnames,
+        rownames = FALSE,
+        options = list(
+            initComplete = htmlwidgets::JS(
+                "function(settings, json) {",
+                "$(this.api().table().header()).css({'background-color': '#000', 'color': '#fff'});",
+                "}"
+            ),
+        order = list(list(3, 'asc'), list(2, 'desc'))
+        )
+    ) 
+}
 
 ```
