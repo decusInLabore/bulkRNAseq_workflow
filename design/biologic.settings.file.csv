@@ -31,6 +31,7 @@
 "TrimGaloreMinQuality","20","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",""
 "countTableFN","/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/data/RN21220test.count.data.txt","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",""
 "TpmTableFN","/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/data/RN21220test.tpm.file.txt","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",""
+"dfPCA","/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/workdir/data/dfPca.txt","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",""
 "DEseq2External_DGE","/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/workdir/data/DEseq2External_DGE/","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",""
 "DEseq2External_LRT","/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/workdir/data/DEseq2External_LRT/","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",""
 "calculate_DGE","FALSE","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",""

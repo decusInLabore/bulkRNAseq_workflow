@@ -36,6 +36,17 @@ dfDesign <- Obio@dfDesign
 dfPCA <- Obio@dfPCA
 
 ## Use provided PCA file if available ##
+if (!is.null(Obio@projectDetailList$dfPcaFN)){
+    dfPCA <- read.delim(
+        Obio@projectDetailList$dfPcaFN,
+        header = T, 
+        sep="\t",
+        stringsAsFactors = F
+    )
+    
+    Obio@dfPCA <- data.frame(NULL)
+    Obio@dfPCA <- dfPCA
+}
 
 
 dds <- Obio@ObjDds
