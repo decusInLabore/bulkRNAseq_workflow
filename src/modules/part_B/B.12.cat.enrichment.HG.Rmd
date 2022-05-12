@@ -16,7 +16,10 @@ if (!exists("sdCutOff")){
 ## Create enriched genes list ##
 EnrichedGenesList <- list()
 
-contrastSel <- names(dfMainData)[grep("contrast_[0-9]{1,2}", names(dfMainData))]
+contrastSel <- c(
+    names(dfMainData)[grep("contrast_[0-9]{1,2}", names(dfMainData))],
+    names(dfMainData)[grep("contrast_D[0-9]{1,2}", names(dfMainData))]
+)
 
 DGEtagVec <- as.vector(sapply(
     contrastSel[grep("logFC", contrastSel)],

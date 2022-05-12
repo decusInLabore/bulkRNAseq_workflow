@@ -154,7 +154,8 @@ write.table(
 
 selVec <- c(
     "hgnc_symbol",
-    names(dfMainData)[grep(paste0("contrast_[0-9]{1,2}_logFC"), names(dfMainData))]
+    names(dfMainData)[grep(paste0("contrast_[0-9]{1,2}_logFC"), names(dfMainData))],
+    names(dfMainData)[grep(paste0("contrast_D[0-9]{1,2}_logFC"), names(dfMainData))]
 )
 
 dfGSEAdata <- unique(dfMainData[, selVec])
