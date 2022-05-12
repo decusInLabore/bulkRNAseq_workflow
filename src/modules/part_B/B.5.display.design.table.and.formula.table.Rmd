@@ -49,8 +49,8 @@ DT::datatable(
             "function(settings, json) {",
             "$(this.api().table().header()).css({'background-color': '#000', 'color': '#fff'});",
             "}"
-        ),
-    order = list(list(3, 'asc'), list(2, 'desc'))
+        ) #,
+    #order = list(list(3, 'asc'), list(2, 'desc'))
     )
 ) 
 

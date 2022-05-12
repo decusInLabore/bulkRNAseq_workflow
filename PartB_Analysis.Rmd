@@ -166,11 +166,11 @@ load(FN)
 ```
 
 <!-- Optional 12: (output only): Category Enrichment Hypergeometric Test Chapter/Module -->
-```{r child = 'src/modules/part_B/B.12.cat.enrichment.HG.Rmd', eval=FALSE}
+```{r child = 'src/modules/part_B/B.12.cat.enrichment.HG.Rmd', eval=TRUE}
 ```
 
 <!-- Optional 13: (output only): Category Enrichment fGSEA Method Chapter/Module -->
-```{r child = 'src/modules/part_B/B.13.cat.enrichment.fGSEA.Rmd', eval=FALSE}
+```{r child = 'src/modules/part_B/B.13.cat.enrichment.fGSEA.Rmd', eval=TRUE}
 ```
 
 
