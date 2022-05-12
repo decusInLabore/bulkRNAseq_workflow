@@ -143,6 +143,55 @@ if (!is.null(Obio@projectDetailList$TpmTableFN)){
 ###############################################################################
 
 ###############################################################################
+## Check provided PCA file                                                   ##
+if (!is.null(Obio@projectDetailList$dfPcaFN)){
+    if (file.exists(Obio@projectDetailList$dfPcaFN)){
+        dfPCA <- read.delim(
+            Obio@projectDetailList$dfPcaFN, 
+            header=T, 
+            sep="\t", 
+            stringsAsFactors = F
+        )
+        
+        pos <- c(
+            grep("^sample.id$", names(dfPCA)),
+            grep("^sample_id$", names(dfPCA))
+        )
+        
+        if (length(pos) == 0){
+            Obio@projectDetailList$dfPcaFN <- NULL
+            print("Provided PCA file not valid. The sample.id column is missing. Will use default calculation.")
+        } 
+        
+        pos <- c(
+            grep("^sample.group$", names(dfPCA)),
+            grep("^sample_group$", names(dfPCA))
+        )
+        
+        if (length(pos) == 0){
+            Obio@projectDetailList$dfPcaFN <- NULL
+            print("Provided PCA file not valid. The sample.group column is missing. Will use default calculation.")
+        } 
+        
+        pos <- c(
+            grep("^PC1$", names(dfPCA)),
+            grep("^PC2$", names(dfPCA))
+        )
+        
+        if (length(pos) != 2){
+            Obio@projectDetailList$dfPcaFN <- NULL
+            print("Provided PCA file not valid. Check format of PCx columns. It should be PC1, PC2, ... Will use default calculation.")
+        } 
+        
+       
+        
+    } # End if file.exists
+} # End dfPcaFN not null
+
+## Done                                                                      ##
+###############################################################################
+
+###############################################################################
 ## Add DGE files, if available                                               ##
 
 

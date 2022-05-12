@@ -102,7 +102,7 @@ pipelineList <- biologicSeqTools2::assembleBiologicProject(
     countTableFN = "/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/data/RN21220test.count.data.txt",
     ## Path to TPM table. 
     TpmTableFN = "/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/data/RN21220test.tpm.file.txt",
-    dfPcaFN = NULL,
+    dfPcaFN = "/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/workdir/data/dfPca.txt",
     calculate_DGE = FALSE,
     calculate_LRT = FALSE,
     ## Path to external DEseq2 output files
