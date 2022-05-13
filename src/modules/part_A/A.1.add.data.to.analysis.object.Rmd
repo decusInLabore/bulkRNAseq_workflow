@@ -183,7 +183,20 @@ if (!is.null(Obio@projectDetailList$dfPcaFN)){
             print("Provided PCA file not valid. Check format of PCx columns. It should be PC1, PC2, ... Will use default calculation.")
         } 
         
-       
+        if (!is.null(Obio@projectDetailList$dfPcaFN)){
+            selVec <- c(
+                "sample.id",
+                "sample_id",
+                "sample.group",
+                "sample_group",
+                names(dfPCA)[grep("^PC", names(dfPCA))]
+            )
+            
+            selVec <- selVec[selVec %in% names(dfPCA)]
+            dfPCA <- dfPCA[,selVec]
+            Obio@dfPCA <- data.frame(NULL)
+            Obio@dfPCA <- dfPCA
+        }
         
     } # End if file.exists
 } # End dfPcaFN not null
