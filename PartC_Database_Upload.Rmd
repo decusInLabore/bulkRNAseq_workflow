@@ -457,30 +457,32 @@ if (length(pos) == 1){
     timepoint <- NULL
 }
 
-biologicSeqTools2::createSettingsFile(
-    publicDataset = FALSE,
-    obj = Obio,
-    df.data = Obio@databaseTable,
-    defaultXcolName = xdefault,
-    defaultYcolName = ydefault,
-    timepointName = timepoint,
-    primDataTable = Obio@parameterList$rnaseqdbTableName,
-    pcaDbTable = Obio@parameterList$PCAdbTableName,
-    sample.order = sample.order, #set to "" to go with default sorting
-    heatmapSampleOrder = "",
-    sample.names = "", # default is sample.order
-    count.sample.colors = sample.colors,
-    ptm.colum = "",
-    count.table.headline = Obio@parameterList$count.table.headline,
-    count.table.sidelabel = Obio@parameterList$count.table.sidelabel,
-    venn.slider.selector.strings = defaultVennSel,
-    plot.selection.strings = plotSelection,
-    webSiteDir = paste0(hpc.mount, "Stefan/protocol_files/github/biologic/src/experiments/"),
-    upper_heatmap_limit = 3,
-    lower_heatmap_limit = -3,
-    heamap.headline.text = Obio@parameterList$heamap.headline.text,
-    project_id = Obio@parameterList$project_id
-)
+
+## Removing legacy function 2022-05
+# biologicSeqTools2::createSettingsFile(
+#     publicDataset = FALSE,
+#     obj = Obio,
+#     df.data = Obio@databaseTable,
+#     defaultXcolName = xdefault,
+#     defaultYcolName = ydefault,
+#     timepointName = timepoint,
+#     primDataTable = Obio@parameterList$rnaseqdbTableName,
+#     pcaDbTable = Obio@parameterList$PCAdbTableName,
+#     sample.order = sample.order, #set to "" to go with default sorting
+#     heatmapSampleOrder = "",
+#     sample.names = "", # default is sample.order
+#     count.sample.colors = sample.colors,
+#     ptm.colum = "",
+#     count.table.headline = Obio@parameterList$count.table.headline,
+#     count.table.sidelabel = Obio@parameterList$count.table.sidelabel,
+#     venn.slider.selector.strings = defaultVennSel,
+#     plot.selection.strings = plotSelection,
+#     webSiteDir = paste0(hpc.mount, "Stefan/protocol_files/github/biologic/src/experiments/"),
+#     upper_heatmap_limit = 3,
+#     lower_heatmap_limit = -3,
+#     heamap.headline.text = Obio@parameterList$heamap.headline.text,
+#     project_id = Obio@parameterList$project_id
+# )
 
 setwd(Obio@parameterList$localWorkDir)
 ## Done deploying next generation website                                    ##
@@ -489,7 +491,15 @@ setwd(Obio@parameterList$localWorkDir)
 ###############################################################################
 ## Create settings JSON                                                      ##
 
-## This project only ##
+## If this is a timeseries experiment, identify all samples representing timepoints
+## that are not present in all timeseries
+
+if (!is.null(Obio@parameterList$designTScol)){
+    samplesToExclude <- samplesToExcludeFromTSdisplay(
+        Obio = Obio,
+        designTScol = Obio@parameterList$designTScol
+    )
+}
 
 
 projectJSON <- biologicSeqTools2::createSettingsJSON(
@@ -514,8 +524,8 @@ projectJSON <- biologicSeqTools2::createSettingsJSON(
     upper_heatmap_limit = 3,
     lower_heatmap_limit = -3,
     heamap.headline.text = Obio@parameterList$heamap.headline.text,
-    project_id = Obio@parameterList$project_id #,
-    #samplesToExcludeFromTSdisplay = samplesToExcludeFromTSdisplay
+    project_id = Obio@parameterList$project_id,
+    samplesToExcludeFromTSdisplay = samplesToExclude
 )
 
 ## Done                                                                      ##
