@@ -87,9 +87,18 @@ if (!is.null(Obio@parameterList$countTableFN)){
         stringsAsFactors = F
     )
     
+    
+    names(dfRSEM) <- gsub("^X$", "gene_id", names(dfRSEM))
+    names(dfRSEM) <- gsub("^x$", "gene_id", names(dfRSEM))
+    names(dfRSEM) <- gsub(paste0("^",Obio@parameterList$primaryAlignmentGeneID, "$"), "gene_id", names(dfRSEM))
+    
     row.names(dfRSEM) <- dfRSEM$gene_id
     
     dfRSEM$gene_id <- NULL
+    
+    selVec <- names(dfRSEM)
+    selVec <- selVec[selVec %in% dfDesign$sample.id]
+    dfRSEM <- dfRSEM[,selVec]
     
     Obio@RSEMcountMatrix <- data.matrix(round(dfRSEM))
     
@@ -121,7 +130,17 @@ if (!is.null(Obio@projectDetailList$TpmTableFN)){
         stringsAsFactors = F
     )
     
-    dfTPM <- dfTPM[rowSums(dfTPM[,2:ncol(dfTPM)]) != 0,]
+    names(dfTPM) <- gsub("^X$", "gene_id", names(dfTPM))
+    names(dfTPM) <- gsub("^x$", "gene_id", names(dfTPM))
+    names(dfTPM) <- gsub(paste0("^",Obio@parameterList$primaryAlignmentGeneID, "$"), "gene_id", names(dfTPM))
+    
+    selVec <- names(dfTPM)
+    selVec <- selVec[selVec != "gene_id"]
+    
+    ## Remove all samples from dfTPM that are not present in the design file specifications
+    selVec <- selVec[selVec %in% dfDesign$sample.id]
+    
+    dfTPM <- dfTPM[rowSums(dfTPM[,selVec]) != 0,]
 
     Obio@dfTPM <- dfTPM
 
@@ -133,6 +152,8 @@ if (!is.null(Obio@projectDetailList$TpmTableFN)){
     if (sum(check) > 0){
       stop("Sample IDs in dfDesign don't match the column names in the count file")
     }
+    
+    
 
 } else {
     print("TPM file not specified")
