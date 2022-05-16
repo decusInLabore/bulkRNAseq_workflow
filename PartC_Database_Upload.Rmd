@@ -17,11 +17,46 @@ always_allow_html: yes
 ###############################################################################
 ## Recommended R-version                                                     ##
 
-# module purge;source /camp/stp/babs/working/software/modulepath_new_software_tree_2018-08-13;module load pandoc/2.2.3.2-foss-2016b;ml R/4.0.3-foss-2020a
+# module purge;source /camp/stp/babs/working/software/modulepath_new_software_tree_2018-08-13;module load pandoc/2.2.3.2-foss-2016b;ml R/4.0.3-foss-2020a;R
 
 ## Done                                                                      ##
 ###############################################################################
 
+
+###############################################################################
+## Recommended R-version                                                     ##
+
+baseWebDir <- "/camp/stp/babs/www/boeings/bioLOGIC_external/data/"
+
+projectWebDir <- paste0(
+    baseWebDir,
+    Obio@parameterList$project_id,
+    "/html/"
+)
+
+if (!dir.exists(projectWebDir)){
+    dir.create(projectWebDir, recursive = T)
+}
+
+## create copy shell script ##
+
+if (file.exists("../html_local/PartB_Analysis.html")){
+    system("mv ../html_local/PartB_Analysis.html ../html_local/Analysis_V1.html")
+}
+
+if (file.exists(paste0("../../outputs/", Obio@parameterList$project_id, ".result.table.xlsx"))){
+    if (!dir.exists("../html_local/report_tables")){
+        dir.create("../html_local/report_tables")
+    }  
+  
+    system(paste0("cp ", paste0("../../outputs/", Obio@parameterList$project_id, ".result.table.xlsx ../html_local/report_tables")))
+}
+
+
+system(paste0("cp -r ../html_local/* ", projectWebDir))
+
+## Copy files to the web server                                              ##
+###############################################################################
 
 ###############################################################################
 ## Set the environment                                                       ##
@@ -767,6 +802,10 @@ if (is.null(Obio@parameterList$main_question)){
     Obio@parameterList$experiment_question <- "What are the differences in gene expression between conditions?"
 }
 
+if (is.null(Obio@parameterList$lead_scientist)){
+    Obio@parameterList$lead_scientist <- "Lead Scientist TBD"
+}
+
 dfUpload <- data.frame(
         name = Obio@parameterList$projectName,
         project_id = Obio@parameterList$project_code,
@@ -1198,11 +1237,100 @@ dbDB <- DBI::dbConnect(
     dbname = "operational"
 )
 
-query <- paste0("SELECT* FROM reports WHERE experiment_id = '",experiment_id,"';")
+query <- paste0("SELECT * FROM reports WHERE experiment_id = '",experiment_id,"';")
 
 dfTest <- DBI::dbGetQuery(dbDB, query)
 DBI::dbDisconnect(dbDB)
 
+createReport <- FALSE
+
+if (nrow(dfTest) > 0 && nchar(enc2native(dfTest$content)) < 200 ){
+    createReport <- FALSE
+    
+} else {
+    id <- 0
+    if (nrow(dfTest) > 0){
+        ## Delete stub report ##
+        id <- dfTest$id
+        
+        dbDB <- DBI::dbConnect(
+            drv = RMySQL::MySQL(), 
+            user = Obio@dbDetailList$db.user, 
+            password = db.pwd, 
+            host = Obio@dbDetailList$host, 
+            dbname = "operational"
+        )
+    
+        query <- paste0("DELETE FROM reports WHERE experiment_id = '",experiment_id,"';")
+    
+        dfTest <- DBI::dbGetQuery(dbDB, query)
+        DBI::dbDisconnect(dbDB)
+    }
+      
+    createReport <- TRUE
+}
+
+if (createReport){
+    reportString1 <- paste0(
+      '<p><strong>Getting Started:</strong></p><p>In this section, you may make notes of interesting observations in the dataset. It is intended to facilitate the discussion of project participants. You may also copy and paste links to plots using the link Icon above.</p><p>In addition, you may want to leave here instructions for further bioinformatics analysis.</p><p>To examine your data, start by reviewing the [<a href="https://biologic.crick.ac.uk/mdata/',
+      Obio@parameterList$project_id,
+      '/html/Analysis_V1.html">Analysis_V1</a>] tab. Here you also may find links to <a href="https://biologic.crick.ac.uk/mdata/',
+      Obio@parameterList$project_id,'/html/report_tables/',Obio@parameterList$project_id,'.result.table.xlsx">download Excel result tables</a>.</p><p>If you have marker gene sets you\'d like to use to quickly assess the quality of these results - you may do so by turning them into heatmap displays in the <a href="https://biologic.crick.ac.uk/',Obio@parameterList$project_id,'/category-view?category_type=Create%20heat%20map">[CategoryView] > Create Heatmap tab</a> (this will accept mouse gene sets copied and pasted from Excel (official gene names only) or official mouse gene names separated by comma).</p>'
+  )
+    
+  reportString2 <- paste0('
+      <p></p><p>All figures in this data analysis have unique URLs - if you wish to write a paragraph about an interesting observation in this report you can do this and include direct links to plots to facilitate discussion with your co-workers. Simply mark the words that should become the link to the plot, use the pin icon in the report tab above and copy and paste the URL of the plot you wish to include. Once done with updating the report, press [Update] below the report to save the report.</p><p>Gene sets curated by your lab can be found in [CategoryView] Lab gene sets.</p><p></p><p><strong>ASF:</strong></p><p>Contributors to be added.</p><p</p><p><strong>Hypotheses and Questions to the Data</strong></p>'
+  )
+      
+   reportString3 <- paste0('   
+      <p><strong>Bioinformatics Tasks</strong></p><p>Leave instructions for bioinformatics tasks in this area.</p><p><strong>Tools</strong></p><p><strong>Result gene categories:</strong> If you wish to add additional gene categories specific to this project or your lab to the result summary and the CategoryView section, please fill in those in <a href="https://biologic.crick.ac.uk/mdata/sll378/html/report_tables/Example.category.table.xlsx">this template</a>, save it and send it back to your analyst by email. A gene category may consist of either official hgnc (human) or mgi (mouse) gene symbols. You may mix human and mouse origin gene categories, but please do not mix the two types of gene symbols with one category.</p><p></p>')
+      
+  reportString4 <- paste0('      
+      <p><strong>Glossary:</strong></p><p><strong>2D scatterplots:</strong> In experiments with a large number of data points, such as an RNA-Sequencing experiment, the number of data points plotted is limited to the most variable 2000 genes in the experiment. This is to achieve an acceptable loading time for figures. If you require for instance a figure with all data points for a report, bioinformatics will create this manually upon request. The main purpose of this app is to give you a quick overview of your data and to enable discovery. In-depth checks and follow-ups will be conducted manually upon request.</p><p><strong>Heatmaps: </strong>In experiments with a large number of data points, such as an RNA-Sequencing experiment, the number of data points plotted is limited to the most variable 2000 genes in the experiment. Heatmaps in RNA-sequencing experiments usually represent row-averaged TPM-values. To get there, the average of all TPM values for all samples is calculated for a given gene, and then all samples are divided by this averaged (mean) TPM value. This representation gives you an idea of which samples exhibit an above-average normalized read count (depicted in red) and a below-average read-count (depicted in blue). For a better overview, samples are clustered on the y-axis according to gene names, but not on the x-axis (by samples). Please contact bioinformatics if you require a depiction in which samples are clustered as well. When reviewing a category result, all genes detected for that category are given in the table below the heatmap.</p><p><strong>Boxplots in the GeneView Section</strong></p><p>Boxplots in the GeneView section give you an idea on the number of normalized reads recorded for a given gene in your experiment in each sample. Thus it gives you an immediate idea on the closeness of your replicates.</p><p><strong>TPM values:</strong> <strong>TPM (Transcripts Per Kilobase Million)</strong></p>')
+      
+  reportString5 <- paste0('<p>How to get there: (1) Divide the read counts by the length of each gene in kilobases. This gives you reads per kilobase (RPK). (2) Count up all the RPK values in a sample and divide this number by 1,000,000. This is your \x93per million\x94 scaling factor. (3) Divide the RPK values by the \x93per million\x94 scaling factor. This gives you TPM.</p><p><strong>Information on duplicaton rates</strong></p><p><a href="https://www.ncbi.nlm.nih.gov/pubmed/27156886">Parekh et al.</a> have examined the impact of PCR-amplification on differential gene expression analyses by RNA-Seq.</p><p><strong>Relevance and implication of the number of sample replicates in an RNA-seq experiment</strong></p><p><a href="https://www.ncbi.nlm.nih.gov/pubmed/27022035">Schurch et al.</a> have systematically examined the impact of the number of replicates on the quality of the results differential gene expression analyses in RNA-seq experiments.</p>')
+  
+  reportString <- paste0(
+      reportString1,
+      reportString2,
+      reportString3,
+      reportString4, 
+      reportString5
+  )
+  
+  timeStamp <- format(as.POSIXlt(Sys.time()),'%Y-%m-%d %H:%M:%S')
+  
+  dfUpload <- data.frame(
+      id = id,
+      experiment_id = experiment_id,
+      content = reportString,
+      created_at = timeStamp,
+      updated_at = timeStamp
+  )
+  
+  biologicSeqTools2::upload.datatable.to.database(
+      host = Obio@dbDetailList$host,
+      user = Obio@dbDetailList$db.user,
+      password = db.pwd,
+      prim.data.db = "operational",
+      dbTableName = "reports",
+      df.data = dfUpload,
+      db.col.parameter.list = list(
+          "INT(10) NULL DEFAULT NULL" = c("id", "experiment_id"),
+          "LONGTEXT NULL DEFAULT NULL" = c("^content$"),
+          "TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP" = c("created_at", "updated_at")
+      ),
+      increment = 5000,
+      new.table = FALSE,
+      first.row.name.index = 1,
+      startOnlyWithConnectionCount1 = FALSE,
+      cols2Index = NULL,
+      indexName = NULL,
+      mode = "MySQL",
+      addRowNamesColumn = FALSE
+  )
+  
+}
 
 ## Done                                                                      ##
 ###############################################################################
