@@ -76,7 +76,7 @@ upload.to.database <- TRUE
 # Load design file from file:
 
 baseDesignFN <- paste0(
-  "design/base.design2.txt"
+  "design/base.design.txt"
 )
 
 
@@ -147,7 +147,7 @@ if (length(pos) == 0){
 
 
 ## Save the design file and make sure its specified in the Setup function.
-designFN <- "Y:/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/workdir/bulkRNAseq_workflow/design/RN21220test2.design.table.txt"
+designFN <- "/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472_brains_from_drosophila_larvae_RN21220/workdir/bulkRNAseq_workflow/design/RN21220.design.table.txt"
 
 write.table(
     dfDesign,
@@ -368,7 +368,7 @@ write.table(
 ## Suggestion: save the tpm file in [project_folder]/data/gene.tpm.file.txt
 
 ## Example: process NF-core output TPM file
-TpmTableFN = "Y:/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/data/RN21220test.tpm.file.txt"
+TpmTableFN = "/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/data/RN21220test.tpm.file.txt"
 
 dfTPM <- read.delim(
     TpmTableFN, 
@@ -390,14 +390,18 @@ if (sum(checkNames %in% designNames) != length(checkNames)){
 
 
 ## Adjust TPM file order to the order given in the design file
-tpmOrder <- c(
-    "gene_id",
-    paste0(
-        as.vector(dfDesign$sample.id)
+tpmOrder <- unique(
+    c(
+        "gene_id",
+        paste0(
+            as.vector(dfDesign$sample.id)
+        )
     )
 )
 
 dfTPM <- unique(dfTPM[, tpmOrder])
+
+TpmTableFN = "/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472_brains_from_drosophila_larvae_RN21220/data/RN21220.tpm.file.txt"
 
 write.table(
     dfTPM,
