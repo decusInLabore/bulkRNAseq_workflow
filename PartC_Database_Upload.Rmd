@@ -41,7 +41,7 @@ if (!file.exists("renv.lock")){
 
 #renv::install("bioc::DESeq2")
 #renv::install("bioc::clusterProfiler")
-#renv::install("decusInLabore/biologicSeqTools2")
+#renv
 
 ## Done                                                                      ##
 ###############################################################################
@@ -495,7 +495,7 @@ setwd(Obio@parameterList$localWorkDir)
 ## that are not present in all timeseries
 
 if (!is.null(Obio@parameterList$designTScol)){
-    samplesToExclude <- samplesToExcludeFromTSdisplay(
+    samplesToExclude <- biologicSeqTools2::samplesToExcludeFromTSdisplay(
         Obio = Obio,
         designTScol = Obio@parameterList$designTScol
     )
@@ -753,14 +753,28 @@ if (is.null(Obio@parameterList$project_id)){
 ###############################################################################
 ## Upload JSON
 
+if (!is.null(Obio@parameterList$abstract) && (nchar(Obio@parameterList$abstract) > 200)){
+    Obio@parameterList$short_description <- gsub(
+        " ", 
+        "", 
+        paste0(substr(Obio@parameterList$abstract, 1, 200), "...")
+    )
+} else {
+    Obio@parameterList$short_description <- "Short descripton to be added."
+}
+
+if (is.null(Obio@parameterList$main_question)){
+    Obio@parameterList$experiment_question <- "What are the differences in gene expression between conditions?"
+}
+
 dfUpload <- data.frame(
         name = Obio@parameterList$projectName,
         project_id = Obio@parameterList$project_code,
         experiment_code = Obio@parameterList$project_id,
-        main_question =  "Project Question", #Obio@parameterList$main_question,
-        description = "Project Description",#Obio@parameterList$description,
+        main_question =  Obio@parameterList$experiment_question, #Obio@parameterList$main_question,
+        description = Obio@parameterList$short_description,#Obio@parameterList$description,
         lab = paste0(Obio@parameterList$labname, " Lab"),
-        lead_scientist = "Lead Scientist"
+        lead_scientist = Obio@parameterList$lead_scientist
     ) 
 ###############################################################################
 ## Check if an entry for this project exist already. If it does > update     ##
@@ -831,57 +845,6 @@ biologicSeqTools2::upload.datatable.to.database(
 ## Done with uploading settings JSON                                         ##
 ###############################################################################
 
-
-dbDB <- DBI::dbConnect(
-    drv = RMySQL::MySQL(), 
-    user = Obio@dbDetailList$db.user, 
-    password = db.pwd, 
-    host = Obio@dbDetailList$host, 
-    dbname = "operational"
-)
-
-query <- paste0("SELECT * FROM experiments WHERE experiment_code = '",Obio@parameterList$project_id,"';")
-
-dfTest <- DBI::dbGetQuery(dbDB, query)
-DBI::dbDisconnect(dbDB)
-
-if (nrow(dfTest) == 0){
-   
-    dfUpload <- data.frame(
-        name = Obio@parameterList$projectName,
-        project_id = Obio@parameterList$project_code,
-        experiment_code = Obio@parameterList$project_id,
-        main_question =  "Project Question", #Obio@parameterList$main_question,
-        description = "Project Description",#Obio@parameterList$description,
-        lab = paste0(Obio@parameterList$labname, " Lab"),
-        lead_scientist = "Lead Scientist"
-    ) 
-    
-    dfUpload[["created_at"]] = timeStamp
-    
-    dfUpload[["updated_at"]] <- timeStamp
-    
-    dfUpload[["id"]] <- 0
-    dfUpload <- dfUpload[,names(dfTest)]
-    
-    biologicSeqTools2::upload.datatable.to.database(
-        host = Obio@dbDetailList$host,
-        user = Obio@dbDetailList$db.user,
-        password = db.pwd,
-        prim.data.db = "operational",
-        dbTableName = "experiments",
-        df.data = dfUpload,
-        db.col.parameter.list =  biologicSeqTools2::inferDBcategories(dfUpload),
-        increment = 1,
-        new.table = FALSE,
-        first.row.name.index = 1,
-        startOnlyWithConnectionCount1 = FALSE,
-        cols2Index = NULL,
-        indexName = NULL,
-        mode = "MySQL",
-        addRowNamesColumn = FALSE
-    )
-}
 
 
 
@@ -1200,6 +1163,48 @@ biologicSeqTools2::upload.datatable.to.database(
 )
 
 ##  End creating reference category selection for this project               ##
+###############################################################################
+
+###############################################################################
+## Upload default report                                                     ##
+
+## Step 1 get experiment id ##
+dbDB <- DBI::dbConnect(
+    drv = RMySQL::MySQL(), 
+    user = Obio@dbDetailList$db.user, 
+    password = db.pwd, 
+    host = Obio@dbDetailList$host, 
+    dbname = "operational"
+)
+
+query <- paste0("SELECT * FROM experiments WHERE experiment_code = '",Obio@parameterList$project_id,"';")
+
+dfTest <- DBI::dbGetQuery(dbDB, query)
+DBI::dbDisconnect(dbDB)
+
+if (nrow(dfTest) > 0){
+    experiment_id <- dfTest$id
+} else {
+    experiment_id <- NULL
+}
+
+
+## Step 2: Check if a report exists already
+dbDB <- DBI::dbConnect(
+    drv = RMySQL::MySQL(), 
+    user = Obio@dbDetailList$db.user, 
+    password = db.pwd, 
+    host = Obio@dbDetailList$host, 
+    dbname = "operational"
+)
+
+query <- paste0("SELECT* FROM reports WHERE experiment_id = '",experiment_id,"';")
+
+dfTest <- DBI::dbGetQuery(dbDB, query)
+DBI::dbDisconnect(dbDB)
+
+
+## Done                                                                      ##
 ###############################################################################
 
 ###############################################################################
