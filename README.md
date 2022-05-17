@@ -16,11 +16,20 @@ cd bulkRNAseq_workflow
 
 
 ```
+# Quickstart
+* Minimal input file requirement: design file, (RSEM-) count file, res(dd) DEseq2 outputs for LRT and differential gene expression comparisons (either generated in this package or from outside sources), a PCA file (optional) and a file containing the most variable genes (optional). 
+* Create in the projectdirectory a directory with the name ```mkdir wordir```. Clone into that this github repo ``` git clone git@github.com:decusInLabore/bulkRNAseq_workflow.git ```. Move into that directory ```cd bulkRNAseq_workflow```
+* Review the <a href="https://github.com/decusInLabore/bulkRNAseq_workflow/blob/main/Part_0_prepare_input_files.Rmd" target="_blank">Part_0_prepare_input_files.Rmd</a> script
+* Edit the <a href="https://github.com/decusInLabore/bulkRNAseq_workflow/blob/main/PartA_Automatic_Setup.Rmd" target="_blank">PartA_Automatic_Setup.Rmd</a> setup script.
+* Run the main analysis script <a href="https://github.com/decusInLabore/bulkRNAseq_workflow/blob/main/PartB_Analysis.Rmd" target="_blank">PartB_Analysis.Rmd</a>
+* Upload the data to the database using the <a href="https://github.com/decusInLabore/bulkRNAseq_workflow/blob/main/PartC_Database_Upload.Rmd" target="_blank">PartC_Database_Upload.Rmd</a> script script. 
 
 This workflow can be run in three modes: 
 * Option 1: Starting from raw fastq files, performing the alignment, differential gene expression analysis and interactive visualization
 * Option 2: Starting from a (RSEM-) read count matrix performing differential gene expression analysis and interactive visualization 
 * Option 3: Starting from DEseq2 output files to create an interactive data visulization
+
+Preparation of the input files is lined out in more detail in the <a href="https://github.com/decusInLabore/bulkRNAseq_workflow/blob/main/Part_0_prepare_input_files.Rmd" target="_blank">Part_0_prepare_input_files.Rmd</a> script. 
 
 # Required input files
 ## Required for all options
@@ -49,7 +58,7 @@ This file can be saved in projectFolder/data/base.design.txt
 # Option 2: Starting from preprossesed outside data
 
 #### Input Format External DESeq2 Analysis
-One possible input format for the DESeq2 result files can be reviewed in the *example_DESeq2_inputs* folder
+One possible input format for the DESeq2 result files can be reviewed in the *example_DESeq2_inputs* folder. Create one folder for differential gene expression type res(dds) outputs and one folder for LRT-type res(dds) outputs. You can either save the res(dds) outputs right away (with row.names = TRUE) or add a gene_id column carrying the gene alignment gene identifiers. The file name of the dds output file will be used for the data visualization. 
 
 #### Load DESeq2 input files from Example example_DESeq2_inputs (see also file vis_project_partA.r)
 
