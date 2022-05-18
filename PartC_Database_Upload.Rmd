@@ -23,40 +23,7 @@ always_allow_html: yes
 ###############################################################################
 
 
-###############################################################################
-## Recommended R-version                                                     ##
 
-baseWebDir <- "/camp/stp/babs/www/boeings/bioLOGIC_external/data/"
-
-projectWebDir <- paste0(
-    baseWebDir,
-    Obio@parameterList$project_id,
-    "/html/"
-)
-
-if (!dir.exists(projectWebDir)){
-    dir.create(projectWebDir, recursive = T)
-}
-
-## create copy shell script ##
-
-if (file.exists("../html_local/PartB_Analysis.html")){
-    system("mv ../html_local/PartB_Analysis.html ../html_local/Analysis_V1.html")
-}
-
-if (file.exists(paste0("../../outputs/", Obio@parameterList$project_id, ".result.table.xlsx"))){
-    if (!dir.exists("../html_local/report_tables")){
-        dir.create("../html_local/report_tables")
-    }  
-  
-    system(paste0("cp ", paste0("../../outputs/", Obio@parameterList$project_id, ".result.table.xlsx ../html_local/report_tables")))
-}
-
-
-system(paste0("cp -r ../html_local/* ", projectWebDir))
-
-## Copy files to the web server                                              ##
-###############################################################################
 
 ###############################################################################
 ## Set the environment                                                       ##
@@ -125,6 +92,40 @@ load(FN)
 
 ```{r , echo=TRUE, eval=T, warning=FALSE}
 
+###############################################################################
+## Recommended R-version                                                     ##
+
+baseWebDir <- "/camp/stp/babs/www/boeings/bioLOGIC_external/data/"
+
+projectWebDir <- paste0(
+    baseWebDir,
+    Obio@parameterList$project_id,
+    "/html/"
+)
+
+if (!dir.exists(projectWebDir)){
+    dir.create(projectWebDir, recursive = T)
+}
+
+## create copy shell script ##
+
+if (file.exists("../html_local/PartB_Analysis.html")){
+    system("mv ../html_local/PartB_Analysis.html ../html_local/Analysis_V1.html")
+}
+
+if (file.exists(paste0("../../outputs/", Obio@parameterList$project_id, ".result.table.xlsx"))){
+    if (!dir.exists("../html_local/report_tables")){
+        dir.create("../html_local/report_tables")
+    }  
+  
+    system(paste0("cp ", paste0("../../outputs/", Obio@parameterList$project_id, ".result.table.xlsx ../html_local/report_tables")))
+}
+
+
+system(paste0("cp -r ../html_local/* ", projectWebDir))
+
+## Copy files to the web server                                              ##
+###############################################################################
 
 ###############################################################################
 ##                                                                           ##
@@ -155,6 +156,7 @@ if (upload.results.to.database){
 db.pwd <- as.vector(dbTable[1,1])
 ##                                                                           ##
 ###############################################################################
+
 
 ###################################
 # Upload pca table to database    #
@@ -1288,7 +1290,7 @@ if (createReport){
   reportString4 <- paste0('      
       <p><strong>Glossary:</strong></p><p><strong>2D scatterplots:</strong> In experiments with a large number of data points, such as an RNA-Sequencing experiment, the number of data points plotted is limited to the most variable 2000 genes in the experiment. This is to achieve an acceptable loading time for figures. If you require for instance a figure with all data points for a report, bioinformatics will create this manually upon request. The main purpose of this app is to give you a quick overview of your data and to enable discovery. In-depth checks and follow-ups will be conducted manually upon request.</p><p><strong>Heatmaps: </strong>In experiments with a large number of data points, such as an RNA-Sequencing experiment, the number of data points plotted is limited to the most variable 2000 genes in the experiment. Heatmaps in RNA-sequencing experiments usually represent row-averaged TPM-values. To get there, the average of all TPM values for all samples is calculated for a given gene, and then all samples are divided by this averaged (mean) TPM value. This representation gives you an idea of which samples exhibit an above-average normalized read count (depicted in red) and a below-average read-count (depicted in blue). For a better overview, samples are clustered on the y-axis according to gene names, but not on the x-axis (by samples). Please contact bioinformatics if you require a depiction in which samples are clustered as well. When reviewing a category result, all genes detected for that category are given in the table below the heatmap.</p><p><strong>Boxplots in the GeneView Section</strong></p><p>Boxplots in the GeneView section give you an idea on the number of normalized reads recorded for a given gene in your experiment in each sample. Thus it gives you an immediate idea on the closeness of your replicates.</p><p><strong>TPM values:</strong> <strong>TPM (Transcripts Per Kilobase Million)</strong></p>')
       
-  reportString5 <- paste0('<p>How to get there: (1) Divide the read counts by the length of each gene in kilobases. This gives you reads per kilobase (RPK). (2) Count up all the RPK values in a sample and divide this number by 1,000,000. This is your \x93per million\x94 scaling factor. (3) Divide the RPK values by the \x93per million\x94 scaling factor. This gives you TPM.</p><p><strong>Information on duplicaton rates</strong></p><p><a href="https://www.ncbi.nlm.nih.gov/pubmed/27156886">Parekh et al.</a> have examined the impact of PCR-amplification on differential gene expression analyses by RNA-Seq.</p><p><strong>Relevance and implication of the number of sample replicates in an RNA-seq experiment</strong></p><p><a href="https://www.ncbi.nlm.nih.gov/pubmed/27022035">Schurch et al.</a> have systematically examined the impact of the number of replicates on the quality of the results differential gene expression analyses in RNA-seq experiments.</p>')
+  reportString5 <- paste0('<p>How to get there: (1) Divide the read counts by the length of each gene in kilobases. This gives you reads per kilobase (RPK). (2) Count up all the RPK values in a sample and divide this number by 1,000,000. This is your per million\x94 scaling factor. (3) Divide the RPK values by the \x93per million\x94 scaling factor. This gives you TPM.</p><p><strong>Information on duplicaton rates</strong></p><p><a href="https://www.ncbi.nlm.nih.gov/pubmed/27156886">Parekh et al.</a> have examined the impact of PCR-amplification on differential gene expression analyses by RNA-Seq.</p><p><strong>Relevance and implication of the number of sample replicates in an RNA-seq experiment</strong></p><p><a href="https://www.ncbi.nlm.nih.gov/pubmed/27022035">Schurch et al.</a> have systematically examined the impact of the number of replicates on the quality of the results differential gene expression analyses in RNA-seq experiments.</p>')
   
   reportString <- paste0(
       reportString1,

@@ -97,7 +97,7 @@ if (!is.null(Obio@parameterList$countTableFN)){
     dfRSEM$gene_id <- NULL
     
     selVec <- names(dfRSEM)
-    selVec <- selVec[selVec %in% dfDesign$sample.id]
+    selVec <- selVec[selVec %in% Obio@dfDesign$sample.id]
     dfRSEM <- dfRSEM[,selVec]
     
     Obio@RSEMcountMatrix <- data.matrix(round(dfRSEM))
