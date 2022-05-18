@@ -88,9 +88,9 @@ In this script all input files will be checked and/or created.
 pipelineList <- biologicSeqTools2::assembleBiologicProject(
     ## Path to the design file. Essential columns: sample.id, sample.group, dataseries. ##
     ## Ideal sample name: [dataseries]_[sample.group]_[replicate] 
-    designFN = "/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472_brains_from_drosophila_larvae_RN21220/workdir/bulkRNAseq_workflow/design/RN21220.design.table.txt",
+    designFN = "/camp/stp/babs/working/boeings/Projects/anastasioud/frederick.clasen/483_P2RN21224_bulkRNAseq_RN21224_part2/workdir/bulkRNAseq_workflow/design/P2RN21224.design.table.txt",
     ## Path to model table ##
-    modelFN =  "/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/workdir/bulkRNAseq_workflow/design/RN21220.model.table.txt",
+    modelFN =  "/camp/stp/babs/working/boeings/Projects/anastasioud/frederick.clasen/483_P2RN21224_bulkRNAseq_RN21224_part2/workdir/bulkRNAseq_workflow/design/P2RN21224.model.table.txt",
     ## Path to NFcore setting file. Set to NULL in no-alignment mode. 
     #NFcoreSettingsFN = "/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/workdir/bulkRNAseq_workflow/design/RN21220test.NFcore.samplesheet.file.csv",
     ## Path to relevant FASTQ files. 
@@ -99,9 +99,9 @@ pipelineList <- biologicSeqTools2::assembleBiologicProject(
     #    "/camp/stp/babs/inputs/sequencing/data/goulda/adrien.franchet/RN21220/primary_data/211130_A01366_0101_BH3YWKDMXY/fastq/"
     #),
     ## Path to RSEM count table. Essential.
-    countTableFN = "/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472_brains_from_drosophila_larvae_RN21220/data/RN21220.count.data.txt",
+    countTableFN = "/camp/stp/babs/working/boeings/Projects/anastasioud/frederick.clasen/483_P2RN21224_bulkRNAseq_RN21224_part2/workdir/data/dfCount.txt",
     ## Path to TPM table. 
-    TpmTableFN = "/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472_brains_from_drosophila_larvae_RN21220/data/RN21220.tpm.file.txt",
+    TpmTableFN = "/camp/stp/babs/working/boeings/Projects/anastasioud/frederick.clasen/483_P2RN21224_bulkRNAseq_RN21224_part2/workdir/data/dfTPM.txt",
     dfPcaFN = NULL, #"/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/workdir/data/dfPca.txt",
     calculate_DGE = TRUE,
     calculate_LRT = TRUE,
@@ -112,24 +112,24 @@ pipelineList <- biologicSeqTools2::assembleBiologicProject(
     #read.length = "100bp",
     #paired.end = FALSE,
     #pathToRSEMresultsFiles = paste0("/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472_brains_from_drosophila_larvae_RN21220/workdir/", "RSEM/Ensembl/"),
-    projectFolder = "/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472_brains_from_drosophila_larvae_RN21220/",
-    experiment_id = "RN21220",
-    project_name = "Drosophila Nervous System Development",
-    lims.id = "RN21220",
-    labname = "Gould",
+    projectFolder = "/camp/stp/babs/working/boeings/Projects/anastasioud/frederick.clasen/483_P2RN21224_bulkRNAseq_RN21224_part2/",
+    experiment_id = "P2RN21224",
+    project_name = "Dietary Effects on Liver Metabolism",
+    lims.id = "RN21224",
+    labname = "Anastasiou",
     NtopGenes = 500,
     experiment.type = "bulk_rna_seq",
-    species = "drosophila_melanogaster",
+    species = "mus_musculus",
     release = "release-89",
     count.table.headline = "TPM-values for all Samples",
     count.table.sidelabel = "TPM",
     heatmap.headline.text = "Heatmap: Row-averaged Expr",
     designTScol = "timepoint",
     timecourse.units = "Days",
-    primDataDB = "agl_data",
+    primDataDB = "dal_data",
     db.user = "babs",
     host = "10.27.241.82",
-    lab.categories.table = "ag_lab_categories"
+    lab.categories.table = "da_lab_categories"
 )
 
 

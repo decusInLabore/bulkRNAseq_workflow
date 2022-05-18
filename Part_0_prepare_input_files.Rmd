@@ -24,7 +24,7 @@ knitr::opts_chunk$set(
 )
 
 # R to use
-# module purge;source /camp/stp/babs/working/software/modulepath_new_software_tree_2018-08-13;module load pandoc/2.2.3.2-foss-2016b;ml R/4.0.3-foss-2020a
+# module purge;source /camp/stp/babs/working/software/modulepath_new_software_tree_2018-08-13;module load pandoc/2.2.3.2-foss-2016b;ml R/4.0.3-foss-2020a;R
 
 if (!require("remotes")){
   install.packages("remotes")
@@ -147,7 +147,7 @@ if (length(pos) == 0){
 
 
 ## Save the design file and make sure its specified in the Setup function.
-designFN <- "/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472_brains_from_drosophila_larvae_RN21220/workdir/bulkRNAseq_workflow/design/RN21220.design.table.txt"
+designFN <- "design/P2RN21224.design.table.txt"
 
 write.table(
     dfDesign,
@@ -298,7 +298,7 @@ if (length(comparison) > 0){
 
 dfModel[is.na(dfModel)] <- ""
 
-modelFN <- "Y:/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/workdir/bulkRNAseq_workflow/design/RN21220test2.model.table.txt"
+modelFN <- "design/P2RN21224.model.table.txt"
 
 write.table(
     dfModel ,
@@ -315,7 +315,7 @@ write.table(
 ## RSEM count file                                                           ##
 ###############################################################################
 
-countTableFN = "Y:/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/data/RN21220test.count.data.txt"
+countTableFN = "/camp/stp/babs/working/boeings/Projects/anastasioud/frederick.clasen/483_P2RN21224_bulkRNAseq_RN21224_part2/workdir/star_rsem/rsem.merged.gene_counts.tsv"
 
 dfCount <- read.delim(
     countTableFN, 
@@ -324,13 +324,15 @@ dfCount <- read.delim(
     stringsAsFactors = F
 )
 
+names(dfCount)
+dfCount$transcript_id.s. <- NULL
 
 checkNames <- names(dfCount)
 checkNames <- checkNames[checkNames != "gene_id"]
 designNames <- unique(dfDesign$sample.id)
 
-if (sum(checkNames %in% designNames) != length(checkNames)){
-    exit("Check if the sample.ids given in the Count file match those in the design file.")
+if (sum(designNames %in% checkNames) != length(designNames)){
+    stop("Check if the sample.ids given in the Count file match those in the design file.")
 } else {
     print("Count file ok. ")
 }
@@ -344,7 +346,9 @@ countOrder <- c(
     )
 )
 
-dfCount <- unique(dfTPM[, countOrder])
+dfCount <- unique(dfCount[, countOrder])
+
+countTableFN <- "../data/dfCount.txt"
 
 write.table(
     dfCount,
@@ -368,7 +372,7 @@ write.table(
 ## Suggestion: save the tpm file in [project_folder]/data/gene.tpm.file.txt
 
 ## Example: process NF-core output TPM file
-TpmTableFN = "/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/data/RN21220test.tpm.file.txt"
+TpmTableFN = "/camp/stp/babs/working/boeings/Projects/anastasioud/frederick.clasen/483_P2RN21224_bulkRNAseq_RN21224_part2/workdir/star_rsem/rsem.merged.gene_tpm.tsv"
 
 dfTPM <- read.delim(
     TpmTableFN, 
@@ -382,7 +386,7 @@ checkNames <- names(dfTPM)
 checkNames <- checkNames[checkNames != "gene_id"]
 designNames <- unique(dfDesign$sample.id)
 
-if (sum(checkNames %in% designNames) != length(checkNames)){
+if (sum(designNames %in% checkNames) != length(designNames)){
     exit("Check if the sample.ids given in the Tpm file match those in the design file.")
 } else {
     print("TPM file ok. ")
@@ -401,7 +405,7 @@ tpmOrder <- unique(
 
 dfTPM <- unique(dfTPM[, tpmOrder])
 
-TpmTableFN = "/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472_brains_from_drosophila_larvae_RN21220/data/RN21220.tpm.file.txt"
+TpmTableFN = "../data/dfTPM.txt"
 
 write.table(
     dfTPM,
