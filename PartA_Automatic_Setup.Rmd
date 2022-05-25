@@ -126,10 +126,10 @@ pipelineList <- biologicSeqTools2::assembleBiologicProject(
     heatmap.headline.text = "Heatmap: Row-averaged Expr",
     designTScol = NULL,
     timecourse.units = NULL,
-    primDataDB = "chl_data",
+    primDataDB = "igl_data",
     db.user = "babs",
     host = "10.27.241.82",
-    lab.categories.table = "ch_lab_categories"
+    lab.categories.table = "ig_lab_categories"
 )
 
 
