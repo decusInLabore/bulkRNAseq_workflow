@@ -323,7 +323,7 @@ sample.order <- unique(paste0(
   #"_TPM"
 ))
 
-
+sample.order <- gsub("\\.", "_", sample.order)
 
 
 ## Sort database.table ##
@@ -343,6 +343,10 @@ Obio@databaseTable <- Obio@databaseTable[,orderVec]
 
 ## Get relevant colors ##
 dfColor <- unique(Obio@dfDesign[,c("sample.id", "sample.group_color")])
+
+##
+dfColor$sample.id <- gsub("\\.", "_", dfColor$sample.id)
+
 row.names(dfColor) <- dfColor$sample.id
 
 sample.colors <- sample.order

@@ -260,7 +260,7 @@ loadDESeq2outputFromFile <- function(
       
       res <- res[!(duplicated(res[,"gene_id"])),]
       res[is.na(res)] <- 0
-      res <- res[res$baseMean > 0,]
+      res <- res[res$baseMean >= 1,]
       res$baseMean <- log2(res$baseMean)
       ## Done 
       ################################
