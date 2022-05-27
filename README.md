@@ -21,8 +21,20 @@ cd bulkRNAseq_workflow
 * Create in the projectdirectory a directory with the name ```mkdir wordir```. Clone into that this github repo ``` git clone git@github.com:decusInLabore/bulkRNAseq_workflow.git ```. Move into that directory ```cd bulkRNAseq_workflow```
 * Review the <a href="https://github.com/decusInLabore/bulkRNAseq_workflow/blob/main/Part_0_prepare_input_files.Rmd" target="_blank">Part_0_prepare_input_files.Rmd</a> script
 * Edit the <a href="https://github.com/decusInLabore/bulkRNAseq_workflow/blob/main/PartA_Automatic_Setup.Rmd" target="_blank">PartA_Automatic_Setup.Rmd</a> setup script. Change the parameters of the biologicSeqTools2::assembleBiologicProject() function according to your needs. This is the only place in which project-specific parameters need to be specified. 
-* Run the main analysis script <a href="https://github.com/decusInLabore/bulkRNAseq_workflow/blob/main/PartB_Analysis.Rmd" target="_blank">PartB_Analysis.Rmd</a>
-* Upload the data to the database using the <a href="https://github.com/decusInLabore/bulkRNAseq_workflow/blob/main/PartC_Database_Upload.Rmd" target="_blank">PartC_Database_Upload.Rmd</a> script script. 
+* Run the workflow by doing 
+```
+sh runWorkflow.sh
+```
+* Additional html files (please remove all dots (.) from the file name) can be uploaded to the web-server by doing
+```
+cp /path/to/your/additional/html_file.html /camp/stp/babs/www/boeings/bioLOGIC_external/data/[project_id]/html/
+```
+
+* Powerpoint slide shows can be added to the project as follows: In powerpoint, export the slideshow as JPEG file and save these in a slide_folder. Then copy the slide folder to the webserver like so:
+```
+cp -r /path/to/your/slide_folder /camp/stp/babs/www/boeings/bioLOGIC_external/data/[project_id]/slides
+```
+
 
 This workflow can be run in three modes: 
 * Option 1: Starting from raw fastq files, performing the alignment, differential gene expression analysis and interactive visualization
