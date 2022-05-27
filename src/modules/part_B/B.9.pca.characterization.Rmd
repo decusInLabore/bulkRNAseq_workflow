@@ -44,6 +44,8 @@ if (!is.null(Obio@projectDetailList$PcaFN)){
         stringsAsFactors = F
     )
     
+    names(dfPCA) <- gsub("\\.", "_", names(dfPCA))
+    
     Obio@dfPCA <- data.frame(NULL)
     Obio@dfPCA <- dfPCA
 }
