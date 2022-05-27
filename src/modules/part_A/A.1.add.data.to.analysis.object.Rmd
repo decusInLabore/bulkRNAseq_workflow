@@ -165,10 +165,10 @@ if (!is.null(Obio@projectDetailList$TpmTableFN)){
 
 ###############################################################################
 ## Check provided PCA file                                                   ##
-if (!is.null(Obio@projectDetailList$dfPcaFN)){
-    if (file.exists(Obio@projectDetailList$dfPcaFN)){
+if (!is.null(Obio@projectDetailList$PcaFN)){
+    if (file.exists(Obio@projectDetailList$PcaFN)){
         dfPCA <- read.delim(
-            Obio@projectDetailList$dfPcaFN, 
+            Obio@projectDetailList$PcaFN, 
             header=T, 
             sep="\t", 
             stringsAsFactors = F
@@ -215,6 +215,7 @@ if (!is.null(Obio@projectDetailList$dfPcaFN)){
             
             selVec <- selVec[selVec %in% names(dfPCA)]
             dfPCA <- dfPCA[,selVec]
+            names(dfPCA) <- gsub("\\.", "_", names(dfPCA))
             Obio@dfPCA <- data.frame(NULL)
             Obio@dfPCA <- dfPCA
         }

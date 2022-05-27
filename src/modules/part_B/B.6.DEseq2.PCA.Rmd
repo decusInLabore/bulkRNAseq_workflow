@@ -215,8 +215,9 @@ loadDESeq2outputFromFile <- function(
     }
   
     allfiles <- paste0(DEseq2resultDir, "/", list.files(DEseq2resultDir))
-    allfiles <- allfiles[grep(".txt", allfiles)]
+    #allfiles <- allfiles[grep(".txt", allfiles)]
     allfiles <- gsub("//", "/", allfiles)
+    allfiles <- sort(allfiles)
     contrastNames <- gsub(gsub("//", "/", paste0(DEseq2resultDir, "/")), "", allfiles)
     contrastNames <- gsub(".txt", "", contrastNames)
 
@@ -259,9 +260,17 @@ loadDESeq2outputFromFile <- function(
       res <- unique(res[,selVec])
       
       res <- res[!(duplicated(res[,"gene_id"])),]
+      
+      ## Remove all log-fcs with an NA padj
+      res <- res[!is.na(res$padj),]
+      res <- res[!is.na(res$log2FoldChange),]
+      
+      
       res[is.na(res)] <- 0
-      res <- res[res$baseMean >= 1,]
-      res$baseMean <- log2(res$baseMean)
+      res <- res[res$baseMean > 0,]
+      
+      # Plus one to avoid negative log2 baseMeans
+      res$baseMean <- log2((res$baseMean + 1))
       ## Done 
       ################################
       

@@ -88,7 +88,7 @@ In this script all input files will be checked and/or created.
 pipelineList <- biologicSeqTools2::assembleBiologicProject(
     ## Path to the design file. Essential columns: sample.id, sample.group, dataseries. ##
     ## Ideal sample name: [dataseries]_[sample.group]_[replicate] 
-    designFN =  "/camp/stp/babs/working/strohbs/projects/hillc/ilaria.gori/RN19316_molecular_mechanism_underlying_Shpritzen_Goldberg_syndrome/BIOLOGICS_data_upload/bulkRNAseq_workflow/DESeq2_input/RN19316_design.txt",
+    designFN =  "/camp/stp/babs/working/boeings/projects/boeings/stefan.boeing/dev_test/data/DESeq2_input_SB_edit/RN19316_design.new.txt",
     ## Path to model table ##
     #modelFN =  "/camp/stp/babs/working/boeings/Projects/anastasioud/frederick.clasen/483_P2RN21224_bulkRNAseq_RN21224_part2/workdir/bulkRNAseq_workflow/design/P2RN21224.model.table.txt",
     ## Path to NFcore setting file. Set to NULL in no-alignment mode. 
@@ -99,10 +99,10 @@ pipelineList <- biologicSeqTools2::assembleBiologicProject(
     #    "/camp/stp/babs/inputs/sequencing/data/goulda/adrien.franchet/RN21220/primary_data/211130_A01366_0101_BH3YWKDMXY/fastq/"
     #),
     ## Path to RSEM count table. Essential.
-    countTableFN = "/camp/stp/babs/working/strohbs/projects/hillc/ilaria.gori/RN19316_molecular_mechanism_underlying_Shpritzen_Goldberg_syndrome/BIOLOGICS_data_upload/bulkRNAseq_workflow/DESeq2_input/dfRSEMcounts.txt",
+    countTableFN = "/camp/stp/babs/working/boeings/projects/boeings/stefan.boeing/dev_test/data/DESeq2_input_SB_edit/dfRSEMcounts.new.txt",
     ## Path to TPM table. 
-    TpmTableFN =  "/camp/stp/babs/working/strohbs/projects/hillc/ilaria.gori/RN19316_molecular_mechanism_underlying_Shpritzen_Goldberg_syndrome/BIOLOGICS_data_upload/bulkRNAseq_workflow/DESeq2_input/dfTPM.txt",
-    dfPcaFN =  "/camp/stp/babs/working/strohbs/projects/hillc/ilaria.gori/RN19316_molecular_mechanism_underlying_Shpritzen_Goldberg_syndrome/BIOLOGICS_data_upload/bulkRNAseq_workflow/DESeq2_input/dfPCA.txt", #"/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/workdir/data/dfPca.txt",
+    TpmTableFN =  "/camp/stp/babs/working/boeings/projects/boeings/stefan.boeing/dev_test/data/DESeq2_input_SB_edit/dfTPM.new.txt",
+    PcaFN =  "//camp/stp/babs/working/boeings/projects/boeings/stefan.boeing/dev_test/data/DESeq2_input_SB_edit/dfPCA.new.txt", #"/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/workdir/data/dfPca.txt",
     calculate_DGE = FALSE,
     calculate_LRT = FALSE,
     ## Path to external DEseq2 output files
@@ -124,8 +124,8 @@ pipelineList <- biologicSeqTools2::assembleBiologicProject(
     count.table.headline = "TPM-values for all Samples",
     count.table.sidelabel = "TPM",
     heatmap.headline.text = "Heatmap: Row-averaged Expr",
-    designTScol = NULL,
-    timecourse.units = NULL,
+    designTScol = "timepoint",
+    timecourse.units = "hours",
     primDataDB = "igl_data",
     db.user = "babs",
     host = "10.27.241.82",
