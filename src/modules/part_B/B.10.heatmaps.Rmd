@@ -84,7 +84,7 @@ if (dfOut[1,1] == 0){
 ```
 
 
-```{r, echo=T, eval=TRUE, warning=FALSE, results="asis"}
+```{r, echo=T, eval=TRUE, warning=FALSE, results=F}
 ## Make heatmap gene list
 logFCselections <- names(dfMainData)[grep("_logFC_", names(dfMainData))]
 padjSelections <- gsub("_logFC_", "_padj_", logFCselections)
@@ -98,7 +98,7 @@ if (nrow(dfSelections) > 2){
 ```
 
 ## Gene Expression Overview {`r tabVar`}
-```{r, echo=TRUE, eval=TRUE, warning=FALSE, results=Fmessage=
+```{r, echo=TRUE, eval=TRUE, warning=FALSE, results=F, message=F}
 ## Make heatmap gene list
 logFCselections <- names(dfMainData)[grep("_logFC_", names(dfMainData))]
 padjSelections <- gsub("_logFC_", "_padj_", logFCselections)
