@@ -86,6 +86,7 @@ projectDetailList <- list(
     "modelFN" = as.vector(dfObio$modelFN[1]),
     "baseDesignFN" = as.vector(dfObio$baseDesignFN[1]),
     "TpmTableFN" = as.vector(dfObio$TpmTableFN[1]),
+    "PcaFN" = as.vector(dfObio$PcaFN[1]),
     
     "DEseq2_DGE_result_folder" = as.vector(dfObio$DEseq2_DGE_result_folder[1]),
     "DEseq2_LRT_result_folder" = as.vector(dfObio$DEseq2_LRT_result_folder[1]),

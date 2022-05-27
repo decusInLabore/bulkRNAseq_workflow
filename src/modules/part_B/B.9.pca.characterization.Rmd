@@ -36,9 +36,9 @@ dfDesign <- Obio@dfDesign
 dfPCA <- Obio@dfPCA
 
 ## Use provided PCA file if available ##
-if (!is.null(Obio@projectDetailList$dfPcaFN)){
+if (!is.null(Obio@projectDetailList$PcaFN)){
     dfPCA <- read.delim(
-        Obio@projectDetailList$dfPcaFN,
+        Obio@projectDetailList$PcaFN,
         header = T, 
         sep="\t",
         stringsAsFactors = F

@@ -25,10 +25,62 @@ HmDisplayCatsFromDb <- Obio@parameterList$HmDisplayCatsFromDb
 project_id <- Obio@parameterList$project_id
 alignmentGeneID <- Obio@parameterList$primaryAlignmentGeneID
 lab.categories.table <- Obio@parameterList$lab.categories.table
+
+
+
 ref.cat.db.table = lab.categories.table
 reportFigDir <- Obio@parameterList$reportFigDir
 labname <- Obio@parameterList$labname
 dfDesign <- Obio@dfDesign
+
+############################################################################### 
+## Check if lab.categories.table exists, and create if it does not           ##
+dbDB <- DBI::dbConnect(
+    drv = RMySQL::MySQL(), 
+    user = Obio@dbDetailList$db.user, 
+    password = db.pwd, 
+    host = Obio@dbDetailList$host, 
+    dbname = Obio@dbDetailList$ref.cat.db
+)
+        
+query <- paste0(
+    'SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = "',lab.categories.table,'";'
+)
+        
+dfOut <-  DBI::dbGetQuery(dbDB, query)
+DBI::dbDisconnect(dbDB)
+        
+## Create lab table if it doesn't exists ##
+if (dfOut[1,1] == 0){
+      dbDB <- DBI::dbConnect(
+      drv = RMySQL::MySQL(), 
+      user = Obio@dbDetailList$db.user, 
+      password = db.pwd, 
+      host = Obio@dbDetailList$host, 
+      dbname = Obio@dbDetailList$ref.cat.db
+  )
+          
+      cat_id_string <- paste0(lab.categories.table, "__1")
+        
+  query1 <- paste0(
+      "CREATE TABLE ",lab.categories.table," AS SELECT * FROM ag_lab_categories WHERE row_names = 10"
+  )
+  res <-  DBI::dbGetQuery(dbDB, query1)
+  
+  query2 <- paste0(
+      "UPDATE ",lab.categories.table," SET row_names = 1 WHERE row_names = 10;"
+  )
+  res <-  DBI::dbGetQuery(dbDB, query2)
+  query3 <- paste0(
+      "UPDATE ",lab.categories.table," SET cat_id = '",cat_id_string,"' WHERE row_names = 1;"
+  )
+  res <-  DBI::dbGetQuery(dbDB, query3)
+  
+  
+  DBI::dbDisconnect(dbDB)
+}
+## Done                                                                      ##
+###############################################################################
 ```
 
 
@@ -46,7 +98,7 @@ if (nrow(dfSelections) > 2){
 ```
 
 ## Gene Expression Overview {`r tabVar`}
-```{r, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
+```{r, echo=TRUE, eval=TRUE, warning=FALSE, results=Fmessage=
 ## Make heatmap gene list
 logFCselections <- names(dfMainData)[grep("_logFC_", names(dfMainData))]
 padjSelections <- gsub("_logFC_", "_padj_", logFCselections)
