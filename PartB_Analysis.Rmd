@@ -98,7 +98,7 @@ pos <- grep("bioLOGIC.Robj$", checkFiles)
 
 if (length(pos) > 1){
     eMessage <- paste0("More than one bioLOGIC.Robj file is present in ", getwd(), ". Please move the obsolete biologic.Robj file to a different folder.")
-    exit(eMessage)
+    stop(eMessage)
 }
 
 FN <- paste0("../", list.files("..")[grep("bioLOGIC.Robj", list.files(".."))])
