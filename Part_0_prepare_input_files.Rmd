@@ -330,7 +330,7 @@ if (length(comparison) > 0){
 
 dfModel[is.na(dfModel)] <- ""
 
-modelFN <- "design/P2RN21224.model.table.txt"
+modelFN <- "design/E7E10E14.model.table.txt"
 
 write.table(
     dfModel ,
