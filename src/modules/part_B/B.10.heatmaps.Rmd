@@ -168,10 +168,13 @@ dfSelections[["designColumn"]] <- sapply(dfSelections$padjSelections, function(x
 ## Get design column from model file ##
 designColNames <- sapply(dfSelections$padjSelections, function(x) unlist(strsplit(x, "padj_"))[2])
 
+modelComp <- as.vector(dfModel$comparison)
+designColNames[!(designColNames %in% modelComp)] <- ""
 
 dfModelSel <- dfModel[dfModel$comparison %in% designColNames,]
 
 dfSelections[["designColumn"]] <- ""
+
     if (nrow(dfModelSel) > 0){
     ## replace all entries found in dfModel to comparisonID
     for (i in 1:nrow(dfModelSel)){
