@@ -162,8 +162,37 @@ db.pwd <- as.vector(dbTable[1,1])
 # Upload pca table to database    #
 ###################################
 
+## Add sample.group_colors to include custom colors in the interactive display
+dfPCA <- Obio@dfPCA
+names(dfPCA) <- gsub("\\.", "_", names(dfPCA))
+pcaSampleGroups <- unique(sort(dfPCA$sample_group))
+
+pos <- c(
+  grep("sample.group_color", names(Obio@dfDesign)),
+  grep("sample_group_color", names(Obio@dfDesign))
+)
+
+
+if (length(pos) > 0){
+    dfColor <- unique(
+        Obio@dfDesign[,c("sample.group", "sample.group_color")]
+    )
+    
+    names(dfColor) <- gsub("\\.", "_", names(dfColor))
+    
+    if (nrow(dfColor) == length(pcaSampleGroups)){
+        dfPCA <- dplyr::full_join(
+            dfPCA, 
+            dfColor,
+            by = "sample_group"
+        )
+    }
+}
+
+names(dfPCA) <- gsub("sample.group_color", "sample_group_colors", names(dfPCA))
+
 biologicSeqTools2::upload.pca.table.to.db(
-    df.pca = Obio@dfPCA,
+    df.pca = dfPCA,
     host =Obio@dbDetailList$host,
     prim.data.db = Obio@dbDetailList$primDataDB,
     password = db.pwd,
