@@ -90,7 +90,39 @@ if (exists("Obio")){
     PCApercentVar <- NULL
 }
 
-plotList[[tag]] <- ggplot2::ggplot(
+
+## Use custom PCA colors if specified ##
+
+## Just in case we still have dots instead of underscores
+names(dfPCA) <- gsub("\\.", "_", names(dfPCA))
+pcaSampleGroups <- unique(sort(dfPCA$sample_group))
+
+## If sample.group colors are set use those, otherwise set default.
+pos <- grep("sample.group_color", names(dfDesign))
+
+if (length(pos) > 0){
+    dfColor <- unique(
+        Obio@dfDesign[,c("sample.group", "sample.group_color")]
+    )
+}
+
+if (nrow(dfColor) == length(pcaSampleGroups)){
+  
+    namedColors <- dfColor$sample.group_color
+    names(namedColors) <- dfColor$sample.group
+  
+    plotList[[tag]] <- ggplot2::ggplot(
+        data = dfPCA,
+        ggplot2::aes(x=PC1, y=PC2, fill = sample_group)
+    ) + ggplot2::geom_vline(xintercept = 0, color = "grey", size=0.5
+    ) + ggplot2::geom_hline(yintercept = 0, color = "grey", size=0.5
+    ) + ggplot2::geom_point(
+        size=2,
+        shape = 21
+    ) + ggplot2::scale_fill_manual("Sample Groups", values = namedColors
+    )
+} else {
+    plotList[[tag]] <- ggplot2::ggplot(
         data = dfPCA,
         ggplot2::aes(x=PC1, y=PC2, fill = sample_group)
     ) + ggplot2::geom_vline(xintercept = 0, color = "grey", size=0.5
@@ -99,6 +131,10 @@ plotList[[tag]] <- ggplot2::ggplot(
         size=2,
         shape = 21
     ) 
+}
+
+
+
 
 if (!is.null(PCApercentVar)){
     plotList[[tag]] <- plotList[[tag]] + ggplot2::labs(
