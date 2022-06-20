@@ -98,13 +98,9 @@ names(dfPCA) <- gsub("\\.", "_", names(dfPCA))
 pcaSampleGroups <- unique(sort(dfPCA$sample_group))
 
 ## If sample.group colors are set use those, otherwise set default.
-pos <- grep("sample.group_color", names(dfDesign))
+pos <- grep("^sample.group_color$", names(dfDesign))
 
-if (length(pos) > 0){
-    dfColor <- unique(
-        Obio@dfDesign[,c("sample.group", "sample.group_color")]
-    )
-} else {
+if (length(pos) == 0){
     ## Create default ##
     sample.group <- unique(dfDesign$sample.group)
     sample.group_color <- sample.group
@@ -116,7 +112,12 @@ if (length(pos) > 0){
     
     dfGroupColors <- unique(data.frame(sample.group, sample.group_color))
     dfDesign <- merge(dfDesign, dfGroupColors, by.x = "sample.group", "sample.group")
+    
 }
+
+dfColor <- unique(
+        Obio@dfDesign[,c("sample.group", "sample.group_color")]
+)
 
 if (nrow(dfColor) == length(pcaSampleGroups)){
   
