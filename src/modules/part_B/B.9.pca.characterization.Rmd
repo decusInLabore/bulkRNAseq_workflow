@@ -104,6 +104,18 @@ if (length(pos) > 0){
     dfColor <- unique(
         Obio@dfDesign[,c("sample.group", "sample.group_color")]
     )
+} else {
+    ## Create default ##
+    sample.group <- unique(dfDesign$sample.group)
+    sample.group_color <- sample.group
+            #library(scales)
+    sample.group_color = scales::hue_pal()(length(sample.group_color))
+            #sample.group_color = c("#990000", "#009900")
+    
+    ## set sample group colors manually
+    
+    dfGroupColors <- unique(data.frame(sample.group, sample.group_color))
+    dfDesign <- merge(dfDesign, dfGroupColors, by.x = "sample.group", "sample.group")
 }
 
 if (nrow(dfColor) == length(pcaSampleGroups)){
