@@ -26,11 +26,11 @@ knitr::opts_chunk$set(
 # R to use
 # module purge;source /camp/stp/babs/working/software/modulepath_new_software_tree_2018-08-13;module load pandoc/2.2.3.2-foss-2016b;ml R/4.0.3-foss-2020a;R
 
-if (!require("remotes")){
-  install.packages("remotes")
-}
+#if (!require("remotes")){
+#  install.packages("remotes")
+#}
 
-remotes::install_github("rstudio/renv")
+#remotes::install_github("rstudio/renv")
 
 if (!file.exists("renv.lock")){
     renv::init()
@@ -38,7 +38,7 @@ if (!file.exists("renv.lock")){
     renv::restore(prompt=FALSE)
 }
 
-renv::install("decusinlabore/biologicSeqTools2")
+#renv::install("decusinlabore/biologicSeqTools2")
 
 workdir <- getwd()
 figureCount <- 1
@@ -86,53 +86,54 @@ In this script all input files will be checked and/or created.
 ## In this example 
 
 pipelineList <- biologicSeqTools2::assembleBiologicProject(
-    ## Path to the design file. Essential columns: sample.id, sample.group, dataseries. ##
-    ## Ideal sample name: [dataseries]_[sample.group]_[replicate] 
-    designFN =  "/camp/stp/babs/working/boeings/Projects/pachnisv/franze.progatzky/277B_2022_RNAseq_G1_G2_glia_cell_analysis/workdir/bulkRNAseq_workflow/design/vpl277B.design.table.txt",
-    ## Path to model table ##
-    modelFN =  "/camp/stp/babs/working/boeings/Projects/pachnisv/franze.progatzky/277B_2022_RNAseq_G1_G2_glia_cell_analysis/workdir/bulkRNAseq_workflow/design/vpl277B.model.table.txt",
-    ## Path to NFcore setting file. Set to NULL in no-alignment mode. 
-    #NFcoreSettingsFN = "/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/workdir/bulkRNAseq_workflow/design/RN21220test.NFcore.samplesheet.file.csv",
-    ## Path to relevant FASTQ files. 
-    #pathToSeqStorageFolder = c(
-    #    "/camp/stp/babs/inputs/sequencing/data/goulda/adrien.franchet/RN21220/primary_data/211203_A01366_0104_AH3WVGDMXY/fastq/",
-    #    "/camp/stp/babs/inputs/sequencing/data/goulda/adrien.franchet/RN21220/primary_data/211130_A01366_0101_BH3YWKDMXY/fastq/"
-    #),
-    ## Path to RSEM count table. Essential.
-    countTableFN = "/camp/stp/babs/working/boeings/Projects/pachnisv/franze.progatzky/277B_2022_RNAseq_G1_G2_glia_cell_analysis/workdir/data/dfCount.txt",
-    ## Path to TPM table. 
-    TpmTableFN =  "/camp/stp/babs/working/boeings/Projects/pachnisv/franze.progatzky/277B_2022_RNAseq_G1_G2_glia_cell_analysis/workdir/data/vpl277.tpm.file.txt",
-    PcaFN =  NULL, #"/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/workdir/data/dfPca.txt",
-    calculate_DGE = TRUE,
-    calculate_LRT = TRUE,
-    ## Path to external DEseq2 output files
-    DEseq2External_DGE = NULL,
-    DEseq2External_LRT = NULL,
-    #stranded = TRUE,
-    #read.length = "100bp",
-    #paired.end = FALSE,
-    #pathToRSEMresultsFiles = paste0("/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472_brains_from_drosophila_larvae_RN21220/workdir/", "RSEM/Ensembl/"),
-    projectFolder = "/camp/stp/babs/working/boeings/Projects/pachnisv/franze.progatzky/277B_2022_RNAseq_G1_G2_glia_cell_analysis/",
-    experiment_id = "RN18120",
-    project_name = "Characterization of enteric glia cells related experiments",
-    lims.id = "RN18120",
-    labname = "Pachnis",
-    NtopGenes = 500,
-    experiment.type = "bulk_rna_seq",
-    species = "mus_musculus",
-    release = "release-89",
-    count.table.headline = "TPM-values for all Samples",
-    count.table.sidelabel = "TPM",
-    heatmap.headline.text = "Heatmap: Row-averaged Expr",
-    designTScol = NULL, #"f_timepoint",
-    timecourse.units = NULL,
-    primDataDB = "vpl_data",
-    db.user = "babs",
-    host = "10.27.241.82",
-    lab.categories.table = "vp_lab_categories"
+  ## Path to the design file. Essential columns: sample.id, sample.group, dataseries. ##
+  ## Ideal sample name: [dataseries]_[sample.group]_[replicate]
+  designFN =  "/camp/stp/babs/working/strohbs/projects/hillc/ilaria.gori/RN19316_molecular_mechanism_underlying_Shpritzen_Goldberg_syndrome/BIOLOGICS_data_upload/bulkRNAseq_workflow/DESeq2_input/RN19316_design.txt",
+  ## Path to model table ##
+  #modelFN =  "/camp/stp/babs/working/boeings/Projects/anastasioud/frederick.clasen/483_P2RN21224_bulkRNAseq_RN21224_part2/workdir/bulkRNAseq_workflow/design/P2RN21224.model.table.txt",
+  ## Path to NFcore setting file. Set to NULL in no-alignment mode.
+  #NFcoreSettingsFN = "/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/workdir/bulkRNAseq_workflow/design/RN21220test.NFcore.samplesheet.file.csv",
+  ## Path to relevant FASTQ files.
+  #pathToSeqStorageFolder = c(
+  #    "/camp/stp/babs/inputs/sequencing/data/goulda/adrien.franchet/RN21220/primary_data/211203_A01366_0104_AH3WVGDMXY/fastq/",
+  #    "/camp/stp/babs/inputs/sequencing/data/goulda/adrien.franchet/RN21220/primary_data/211130_A01366_0101_BH3YWKDMXY/fastq/"
+  #),
+  ## Path to RSEM count table. Essential.
+  countTableFN = "/camp/stp/babs/working/strohbs/projects/hillc/ilaria.gori/RN19316_molecular_mechanism_underlying_Shpritzen_Goldberg_syndrome/BIOLOGICS_data_upload/bulkRNAseq_workflow/DESeq2_input/dfRSEMcounts.txt",
+  ## Path to TPM table.
+  TpmTableFN =  "/camp/stp/babs/working/strohbs/projects/hillc/ilaria.gori/RN19316_molecular_mechanism_underlying_Shpritzen_Goldberg_syndrome/BIOLOGICS_data_upload/bulkRNAseq_workflow/DESeq2_input/dfTPM.txt",
+  PcaFN =  "/camp/stp/babs/working/strohbs/projects/hillc/ilaria.gori/RN19316_molecular_mechanism_underlying_Shpritzen_Goldberg_syndrome/BIOLOGICS_data_upload/bulkRNAseq_workflow/DESeq2_input/dfPCA.txt",
+  #"/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/workdir/data/dfPca.txt",
+  calculate_DGE = FALSE,
+  calculate_LRT = FALSE,
+  ## Path to external DEseq2 output files
+  DEseq2External_DGE = "/camp/stp/babs/working/strohbs/projects/hillc/ilaria.gori/RN19316_molecular_mechanism_underlying_Shpritzen_Goldberg_syndrome/BIOLOGICS_data_upload/bulkRNAseq_workflow/DESeq2_input/DESeq2_DEG/",
+  #"/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/workdir/data/DEseq2External_DGE/",
+  DEseq2External_LRT = "/camp/stp/babs/working/strohbs/projects/hillc/ilaria.gori/RN19316_molecular_mechanism_underlying_Shpritzen_Goldberg_syndrome/BIOLOGICS_data_upload/bulkRNAseq_workflow/DESeq2_input/DESeq2_LRT/",
+  #"/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/workdir/data/DEseq2External_LRT/",
+  #stranded = TRUE,
+  #read.length = "100bp",
+  #paired.end = FALSE,
+  #pathToRSEMresultsFiles = paste0("/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472_brains_from_drosophila_larvae_RN21220/workdir/", "RSEM/Ensembl/"),
+  projectFolder = "/camp/stp/babs/working/boeings/Projects/boeings/stefan.boeing/dev_test/",
+  experiment_id = "RN19316test",
+  project_name = "Molecular Mechanisms underlying Shprizen-Goldberg syndorme",
+  lims.id = "RN19316",
+  labname = "Hill",
+  NtopGenes = 500,
+  experiment.type = "bulk_rna_seq",
+  species = "homo_sapiens",
+  release = "release-89",
+  count.table.headline = "TPM-values for all Samples",
+  count.table.sidelabel = "TPM",
+  heatmap.headline.text = "Heatmap: Row-averaged Expr",
+  designTScol = NULL,
+  timecourse.units = NULL,
+  primDataDB = "chl_data",
+  db.user = "babs",
+  host = "10.27.241.82",
+  lab.categories.table = "ch_lab_categories"
 )
-
-
 
 
 ```
