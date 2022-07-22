@@ -23,14 +23,22 @@ knitr::opts_chunk$set(
     warning = FALSE
 )
 
+## Before starting R, cd into projectDir/scripts/bulkRNAseq_workflow
+
 # R to use
 # module purge;source /camp/stp/babs/working/software/modulepath_new_software_tree_2018-08-13;module load pandoc/2.2.3.2-foss-2016b;ml R/4.0.3-foss-2020a;R
 
-if (!require("remotes")){
-  install.packages("remotes")
-}
 
-remotes::install_github("rstudio/renv")
+#projectDir <- "/camp/stp/babs/working/boeings/Projects/boeings/stefan.boeing/491_demo_timecourse_GSE134515/"
+## Start in the project dir
+projectDir <- gsub("scripts/bulkRNAseq_workflow", "", getwd())
+
+
+# if (!require("remotes")){
+#   install.packages("remotes")
+# }
+# 
+# remotes::install_github("rstudio/renv")
 
 if (!file.exists("renv.lock")){
     renv::init()
@@ -38,9 +46,14 @@ if (!file.exists("renv.lock")){
     renv::restore(prompt=FALSE)
 }
 
-renv::install("decusinlabore/biologicSeqTools2")
+# renv::install("decusinlabore/biologicSeqTools2")
 
-workdir <- getwd()
+workdir <- paste0(projectDir, "workdir/")
+if (!dir.exists(workdir)){
+    dir.create(workdir)
+}
+
+
 figureCount <- 1
 tableCount <- 1
 upload.to.database <- TRUE
@@ -76,7 +89,8 @@ upload.to.database <- TRUE
 # Load design file from file:
 
 baseDesignFN <- paste0(
-  "../data/vpl277C.base.design.file.txt"
+  projectDir, 
+  "scripts/bulkRNAseq_workflow/design/basedesign.txt"
 )
 
 
@@ -149,16 +163,41 @@ if (length(pos) == 0){
 
 }
 
+###############################################################################
+## Add DGE comparisons                                                       ##
 
-## Save the design file and make sure its specified in the Setup function.
-designFN <- "design/E7E10E14.design.table.txt"
-
-write.table(
-    dfDesign,
-    designFN, 
-    sep = "\t",
-    row.names = F
+comparisonList = list(
+    "comp_1" = c("KO", "WT"),
+    "comp_2" = c("KO_T0h", "WT_T0h"),
+    "comp_3" = c("KO_T2h", "WT_T2h"),
+    "comp_4" = c("KO_T8h", "WT_T8h"),
+    "comp_5" = c("KO_T24h", "WT_T24h")
 )
+
+dfDesign <-  biologicSeqTools2::addDGEcomparisons2DesignFile(
+    dfDesign = dfDesign, 
+    comparisonList = comparisonList
+)
+
+
+designFN <- paste0(
+  projectDir, 
+  "scripts/bulkRNAseq_workflow/design/design.table.txt"
+)
+
+
+readr::write_delim(
+    dfDesign,
+    designFN,
+    delim = "\t"
+)
+
+
+## Done                                                                      ##
+###############################################################################
+
+
+
 
 ## check design file ##
 ## This section will check if all relevant columns are present
@@ -302,7 +341,7 @@ if (length(comparison) > 0){
 
 dfModel[is.na(dfModel)] <- ""
 
-modelFN <- "design/E7E10E14.model.table.txt"
+modelFN <- "design/model.table.txt"
 
 write.table(
     dfModel ,
@@ -319,15 +358,11 @@ write.table(
 ## RSEM count file                                                           ##
 ###############################################################################
 
-countTableFN = "/camp/stp/babs/working/boeings/Projects/lovellbadger/gunes.taylor/483_vis_E07_E10_E14_merged/basedata/RN21224.count.data.preprocessed.txt"
-
-pipelineList <- list()
-
-pipelineList[["pathToRSEMresultsFiles"]] <- c(
-    "/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/RN20094_E07/GRCg6a/processed_data/results/star_rsem/",
-    "/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/RN20152_E10/GRCg6a/processed_data/results/star_rsem/",
-    "/camp/stp/babs/working/eastp/analysis/073_fox12-_chicken_gonads.gunes.taylor/experiments/RN21119_E14/GRCg6a/processed_data/results/star_rsem/"
+countTableFN = paste0(
+    projectDir, 
+    "data/rsem.merged.gene_counts.tsv"
 )
+
 
 dfRSEM <- read.delim(
     countTableFN, 
@@ -336,28 +371,21 @@ dfRSEM <- read.delim(
     stringsAsFactors = F
 )
 
-
+dfRSEM$transcript_id.s.<- NULL
 ## Customization
 ## Make sure it's integers:
-dfRSEM[,2:ncol(dfRSEM)] <- round(dfRSEM[,2:ncol(dfRSEM)])
+selVec <- names(dfRSEM)
+selVec <- selVec[selVec != "gene_id"]
 
-for (i in 1:length(pipelineList[["pathToRSEMresultsFiles"]])){
-    names(dfRSEM) <- gsub(paste0("X", gsub("-", ".", gsub("/", ".", pipelineList[["pathToRSEMresultsFiles"]][[i]]))), "", names(dfRSEM))
-}
+dfRSEM[,selVec] <- round(dfRSEM[,selVec])
 
-names(dfRSEM) <- gsub(".genes.results", "", names(dfRSEM))
 
-## now change sampleIDs to sample.ids
 
-dfTranslate <- unique(dfDesign[,c("sampleID", "sample.id")])
-
-samplesPresent <- names(dfRSEM)[names(dfRSEM) != "X"]
-samplesNotPresent <- dfTranslate$sampleID[!(dfTranslate$sampleID %in% names(dfRSEM))]
-
+samplesPresent <- names(dfRSEM[,selVec])
+samplesNotPresent <- dfDesign$sample.id[!(dfDesign$sample.id %in% samplesPresent)]
+  
 ## Updating dfDesign
-dfDesign <- dfDesign[dfDesign$sampleID %in% samplesPresent, ]
-
-designFN <- "design/E7E10E14.design.table.txt"
+dfDesign <- dfDesign[dfDesign$sample.id %in% samplesPresent, ]
 
 write.table(
     dfDesign,
@@ -367,19 +395,10 @@ write.table(
 )
 
 
-dfTranslate <- unique(dfDesign[,c("sampleID", "sample.id")])
-
-## Renaming RSEM columns
-for (i in 1:nrow(dfTranslate)){
-    names(dfRSEM) <- gsub(paste0("^", as.vector(dfTranslate[i,"sampleID"]), "$"), as.vector(dfTranslate[i,"sample.id"]), names(dfRSEM))
-}
-
-names(dfRSEM) <- gsub("X", "ENSGALG", names(dfRSEM))
-
 ## Format: |gene_id column names X|sample.id[1]|sample.id[2]|sample.id[3]|...
 
 rsemOrder <- c(
-        "ENSGALG",
+        "gene_id",
         paste0(
             as.vector(dfDesign$sample.id)
             #"_TPM"
@@ -388,14 +407,17 @@ rsemOrder <- c(
     
 dfRSEM <- dfRSEM[, rsemOrder]
     
-names(dfRSEM) <- gsub("ENSGALG", "gene_id", names(dfRSEM))
+names(dfRSEM) <- gsub("ENSMUSG", "gene_id", names(dfRSEM))
 
-countTableFN <- "../data/dfCount.txt"
+countTableFN <- paste0(
+    projectDir,
+    "data/rsem.count.txt"
+)
 
 write.table(dfRSEM, countTableFN, sep = "\t", row.names=F)
 
 
-
+dfCount <- dfRSEM
 names(dfCount)
 dfCount$transcript_id.s. <- NULL
 
@@ -420,14 +442,13 @@ countOrder <- c(
 
 dfCount <- unique(dfCount[, countOrder])
 
-countTableFN <- "../data/dfCount.txt"
-
-write.table(
-    dfCount,
-    countTableFN,
-    sep = "\t",
-    row.names = F
+countTableFN <- paste0(
+    projectDir,
+    "data/rsem.count.txt"
 )
+
+write.table(dfRSEM, countTableFN, sep = "\t", row.names=F)
+
 
 ## Done adding count file                                                    ##
 ###############################################################################
@@ -445,7 +466,11 @@ write.table(
 
 ## Example: process NF-core output TPM file
 
-TpmTableFN = "/camp/stp/babs/working/boeings/Projects/lovellbadger/gunes.taylor/483_vis_E07_E10_E14_merged/basedata/E7E10E14.tpm.file.txt"
+TpmTableFN = paste0(
+    projectDir,
+    "data/rsem.merged.gene_tpm.tsv"
+)
+
 
 dfTPM <- read.delim(
     TpmTableFN, 
@@ -455,6 +480,7 @@ dfTPM <- read.delim(
 )
 
 names(dfTPM) <- gsub("_TPM", "", names(dfTPM))
+dfTPM$transcript_id.s. <- NULL
 
 checkNames <- names(dfTPM)
 checkNames <- checkNames[checkNames != "gene_id"]
@@ -479,13 +505,14 @@ tpmOrder <- unique(
 
 dfTPM <- unique(dfTPM[, tpmOrder])
 
-TpmTableFN = "../data/dfTPM.txt"
+TpmTableFN = paste0(projectDir, "data/dfTPM.txt")
 
 write.table(
     dfTPM,
     TpmTableFN,
     sep = "\t",
     row.names = F
+)
 
 
 

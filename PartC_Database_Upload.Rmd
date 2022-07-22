@@ -28,11 +28,11 @@ always_allow_html: yes
 ###############################################################################
 ## Set the environment                                                       ##
 
-if (!require("remotes")){
-  install.packages("remotes")
-}
-
-remotes::install_github("rstudio/renv")
+# if (!require("remotes")){
+#   install.packages("remotes")
+# }
+# 
+# remotes::install_github("rstudio/renv")
 
 if (!file.exists("renv.lock")){
     renv::init()
@@ -65,10 +65,8 @@ knitr::opts_chunk$set(
 ###############################################################################
 ## Set global variables                                                      ##
 
-cDir <- getwd()
-setwd("..")
-workdir <- getwd()
-setwd(cDir)
+workdir <- gsub("scripts/bulkRNAseq_workflow","workdir/",getwd())
+
 
 figureCount <- 1
 tableCount <- 1
@@ -82,7 +80,7 @@ shinyBaseServerURL <- "shiny-bioinformatics.crick.ac.uk"
 ###############################################################################
 ## Load biologic object from part A                                          ##
 library(biologicSeqTools2)
-FN <- paste0("../", list.files("..")[grep("bioLOGIC.Robj", list.files(".."))])
+FN <- paste0("../../workdir/", list.files("../../workdir")[grep("bioLOGIC.Robj", list.files("../../workdir"))])
 load(FN)
 ## Done                                                                      ##
 ###############################################################################
@@ -109,20 +107,20 @@ if (!dir.exists(projectWebDir)){
 
 ## create copy shell script ##
 
-if (file.exists("../html_local/PartB_Analysis.html")){
-    system("mv ../html_local/PartB_Analysis.html ../html_local/Analysis_V1.html")
+if (file.exists("../../html_local/PartB_Analysis.html")){
+    system("mv ../../html_local/PartB_Analysis.html ../../html_local/Analysis_V1.html")
 }
 
 if (file.exists(paste0("../../outputs/", Obio@parameterList$project_id, ".result.table.xlsx"))){
-    if (!dir.exists("../html_local/report_tables")){
-        dir.create("../html_local/report_tables")
+    if (!dir.exists("../../html_local/report_tables")){
+        dir.create("../../html_local/report_tables")
     }  
   
     system(paste0("cp ", paste0("../../outputs/", Obio@parameterList$project_id, ".result.table.xlsx ../html_local/report_tables")))
 }
 
 
-system(paste0("cp -r ../html_local/* ", projectWebDir))
+system(paste0("cp -r ../../html_local/* ", projectWebDir))
 
 ## Copy files to the web server                                              ##
 ###############################################################################
