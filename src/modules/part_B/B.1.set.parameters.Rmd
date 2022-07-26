@@ -9,63 +9,6 @@ VersionPdfExt <- VersionPdfExt <- paste0(".",chnkPrefix,"V", gsub("-", "", Sys.D
 ## Data Preparation
 
 ```{r B_set_directories, echo=FALSE, eval=TRUE, warning=FALSE, results="asis"}
-###############################################################################
-## Set database password                                                     ##
-# Get database password from file
-
-if (dir.exists("/Volumes/babs/working/boeings/")){
-    hpc.mount <- "/Volumes/babs/working/boeings/"
-} else if (dir.exists("Y:/working/boeings/")){
-    hpc.mount <- "Y:/working/boeings/"
-} else if (dir.exists("/camp/stp/babs/working/boeings/")){
-    hpc.mount <- "/camp/stp/babs/working/boeings/"
-} else {
-    hpc.mount <- ""
-}
-
-## Loading the BABS password ##
-if (upload.results.to.database){
-    FN <- paste0(hpc.mount, "Projects/reference_data/pwd_folder/babs.txt")
-    dbTable <- read.delim(
-      FN,
-      header = F,
-      sep = "\t",
-      stringsAsFactors = F
-    )
-}
-
-db.pwd <- as.vector(dbTable[1,1])
-##                                                                           ##
-###############################################################################
-
-
-###############################################################################
-## Set db access credentials                                                 ##
-# FN <- paste0(hpc.mount, "Projects/reference_data/documentation/BC.parameters.txt")
-# dbTable <- read.delim(
-#     FN,
-#     sep = "\t",
-#     stringsAsFactors = F
-# )
-# 
-# db.pwd <- as.vector(dbTable[1,1])
-
-## Done                                                                      ##
-###############################################################################
-
-
-###############################################################################
-## Load Obio object from step A                                              ##
-ObioFN <- paste0(
-    workdir, "/", 
-    list.files(workdir)[grep(".bioLOGIC.Robj", list.files(workdir))]
-)
-
-library(biologicSeqTools2)
-load(ObioFN)
-
-
-
 ## Set project specific parameters ##
 Obio <- setMountingPoint(Obio)
 Obio <- setAnalysisPaths(Obio)

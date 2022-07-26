@@ -126,7 +126,7 @@ if (length(lrtVec) > 0){
         tabVar <- ".tabset .tabset-fade .tabset-pills"
     }
     
-    sectionDisplay <- paste0("## Likelyhood-ratio Test Results (LRT) {",tabVar, "}")
+    sectionDisplay <- paste0("# Likelyhood-ratio Test Results (LRT) {",tabVar, "}")
     
 } else {
     sectionDisplay <- ""

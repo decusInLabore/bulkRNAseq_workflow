@@ -396,7 +396,7 @@ if (length(plotList) > 3){
 }
 ```
 
-## Category Enrichments - Hypergeometric Test {`r tabVar`} 
+# Category Enrichments - Hypergeometric Test {`r tabVar`} 
 ```{r create-cat-enrichment-plot, echo=T, eval=TRUE, warning=FALSE, results='asis'}
 ###############################################################################
 ## Do category enrichment on clusters                                        ##
