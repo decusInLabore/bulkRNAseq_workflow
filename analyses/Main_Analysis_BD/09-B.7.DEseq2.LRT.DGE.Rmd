@@ -297,9 +297,9 @@ if (!is.null(Obio@dataTableList$dfRowVar)){
 
 df.summary[["logFC_cut_off"]] <- 0
 
-# rowSelVec <- as.vector(
-#     dfSel[1:Obio@parameterList$NtopGenes,Obio@parameterList$primaryAlignmentGeneID]
-# )
+rowSelVec <- as.vector(
+    dfSel[1:Obio@parameterList$NtopGenes,Obio@parameterList$primaryAlignmentGeneID]
+)
 df.summary[df.summary[, Obio@parameterList$primaryAlignmentGeneID] %in% rowSelVec, "logFC_cut_off"] <- 1
 
 
