@@ -22,14 +22,14 @@
 #
 # remotes::install_github("rstudio/renv")
 
-if (!file.exists("../../bulkRNAseq_workflow/renv.lock")){
+if (!file.exists("renv.lock")){
   renv::init()
 } else {
   renv::restore(
-      project = "../../bulkRNAseq_workflow",
-      prompt=FALSE
+    prompt=FALSE
   )
 }
+
 
 
 #renv::install("bioc::DESeq2")
@@ -40,10 +40,11 @@ if (!file.exists("../../bulkRNAseq_workflow/renv.lock")){
 ## Done                                                                      ##
 ###############################################################################
 
-print(getwd())
+###############################################################################
+## Load biologic object                                                      ##
 
 # Scripts will run for now in projectDir/scripts/bulkrnaseq_workflow
-check <- list.files("../../../data/biologic_active_object/")
+check <- list.files("../../../../data/biologic_active_object/")
 check <- check[grep("bioLOGIC.Robj$", check)]
 
 if (length(check) == 0){
@@ -52,5 +53,8 @@ if (length(check) == 0){
     stop(paste0("More than one .biologic.Robj file is present in [projectDir]/data/biologic_active_object/. Please move the outdated biologic object into another folder"))
 } else {
     library(biologicSeqTools2)
-    load(paste0("../../../data/biologic_active_object/", check))
+    load(paste0("../../../../data/biologic_active_object/", check))
 }
+
+## Done loading biologic object                                              ##
+###############################################################################

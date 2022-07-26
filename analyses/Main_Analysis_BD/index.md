@@ -8,44 +8,7 @@ output:
       in_header: header.html
 
 ---
-```{r, include=FALSE}
-###############################################################################
-## Recommended R-version                                                     ##
 
-# module purge;source /camp/stp/babs/working/software/modulepath_new_software_tree_2018-08-13;module load pandoc/2.2.3.2-foss-2016b;ml R/4.0.3-foss-2020a
-
-## Done                                                                      ##
-###############################################################################
-
-
-###############################################################################
-## Set the environment                                                       ##
-
-# if (!require("remotes")){
-#   install.packages("remotes")
-# }
-# 
-# remotes::install_github("rstudio/renv")
-
-if (!file.exists("renv.lock")){
-    renv::init(
-    )
-} else {
-    renv::restore(
-        #project = "../../",
-        prompt=FALSE
-    )
-}
-
-
-#renv::install("bioc::DESeq2")
-#renv::install("bioc::clusterProfiler")
-#renv::install("decusInLabore/biologicSeqTools2")
-#renv::install("jokergoo/ComplexHeatmap")
-
-## Done                                                                      ##
-###############################################################################
-```
 
 # Bulk RNA-Seq Analysis
 
@@ -53,7 +16,8 @@ if (!file.exists("renv.lock")){
 
 The **bookdown** package can be installed from CRAN or Github:
 
-```{r eval=FALSE}
+
+```r
 install.packages("bookdown")
 # or the development version
 # devtools::install_github("rstudio/bookdown")
@@ -63,15 +27,10 @@ Remember each Rmd file contains one and only one chapter, and a chapter is defin
 
 To compile this example to PDF, you need XeLaTeX. You are recommended to install TinyTeX (which includes XeLaTeX): <https://yihui.name/tinytex/>.
 
-```{r include=FALSE}
-# automatically create a bib database for R packages
-knitr::write_bib(c(
-  .packages(), 'bookdown', 'knitr', 'rmarkdown'
-), 'packages.bib')
-```
 
-```{r create_report_params, eval=T, results="asis"}
 
+
+```r
 ## Try to retrieve project data from db ##
 db.pwd2 <- "zU3ufd9L"
 db.user2 <- "reader"
@@ -94,7 +53,13 @@ tryCatch({
 }, error = function(x) {
     message("Project Database could not be reached or has no entry in Obio@parameterList$lims.id for this analysis.")
 })
+```
 
+```
+## Project Database could not be reached or has no entry in Obio@parameterList$lims.id for this analysis.
+```
+
+```r
 ###############################################################################
 ## Helper
 firstup <- function(x) {
@@ -122,7 +87,6 @@ if (exists("dfProposal")){
     if (!is.na(dfProposal[1,"proposal_text"]) & dfProposal[1,"proposal_text"] != ""){
         projectParams[["abstract"]] = dfProposal[1,"proposal_text"]
 
-
     }
 }
 
@@ -138,21 +102,19 @@ projectParams <- lapply(
   #gsub("([.|()\\^{}+$*?]|\\[|\\])", "\\\\\1", x)
   gsub("\\\n", " ", x)
 )
-
-
 ```
 
 
 
 ---
-title: "`r projectParams$title`"
-subtitle:  "`r projectParams$subtitle`"
+title: "Transcriptomic analysis of Sh2d2a knockout regulatory T cells following a time-course of anti-CD3 stimulation"
+subtitle:  "David M Briscoe Lab; Literature Bulk-rna Seq GSE134515"
 author:
     - Bioinformatics: Stefan Boeing^[The Francis Crick Institute, stefan.boeing@crick.ac.uk]
-date: 'Compiled: `r format(Sys.Date(), "%B %d, %Y")`'
+date: 'Compiled: July 26, 2022'
 
 abstract: |
-    "`r projectParams$abstract`"
+    "CD4 CD25high regulatory T cells were FACS-sorted from Sh2d2a knockout and wild type mice and activated with 1 µg ml anti-CD3  clone: 145-2C11  for 2, 8 and 24 hours  Experiments were performed in duplicate conditions "
 
 description: "This is a minimal example of using the bookdown package to write a book. The output format for this example is bookdown::gitbook."
 ---
