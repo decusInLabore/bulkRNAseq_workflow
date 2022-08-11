@@ -1,0 +1,24 @@
+normalization: 1x (effective genome size 130000000)
+minFragmentLength: 0
+verbose: False
+out_file_for_raw_data: None
+numberOfSamples: None
+bedFile: None
+bamFilesList: ['/camp/stp/babs/working/boeings/Projects/lovellbadger/michelle.neumann/492_bulkRNAseq_mouse_Foxl2_RN20202/workdir/star_rsem/WT_Foxl2_R1.markdup.sorted.bam']
+ignoreDuplicates: False
+numberOfProcessors: 16
+samFlag_exclude: None
+save_data: False
+stepSize: 20
+smoothLength: 60
+center_read: True
+defaultFragmentLength: 150
+chrsToSkip: []
+region: 11:112781224:112788760:20
+maxPairedFragmentLength: 600
+samFlag_include: None
+binLength: 20
+blackListFileName: None
+maxFragmentLength: 0
+minMappingQuality: None
+zerosToNans: False

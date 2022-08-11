@@ -97,7 +97,7 @@ if (nrow(dfSelections) > 2){
 }
 ```
 
-## Gene Expression Overview {`r tabVar`}
+
 ```{r, echo=TRUE, eval=TRUE, warning=FALSE, results=F, message=F}
 ## Make heatmap gene list
 logFCselections <- names(dfMainData)[grep("_logFC_", names(dfMainData))]
@@ -598,7 +598,7 @@ for (k in 1:length(HmDisplayCatsFromDb)){
     figureCount <- figureCount + 1 
     
     NewChnk <- paste0(
-            "### HM_", names(HmDisplayCatsFromDb)[k],
+            "## HM_", names(HmDisplayCatsFromDb)[k],
             "\n```{r, results='asis', echo=F, eval=TRUE, warning=FALSE, fig.cap='",figCap,"'}\n",
             "\n",
             "\n print(HMplotList[['",names(HmDisplayCatsFromDb)[k],"']])",
@@ -619,9 +619,16 @@ for (k in 1:length(HmDisplayCatsFromDb)){
 ## End heatmap plotting loop
 ## Done                                                                      ##
 ###############################################################################
+if (length(contrastVec) > 2){
+    tabVar <- ".tabset .tabset-fade .tabset-dropdown"
+} else {
+    tabVar <- ".tabset .tabset-fade .tabset-pills"
+}
+
 ```
 
 
+# Heatmaps {`r tabVar`}
 
 ```{r, echo=FALSE, eval=TRUE, warning=FALSE, results="asis"}
 cat(paste(knitr::knit(text = chnkVec, quiet = T), collapse = '\n'))

@@ -65,7 +65,7 @@ if (nrow(dfSelections) > 2){
 
 ```
 
-# Differential Gene Expression Analysis (DGE) {`r tabVar`}
+
 ```{r, echo=TRUE, eval=TRUE, warning=FALSE, results=F}
 
 if (!exists("sdCutOff")){
@@ -444,7 +444,7 @@ if (length(contrastVec) > 2){
 ```
 
 
-
+# Differential Gene Expression Analysis (DGE) {`r tabVar`}
 ```{r, echo=FALSE, eval=TRUE, warning=FALSE, results="asis"}
 cat(paste(knitr::knit(text = chnkVec, quiet = T), collapse = '\n'))
 ```
