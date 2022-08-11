@@ -32,6 +32,14 @@ always_allow_html: yes
 # 
 # remotes::install_github("rstudio/renv")
 
+## Manual startup process
+# cd into /analyses/Main_analysis
+# start R
+# do renv::activate()
+# do renv::restore()
+# Future: remove renv. files in main
+
+
 if (!file.exists("renv.lock")){
     renv::init(
     )
@@ -42,6 +50,11 @@ if (!file.exists("renv.lock")){
     )
 }
 
+projectDir <- gsub("scripts/bulkRNAseq_workflow/analyses/Main_Analysis", "", getwd())
+workdir <- gsub("scripts/bulkRNAseq_workflow","workdir/",getwd())
+figureCount <- 1
+tableCount <- 1
+upload.to.database <- TRUE
 
 #renv::install("bioc::DESeq2")
 #renv::install("bioc::clusterProfiler")
@@ -72,6 +85,15 @@ knitr::opts_chunk$set(
 ###############################################################################
 ```
 
+
+<!-- Essential: Load Obio Data Object ---------------------------------------->
+```{r child = '01-A1.define.settings.Rmd', eval=TRUE}
+```
+
+<!-- Essential:Create Obio object     ---------------------------------------->
+```{r child = '02-Create.bioLOGIC.object.Rmd', eval=TRUE}
+```
+
 ```{r, echo=FALSE, eval=TRUE, warning=FALSE, results=F}
 ###############################################################################
 ## load biologic object                                                      ##
@@ -96,11 +118,11 @@ Obio@parameterList[["urlString"]] <- "biologic.crick.ac.uk"
 
 ###############################################################################
 ## In this case - set project params                                         ##
-Obio@documentationParams <- list(
-    "title" = "Transcriptomic analysis of Sh2d2a knockout regulatory T cells following a time-course of anti-CD3 stimulation",
-    "subtitle" = "David M Briscoe Lab; Literature Bulk-rna Seq GSE134515",
-    "abstract" = "CD4+CD25high regulatory T cells were FACS-sorted from Sh2d2a knockout and wild type mice and activated with 1 µg/ml anti-CD3 (clone: 145-2C11) for 2, 8 and 24 hours. Experiments were performed in duplicate conditions."
-)
+# Obio@documentationParams <- list(
+#     "title" = "Transcriptomic analysis of Sh2d2a knockout regulatory T cells following a time-course of anti-CD3 stimulation",
+#     "subtitle" = "David M Briscoe Lab; Literature Bulk-rna Seq GSE134515",
+#     "abstract" = "CD4+CD25high regulatory T cells were FACS-sorted from Sh2d2a knockout and wild type mice and activated with 1 µg/ml anti-CD3 (clone: 145-2C11) for 2, 8 and 24 hours. Experiments were performed in duplicate conditions."
+# )
 
 ## Done                                                                      ##
 ###############################################################################
@@ -141,7 +163,7 @@ if (Obio@parameterList[["upload.results.to.database"]]){
 ###############################################################################
 ## Save biologic object with additional variables                            ##
 
-source("save.biologic.robj.R")
+# source("save.biologic.robj.R")
 
 ## Done                                                                      ##
 ###############################################################################

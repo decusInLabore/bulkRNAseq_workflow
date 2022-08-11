@@ -65,7 +65,7 @@ if (nrow(dfSelections) > 2){
 
 ```
 
-## Differential Gene Expression Analysis (DGE) {`r tabVar`}
+# Differential Gene Expression Analysis (DGE) {`r tabVar`}
 ```{r, echo=TRUE, eval=TRUE, warning=FALSE, results=F}
 
 if (!exists("sdCutOff")){
@@ -363,7 +363,7 @@ for (i in 1:length(contrastVec)){
     figureCount <- figureCount + 1
    
     NewChnk <- paste0(
-            "### MA-Plot ",contrastVec[i],
+            "## MA-Plot ",contrastVec[i],
             "\n```{r ",contrastVec[i],", results='asis', echo=F, eval=TRUE, warning=FALSE, fig.cap='",figCap,"'}\n",
             "\n",
             "\n print(MAplotList[['",tagMA,"']])",

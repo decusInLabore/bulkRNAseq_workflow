@@ -1,21 +1,28 @@
 # bulkRNAseq_workflow
 
-This vignette is under construction and is continiously updated. 
 
 * Creeate a project directory
 * cd into that project directory
 * Create required directories
 ```
-mkdir workdir basedata FASTQ_files
+mkdir scripts workdir basedata FASTQ_files
 
-cd workdir
+cd scripts
 
 git clone git@github.com:decusInLabore/bulkRNAseq_workflow.git
 
-cd bulkRNAseq_workflow
-
+cd bulkRNAseq_workflow/analyses/Main_Analysis
 
 ```
+Start R
+
+```
+module purge;source /camp/stp/babs/working/software/modulepath_new_software_tree_2018-08-13;module load pandoc/2.2.3.2-foss-2016b;ml R/4.0.3-foss-2020a;R
+```
+
+Adjust paths in file Part_0_prepare_alignment_and_input_files_for_Crick_RNA_Seq.Rmd
+
+
 # Quickstart
 * Minimal input file requirement: design file, (RSEM-) count file, res(dd) DEseq2 outputs for LRT and differential gene expression comparisons (either generated in this package or from outside sources), a PCA file (optional) and a file containing the most variable genes (optional). 
 * Create in the projectdirectory a directory with the name ```mkdir wordir```. Clone into that this github repo ``` git clone git@github.com:decusInLabore/bulkRNAseq_workflow.git ```. Move into that directory ```cd bulkRNAseq_workflow```

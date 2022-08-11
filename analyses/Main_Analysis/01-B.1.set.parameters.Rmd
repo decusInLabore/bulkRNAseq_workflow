@@ -21,11 +21,14 @@ if (is.null(Obio@parameterList$path2GeneIDtable)){
 }
 
 ## For now we expect a gene annotation file to be specified already
-Obio <- setCrickGenomeAndGeneNameTable(Obio)
+# Obio <- setCrickGenomeAndGeneNameTable(Obio)
 
 # In the future this will be done using the more general
-# biologicSeqTools2::setGenomeAndGeneNameTable
-# function
+#Obio <- biologicSeqTools2::setGenomeAndGeneNameTable()
+Obio@parameterList$species == "mus_musculus"
+Obio@parameterList$primaryAlignmentGeneID <- "ENSMUSG"
+Obio@parameterList$geneIDcolumn <-  "mgi_symbol"
+
 
 ## Create analysis folders in the working directory
 Obio <- createAnalysisFolders(
@@ -38,7 +41,7 @@ Obio <- setDataBaseParameters(Obio)
 ## This can be upgraded to web retrieval of annotation data 
 Obio <- addGeneAnnotation(Obio)
 
- 
+
 ## Create shiny path for figure outputs ##           
 shinyURL <- paste0(
     "https://",
@@ -106,7 +109,7 @@ if (!is.null(Obio@dbDetailList$host)){
     urlString <- ""
 }
 
-
+source("save.biologic.robj.R")
 ##                                                                           ##
 ###############################################################################
 

@@ -365,7 +365,7 @@ for (j in 1:length(DGEtagVec)){
             figureCount <- figureCount + 1 
             
             NewChnk <- paste0(
-                "### ", DGEtagVec[j],
+                "## ", DGEtagVec[j],
                 "\n```{r enrichr_",
                 j,", results='asis', echo=F, eval=TRUE, warning=FALSE, fig.cap='",
                 figLegend,"'}\n",

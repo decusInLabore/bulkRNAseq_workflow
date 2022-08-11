@@ -38,7 +38,7 @@ if (!file.exists("renv.lock")){
 }
 
 #renv::install("decusinlabore/biologicSeqTools2")
-projectDir <- gsub("scripts/bulkRNAseq_workflow", "", getwd())
+projectDir <- gsub("scripts/bulkRNAseq_workflow/analyses/Main_Analysis", "", getwd())
 workdir <- gsub("scripts/bulkRNAseq_workflow","workdir/",getwd())
 figureCount <- 1
 tableCount <- 1
@@ -116,20 +116,20 @@ pipelineList <- biologicSeqTools2::assembleBiologicProject(
   #paired.end = FALSE,
   #pathToRSEMresultsFiles = paste0("/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472_brains_from_drosophila_larvae_RN21220/workdir/", "RSEM/Ensembl/"),
   projectFolder = projectDir,
-  experiment_id = "GSE134515",
-  project_name = " 	Transcriptomic analysis of Sh2d2a knockout regulatory T cells following a time-course of anti-CD3 stimulation",
-  lims.id = NULL,
-  labname = "Briscoe",
+  experiment_id = "RN20202",
+  project_name = "TBD",
+  lims.id = "RN20202",
+  labname = "Lovell Badge",
   NtopGenes = 500,
   experiment.type = "bulk_rna_seq",
   species = "mus_musculus",
-  release = "release-89",
+  release = "release-95",
   count.table.headline = "TPM-values for all Samples",
   count.table.sidelabel = "TPM",
   heatmap.headline.text = "Heatmap: Row-averaged Expr",
-  designTScol = "timepoint",
-  timecourse.units = "hours",
-  primDataDB = "ref_data",
+  designTScol = NULL,
+  timecourse.units = NULL,
+  primDataDB = "rll_data",
   db.user = "babs",
   host = "10.27.241.82",
   lab.categories.table = "ref_lab_categories"
@@ -142,7 +142,7 @@ pipelineList <- biologicSeqTools2::assembleBiologicProject(
 
 <!-- Essential 1: (output required later): Set Parameters and directories and create Obio object Chapter/Module -->
 <!-- This section creates the plain Obio object without any data in it. -->
-```{r child = 'src/modules/settings/set.parameters.Rmd', eval=TRUE}
+```{r child = '../../src/modules/settings/set.parameters.Rmd', eval=TRUE}
 ```
 
 <!-- Create fastq analysis files-->

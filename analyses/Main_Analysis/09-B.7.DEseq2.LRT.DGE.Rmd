@@ -433,12 +433,12 @@ if (length(rmVec) > 0){
 # ## Remove unnecessary columns, if needed ##
 # #
 # ## Create GSEA rank files ##
-biologicSeqTools2::create.gsea.rnk.files(
-     Obio@parameterList$localWorkDir,
-     df.dataTable = database.table2,
-     GSEA.colum.type = "_logFC_",
-     gene.symbol.column.name = "hgnc_symbol"
- )
+# biologicSeqTools2::create.gsea.rnk.files(
+#      Obio@parameterList$localWorkDir,
+#      df.dataTable = database.table2,
+#      GSEA.colum.type = "_logFC_",
+#      gene.symbol.column.name = "hgnc_symbol"
+#  )
 # #
 # # ## Remove last character from file ##
 # # #truncate -s -2 file
