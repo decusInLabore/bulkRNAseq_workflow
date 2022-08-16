@@ -1,6 +1,5 @@
 "comparison"	"comparisonID"	"test"	"type"	"model"	"reducedModel"	"normalizeAllSamplesTogether"	"betaPrior"
-"Foxl2cond_vs_Foxl2WT"	"comp_1"	"Wald"	"DGE"	"~ condition"	""	FALSE	"TRUE"
-"Foxl2cond_vs_Sox9WT"	"comp_2"	"Wald"	"DGE"	"~ condition"	""	FALSE	"TRUE"
-"Foxl2WT_vs_Sox9WT"	"comp_3"	"Wald"	"DGE"	"~ condition"	""	FALSE	"TRUE"
-"LRT_Genotype"	"LRT_Genotype"	"LRT"	"LRT"	"~ condition"	"~1"	FALSE	""
-"LRT_Sample_Group"	"LRT_Sample_Group"	"LRT"	"LRT"	"~ condition"	"~1"	FALSE	""
+"Act_Wt_vs_Wt_Wt"	"comp_1"	"Wald"	"DGE"	"~ condition"	""	FALSE	TRUE
+"Act_HPV8_vs_Wt_HPV8"	"comp_2"	"Wald"	"DGE"	"~ condition"	""	FALSE	TRUE
+"Act_HPV8_vs_Act_Wt"	"comp_3"	"Wald"	"DGE"	"~ condition"	""	FALSE	TRUE
+"Wt_HPV8_vs_Wt_Wt"	"comp_4"	"Wald"	"DGE"	"~ condition"	""	FALSE	TRUE

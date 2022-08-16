@@ -52,7 +52,8 @@ if (!file.exists("renv.lock")){
     renv::restore(prompt=FALSE)
 }
 
-
+#renv::install("decusinlabore/biologicSeqTools2)
+#renv::install("bioc::ensembldb")
 #renv::install("bioc::DESeq2")
 #renv::install("bioc::clusterProfiler")
 #renv
@@ -111,7 +112,7 @@ library(ggplot2)
 #library(DT)
 
 
-geneCoveragePlotVec <- c("Foxl2","Sox9", "Xist", "Thbs4", "Dmrt1", "Inhba")
+geneCoveragePlotVec <- c("Inhba", "Inhbb")
 
 
 figureCount <- 1

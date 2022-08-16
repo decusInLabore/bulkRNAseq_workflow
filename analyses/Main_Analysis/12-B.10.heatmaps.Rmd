@@ -619,7 +619,7 @@ for (k in 1:length(HmDisplayCatsFromDb)){
 ## End heatmap plotting loop
 ## Done                                                                      ##
 ###############################################################################
-if (length(contrastVec) > 2){
+if (length(HMplotList) > 2){
     tabVar <- ".tabset .tabset-fade .tabset-dropdown"
 } else {
     tabVar <- ".tabset .tabset-fade .tabset-pills"

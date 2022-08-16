@@ -2,7 +2,7 @@
 local({
 
   # the requested version of renv
-  version <- "0.15.2-10"
+  version <- "0.15.5-49"
 
   # the project directory
   project <- getwd()
@@ -54,19 +54,9 @@ local({
   # mask 'utils' packages, will come first on the search path
   library(utils, lib.loc = .Library)
 
-  # check to see if renv has already been loaded
-  if ("renv" %in% loadedNamespaces()) {
-
-    # if renv has already been loaded, and it's the requested version of renv,
-    # nothing to do
-    spec <- .getNamespaceInfo(.getNamespace("renv"), "spec")
-    if (identical(spec[["version"]], version))
-      return(invisible(TRUE))
-
-    # otherwise, unload and attempt to load the correct version of renv
+  # unload renv if it's already been loaded
+  if ("renv" %in% loadedNamespaces())
     unloadNamespace("renv")
-
-  }
 
   # load bootstrap tools   
   `%||%` <- function(x, y) {
@@ -324,11 +314,20 @@ local({
     }
   
     # bail if it doesn't exist
-    if (!file.exists(tarball))
+    if (!file.exists(tarball)) {
+  
+      # let the user know we weren't able to honour their request
+      fmt <- "* RENV_BOOTSTRAP_TARBALL is set (%s) but does not exist."
+      msg <- sprintf(fmt, tarball)
+      warning(msg)
+  
+      # bail
       return()
   
-    fmt <- "* Using local tarball at path '%s'."
-    msg <- sprintf(fmt, version)
+    }
+  
+    fmt <- "* Bootstrapping with tarball at path '%s'."
+    msg <- sprintf(fmt, tarball)
     message(msg)
   
     tarball
@@ -388,7 +387,13 @@ local({
     bin <- R.home("bin")
     exe <- if (Sys.info()[["sysname"]] == "Windows") "R.exe" else "R"
     r <- file.path(bin, exe)
-    args <- c("--vanilla", "CMD", "INSTALL", "--no-multiarch", "-l", shQuote(library), shQuote(tarball))
+  
+    args <- c(
+      "--vanilla", "CMD", "INSTALL", "--no-multiarch",
+      "-l", shQuote(path.expand(library)),
+      shQuote(path.expand(tarball))
+    )
+  
     output <- system2(r, args, stdout = TRUE, stderr = TRUE)
     message("Done!")
   
@@ -762,12 +767,17 @@ local({
   
   }
   
-  renv_bootstrap_user_dir <- function(path) {
-    dir <- renv_bootstrap_user_dir_impl(path)
-    chartr("\\", "/", dir)
+  renv_bootstrap_user_dir <- function() {
+    dir <- renv_bootstrap_user_dir_impl()
+    path.expand(chartr("\\", "/", dir))
   }
   
-  renv_bootstrap_user_dir_impl <- function(path) {
+  renv_bootstrap_user_dir_impl <- function() {
+  
+    # use local override if set
+    override <- getOption("renv.userdir.override")
+    if (!is.null(override))
+      return(override)
   
     # use R_user_dir if available
     tools <- asNamespace("tools")
@@ -778,10 +788,8 @@ local({
     envvars <- c("R_USER_CACHE_DIR", "XDG_CACHE_HOME")
     for (envvar in envvars) {
       root <- Sys.getenv(envvar, unset = NA)
-      if (!is.na(root)) {
-        path <- file.path(root, "R/renv")
-        return(path)
-      }
+      if (!is.na(root))
+        return(file.path(root, "R/renv"))
     }
   
     # use platform-specific default fallbacks
@@ -797,11 +805,25 @@ local({
   
   renv_json_read <- function(file = NULL, text = NULL) {
   
+    # if jsonlite is loaded, use that instead
+    if ("jsonlite" %in% loadedNamespaces())
+      renv_json_read_jsonlite(file, text)
+    else
+      renv_json_read_default(file, text)
+  
+  }
+  
+  renv_json_read_jsonlite <- function(file = NULL, text = NULL) {
     text <- paste(text %||% read(file), collapse = "\n")
+    jsonlite::fromJSON(txt = text, simplifyVector = FALSE)
+  }
+  
+  renv_json_read_default <- function(file = NULL, text = NULL) {
   
     # find strings in the JSON
+    text <- paste(text %||% read(file), collapse = "\n")
     pattern <- '["](?:(?:\\\\.)|(?:[^"\\\\]))*?["]'
-    locs <- gregexpr(pattern, text)[[1]]
+    locs <- gregexpr(pattern, text, perl = TRUE)[[1]]
   
     # if any are found, replace them with placeholders
     replaced <- text
@@ -830,8 +852,9 @@ local({
   
     # transform the JSON into something the R parser understands
     transformed <- replaced
-    transformed <- gsub("[[{]", "list(", transformed)
-    transformed <- gsub("[]}]", ")", transformed)
+    transformed <- gsub("{}", "`names<-`(list(), character())", transformed, fixed = TRUE)
+    transformed <- gsub("[[{]", "list(", transformed, perl = TRUE)
+    transformed <- gsub("[]}]", ")", transformed, perl = TRUE)
     transformed <- gsub(":", "=", transformed, fixed = TRUE)
     text <- paste(transformed, collapse = "\n")
   

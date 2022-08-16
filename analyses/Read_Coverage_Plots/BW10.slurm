@@ -4,7 +4,7 @@ verbose: False
 out_file_for_raw_data: None
 numberOfSamples: None
 bedFile: None
-bamFilesList: ['/camp/stp/babs/working/boeings/Projects/hillc/simon.mccluney/499_bulkRNAseq_Activin_signature_GSE130017/workdir/star_rsem/Act_HPV8_rep3.markdup.sorted.bam']
+bamFilesList: ['/camp/stp/babs/working/boeings/Projects/hillc/simon.mccluney/499_bulkRNAseq_Activin_signature_GSE130017/workdir/star_rsem/Wt_Wt_rep1.markdup.sorted.bam']
 ignoreDuplicates: False
 numberOfProcessors: 16
 samFlag_exclude: None
