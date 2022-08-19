@@ -1,4 +1,4 @@
-# Gene Set Enrichment Analysis (GSEA) {.tabset .tabset-fade .tabset-pills}
+# Gene Set Enrichment Analysis (GSEA)
 <!-- Set PArameters Module -->
 <!-- Set the chnkPrefix to make all chunks unique in the overall folder -->
 ```{r partC_C11B_pca_init, echo=FALSE, eval=TRUE, warning=FALSE}

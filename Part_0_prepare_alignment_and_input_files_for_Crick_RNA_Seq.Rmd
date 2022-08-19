@@ -66,21 +66,18 @@ upload.to.database <- TRUE
 
 ## Load nf-core basedesign file
 
-FN <- "/camp/stp/babs/working/boeings/Projects/lovellbadger/michelle.neumann/492_bulkRNAseq_mouse_Foxl2_RN20202/data/github.RN20202.basedesign.file.csv"
+FN <- paste0(projectDir, "data/base.design.RN22179.txt")
 
-dfbase <- readr::read_csv(FN)
+dfbase <- readr::read_delim(FN, delim="\t")
 
-## In this case, only one of the two sequencing runs, the on on flow-cell 220624_A01366_0228_AHCGKFDMXY was successful.
+dfbase <- dfbase[,c("sampleID", "sample.id")]
+
 dfSettings <- dfbase
-dfSettings[["sampleID"]] <- sapply(dfSettings$fastq_1, function(x) unlist(strsplit(x, ","))[1])
-dfSettings[["sampleID"]] <- sapply(dfSettings$sampleID, function(x) unlist(strsplit(x, "fastq/"))[2])
-dfSettings[["sampleID"]] <- as.vector(sapply(dfSettings$sampleID, function(x) unlist(strsplit(x, "_"))[1]))
-dfSettings <- unique(dfSettings[,c("sample", "sampleID")])
 
 ## Get available files
 seqDir <-  c(
-    "/camp/stp/sequencing/outputs/babs/data/lovell-badger/michelle.neumann/RN20202/primary_data/220624_A01366_0228_AHCGKFDMXY/fastq/",
-    "/camp/stp/sequencing/outputs/babs/data/lovell-badger/michelle.neumann/RN20202/primary_data/220622_A01366_0226_BH55HFDRX2/fastq/"
+    "/camp/stp/sequencing/outputs/babs/data/liv/sofia.pedersen/RN22179/primary_data/220801_A01366_0248_BHCHGTDMXY/fastq/",
+    "/camp/stp/sequencing/outputs/babs/data/liv/sofia.pedersen/RN22179/primary_data/220811_A01366_0258_BHFFK2DMXY/fastq/"
 )
 
 
@@ -140,34 +137,12 @@ dfRes <- do.call(rbind,resList)
 dfRes$sampleID <- NULL
 dfRes$fastq <- NULL
 dfRes[["strandedness"]] <- "reverse"
+names(dfRes) <- gsub("sample.id", "sample", names(dfRes))
 dfRes <- dfRes[,c("sample", "fastq_1", "fastq_2", "strandedness")]
-
-## Let's adjust the sample names and make them more meaningful
-## load asf the asf sample sheet
-FN <- "/camp/stp/babs/working/boeings/Projects/lovellbadger/michelle.neumann/492_bulkRNAseq_mouse_Foxl2_RN20202/data/project-NEU1554-asf-sample-sheet.kapa.only.txt"
-dfSample <- read.delim(
-    FN,
-    sep = "\t",
-    stringsAsFactors = F
-)
-
-dfSampleUpdate <- unique(dfSample[,c("sample.id", "original.sample.id")])
-
-dfRes <- dplyr::full_join(
-    dfRes,
-    dfSampleUpdate,
-    by = c("sample" = "original.sample.id")
-)
-
-dfRes$sample <- dfRes$sample.id
-dfRes$sample.id <- NULL
-
-dfRes <- dfRes[,c("sample", "fastq_1", "fastq_2", "strandedness")]
-
 
 readr::write_csv(
     dfRes, 
-    path = "/camp/stp/babs/working/boeings/Projects/lovellbadger/michelle.neumann/492_bulkRNAseq_mouse_Foxl2_RN20202/scripts/bulkRNAseq_workflow/design/nf.core.settings.file.csv"
+    path = paste0(projectDir, "scripts/bulkRNAseq_workflow/design/nf.core.settings.file.csv")
 )
 
 ## Create NF-core script
@@ -175,9 +150,9 @@ biologicSeqTools2::createbulkRNASeqAnalysisNFcoreScript(
     outdir = workdir,
     genomeFa = "/camp/svc/reference/Genomics/babs/mus_musculus/ensembl/GRCm38/release-95/genome/Mus_musculus.GRCm38.dna_sm.toplevel.fa",
     GTFfile = "/camp/svc/reference/Genomics/babs/mus_musculus/ensembl/GRCm38/release-95/gtf/Mus_musculus.GRCm38.95.rnaseqc.gtf",
-    project_id = "RN20202",
-    scriptOutdir = "/camp/stp/babs/working/boeings/Projects/lovellbadger/michelle.neumann/492_bulkRNAseq_mouse_Foxl2_RN20202/scripts/",
-    NFcoreSettingsFN = "/camp/stp/babs/working/boeings/Projects/lovellbadger/michelle.neumann/492_bulkRNAseq_mouse_Foxl2_RN20202/scripts/bulkRNAseq_workflow/design/nf.core.settings.file.csv",
+    project_id = "RN22179",
+    scriptOutdir = paste0(projectDir, "scripts/"),
+    NFcoreSettingsFN = paste0(projectDir, "scripts/bulkRNAseq_workflow/design/nf.core.settings.file.csv"),
     scriptVecSlot = "scriptVec"
 )
 
@@ -213,7 +188,7 @@ biologicSeqTools2::createbulkRNASeqAnalysisNFcoreScript(
 
 # Load design file from file:
 
-baseDesignFN <- "/camp/stp/babs/working/boeings/Projects/lovellbadger/michelle.neumann/492_bulkRNAseq_mouse_Foxl2_RN20202/data/project-NEU1554-asf-sample-sheet.kapa.only.txt"
+baseDesignFN <- paste0(projectDir, "data/base.design.RN22179.txt")
 
 
 
@@ -234,6 +209,8 @@ dfDesign <- biologicSeqTools2::completeDesignBasedOnSampleID(dfDesign)
 ## Check: Make sure the above required columns are present:
 names(dfDesign)
 
+## Reorder
+dfDesign <- dfDesign[order(dfDesign$f_Status, dfDesign$f_Sex),]
 
 ###############################################################################
 ## Add dataseries color, if not provided in base design file                 ##
@@ -289,18 +266,16 @@ if (length(pos) == 0){
 ## Add DGE comparisons                                                       ##
 
 ## Here already done in the base design file
-# comparisonList = list(
-#     "comp_1" = c("KO", "WT"),
-#     "comp_2" = c("KO_T0h", "WT_T0h"),
-#     "comp_3" = c("KO_T2h", "WT_T2h"),
-#     "comp_4" = c("KO_T8h", "WT_T8h"),
-#     "comp_5" = c("KO_T24h", "WT_T24h")
-# )
-# 
-# dfDesign <-  biologicSeqTools2::addDGEcomparisons2DesignFile(
-#     dfDesign = dfDesign, 
-#     comparisonList = comparisonList
-# )
+comparisonList = list(
+    "comp_1" = c("Disease", "Control"),
+    "comp_2" = c("Female_Disease", "Female_Control"),
+    "comp_3" = c("Male_Disease", "Male_Control")
+)
+
+dfDesign <-  biologicSeqTools2::addDGEcomparisons2DesignFile(
+    dfDesign = dfDesign,
+    comparisonList = comparisonList
+)
 
 
 designFN <- paste0(
@@ -308,6 +283,8 @@ designFN <- paste0(
   "scripts/bulkRNAseq_workflow/design/design.table.txt"
 )
 
+
+dfDesign <- dfDesign[order(dfDesign$f_Status, dfDesign$f_Sex, dfDesign$f_Batch),]
 
 readr::write_delim(
     dfDesign,
@@ -395,7 +372,7 @@ for (i in 1:length(comparisonID)){
 test <- rep("Wald", length(comparison))
 type <- rep("DGE", length(comparison))
 
-model <- rep("~ condition", length(comparison))
+model <- c("~ f_Batch + f_Sex + condition",rep("~ f_Batch + condition", length(comparison)-1))
 
 ## You might need to replace the above model vector with a bespoke model
 # for each comparison
@@ -413,7 +390,7 @@ reducedModel <- rep("", length(comparison))
 
 ## Normalise all samples together, or just those involved in the DGE comparison
 normalizeAllSamplesTogether <- rep(FALSE, length(comparison))
-betaPrior <- rep(TRUE, length(comparison))
+betaPrior <- c(rep(FALSE, length(comparison)))
 
 
 dfModel <- data.frame(

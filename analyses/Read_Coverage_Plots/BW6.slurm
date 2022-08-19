@@ -4,7 +4,7 @@ verbose: False
 out_file_for_raw_data: None
 numberOfSamples: None
 bedFile: None
-bamFilesList: ['/camp/stp/babs/working/boeings/Projects/hillc/simon.mccluney/499_bulkRNAseq_Activin_signature_GSE130017/workdir/star_rsem/Act_Wt_rep3.markdup.sorted.bam']
+bamFilesList: ['/camp/stp/babs/working/boeings/Projects/liv/sofia.pedersen/503_bulkRNAseq_early_colorectal_cancer_RN22179/workdir/star_rsem/Female_Disease_1.markdup.sorted.bam']
 ignoreDuplicates: False
 numberOfProcessors: 16
 samFlag_exclude: None
@@ -14,7 +14,7 @@ smoothLength: 60
 center_read: True
 defaultFragmentLength: 150
 chrsToSkip: []
-region: 1:119414465:119423248:20
+region: 6:125160715:125167467:20
 maxPairedFragmentLength: 600
 samFlag_include: None
 binLength: 20

@@ -1,5 +1,4 @@
 "comparison"	"comparisonID"	"test"	"type"	"model"	"reducedModel"	"normalizeAllSamplesTogether"	"betaPrior"
-"Act_Wt_vs_Wt_Wt"	"comp_1"	"Wald"	"DGE"	"~ condition"	""	FALSE	TRUE
-"Act_HPV8_vs_Wt_HPV8"	"comp_2"	"Wald"	"DGE"	"~ condition"	""	FALSE	TRUE
-"Act_HPV8_vs_Act_Wt"	"comp_3"	"Wald"	"DGE"	"~ condition"	""	FALSE	TRUE
-"Wt_HPV8_vs_Wt_Wt"	"comp_4"	"Wald"	"DGE"	"~ condition"	""	FALSE	TRUE
+"Disease_vs_Control"	"comp_1"	"Wald"	"DGE"	"~ f_Batch + f_Sex + condition"	""	FALSE	FALSE
+"Female_Disease_vs_Female_Control"	"comp_2"	"Wald"	"DGE"	"~ f_Batch + condition"	""	FALSE	FALSE
+"Male_Disease_vs_Male_Control"	"comp_3"	"Wald"	"DGE"	"~ f_Batch + condition"	""	FALSE	FALSE
