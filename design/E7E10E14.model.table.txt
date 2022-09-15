@@ -1,10 +1,6 @@
 "comparison"	"comparisonID"	"test"	"type"	"model"	"reducedModel"	"normalizeAllSamplesTogether"	"betaPrior"
-"FemHomED07_vs_FemWtED07"	"comp_1"	"Wald"	"DGE"	"~ condition"	""	FALSE	"TRUE"
-"MaleHomED07_vs_MaleWtED07"	"comp_2"	"Wald"	"DGE"	"~ condition"	""	FALSE	"TRUE"
-"FemHomED10_vs_FemWtED10"	"comp_3"	"Wald"	"DGE"	"~ condition"	""	FALSE	"TRUE"
-"MaleHomED10_vs_MaleWtED10"	"comp_4"	"Wald"	"DGE"	"~ condition"	""	FALSE	"TRUE"
-"FemHomED14_vs_FemWtED14"	"comp_5"	"Wald"	"DGE"	"~ condition"	""	FALSE	"TRUE"
-"MaleHomED14_vs_MaleWtED14"	"comp_6"	"Wald"	"DGE"	"~ condition"	""	FALSE	"TRUE"
-"LRT_Gender"	"LRT_Gender"	"LRT"	"LRT"	"~ condition"	"~1"	FALSE	""
-"LRT_Genotype"	"LRT_Genotype"	"LRT"	"LRT"	"~ condition"	"~1"	FALSE	""
-"LRT_Timepoint"	"LRT_Timepoint"	"LRT"	"LRT"	"~ condition"	"~1"	FALSE	""
+"KO_vs_WT"	"comp_1"	"Wald"	"DGE"	"~ condition"	""	FALSE	TRUE
+"KO_T0h_vs_WT_T0h"	"comp_2"	"Wald"	"DGE"	"~ condition"	""	FALSE	TRUE
+"KO_T2h_vs_WT_T2h"	"comp_3"	"Wald"	"DGE"	"~ condition"	""	FALSE	TRUE
+"KO_T8h_vs_WT_T8h"	"comp_4"	"Wald"	"DGE"	"~ condition"	""	FALSE	TRUE
+"KO_T24h_vs_WT_T24h"	"comp_5"	"Wald"	"DGE"	"~ condition"	""	FALSE	TRUE

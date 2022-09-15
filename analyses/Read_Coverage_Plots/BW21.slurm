@@ -1,0 +1,24 @@
+normalization: 1x (effective genome size 130000000)
+minFragmentLength: 0
+verbose: False
+out_file_for_raw_data: None
+numberOfSamples: None
+bedFile: None
+bamFilesList: ['/camp/stp/babs/working/boeings/Projects/liv/sofia.pedersen/503_bulkRNAseq_early_colorectal_cancer_RN22179/workdir/star_rsem/Male_Disease_1.markdup.sorted.bam']
+ignoreDuplicates: False
+numberOfProcessors: 16
+samFlag_exclude: None
+save_data: False
+stepSize: 20
+smoothLength: 60
+center_read: True
+defaultFragmentLength: 150
+chrsToSkip: []
+region: 6:125160715:125167467:20
+maxPairedFragmentLength: 600
+samFlag_include: None
+binLength: 20
+blackListFileName: None
+maxFragmentLength: 0
+minMappingQuality: None
+zerosToNans: False

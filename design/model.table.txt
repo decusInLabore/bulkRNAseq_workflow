@@ -1,0 +1,6 @@
+"comparison"	"comparisonID"	"test"	"type"	"model"	"reducedModel"	"normalizeAllSamplesTogether"	"betaPrior"
+"KO_NK_vs_WT_NK"	"comp_1"	"Wald"	"DGE"	"~ condition"	""	FALSE	"TRUE"
+"KO_PB_vs_WT_PB"	"comp_2"	"Wald"	"DGE"	"~ condition"	""	FALSE	"TRUE"
+"KO_allBcells_vs_WT_allBcells"	"comp_3"	"Wald"	"DGE"	"~ condition"	""	FALSE	"TRUE"
+"LRT_WT_KO"	"LRT_WT_KO"	"LRT"	"LRT"	"~ condition"	"~1"	FALSE	""
+"LRT_Celltype"	"LRT_Celltype"	"LRT"	"LRT"	"~ condition"	"~1"	FALSE	""

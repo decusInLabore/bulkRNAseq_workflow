@@ -12,7 +12,6 @@ output:
 
 always_allow_html: yes
 
-
 ---
 
 ```{r setup, include=FALSE}
@@ -39,8 +38,8 @@ if (!file.exists("renv.lock")){
 }
 
 #renv::install("decusinlabore/biologicSeqTools2")
-
-workdir <- getwd()
+projectDir <- gsub("scripts/bulkRNAseq_workflow/analyses/Main_Analysis", "", getwd())
+workdir <- gsub("scripts/bulkRNAseq_workflow","workdir/",getwd())
 figureCount <- 1
 tableCount <- 1
 upload.to.database <- TRUE
@@ -88,9 +87,9 @@ In this script all input files will be checked and/or created.
 pipelineList <- biologicSeqTools2::assembleBiologicProject(
   ## Path to the design file. Essential columns: sample.id, sample.group, dataseries. ##
   ## Ideal sample name: [dataseries]_[sample.group]_[replicate]
-  designFN =  "/camp/stp/babs/working/strohbs/projects/hillc/ilaria.gori/RN19316_molecular_mechanism_underlying_Shpritzen_Goldberg_syndrome/BIOLOGICS_data_upload/bulkRNAseq_workflow/DESeq2_input/RN19316_design.txt",
+  designFN =  paste0(projectDir, "scripts/bulkRNAseq_workflow/design/design.table.txt"),
   ## Path to model table ##
-  #modelFN =  "/camp/stp/babs/working/boeings/Projects/anastasioud/frederick.clasen/483_P2RN21224_bulkRNAseq_RN21224_part2/workdir/bulkRNAseq_workflow/design/P2RN21224.model.table.txt",
+  modelFN =  paste0(projectDir, "scripts/bulkRNAseq_workflow/design/model.table.txt"),
   ## Path to NFcore setting file. Set to NULL in no-alignment mode.
   #NFcoreSettingsFN = "/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/workdir/bulkRNAseq_workflow/design/RN21220test.NFcore.samplesheet.file.csv",
   ## Path to relevant FASTQ files.
@@ -99,40 +98,41 @@ pipelineList <- biologicSeqTools2::assembleBiologicProject(
   #    "/camp/stp/babs/inputs/sequencing/data/goulda/adrien.franchet/RN21220/primary_data/211130_A01366_0101_BH3YWKDMXY/fastq/"
   #),
   ## Path to RSEM count table. Essential.
-  countTableFN = "/camp/stp/babs/working/strohbs/projects/hillc/ilaria.gori/RN19316_molecular_mechanism_underlying_Shpritzen_Goldberg_syndrome/BIOLOGICS_data_upload/bulkRNAseq_workflow/DESeq2_input/dfRSEMcounts.txt",
+  countTableFN = paste0(projectDir, "data/rsem.count.txt"),
   ## Path to TPM table.
-  TpmTableFN =  "/camp/stp/babs/working/strohbs/projects/hillc/ilaria.gori/RN19316_molecular_mechanism_underlying_Shpritzen_Goldberg_syndrome/BIOLOGICS_data_upload/bulkRNAseq_workflow/DESeq2_input/dfTPM.txt",
-  PcaFN =  "/camp/stp/babs/working/strohbs/projects/hillc/ilaria.gori/RN19316_molecular_mechanism_underlying_Shpritzen_Goldberg_syndrome/BIOLOGICS_data_upload/bulkRNAseq_workflow/DESeq2_input/dfPCA.txt",
+  TpmTableFN =   paste0(projectDir, "data/dfTPM.txt"),
+  biologicSettingsFN = paste0(projectDir, "scripts/bulkRNAseq_workflow/design/biologic.settings.file.csv"),
+  PcaFN =  NULL,
   #"/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/workdir/data/dfPca.txt",
-  calculate_DGE = FALSE,
-  calculate_LRT = FALSE,
+  calculate_DGE = TRUE,
+  calculate_LRT = TRUE,
   ## Path to external DEseq2 output files
-  DEseq2External_DGE = "/camp/stp/babs/working/strohbs/projects/hillc/ilaria.gori/RN19316_molecular_mechanism_underlying_Shpritzen_Goldberg_syndrome/BIOLOGICS_data_upload/bulkRNAseq_workflow/DESeq2_input/DESeq2_DEG/",
+  DEseq2External_DGE = NULL,
   #"/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/workdir/data/DEseq2External_DGE/",
-  DEseq2External_LRT = "/camp/stp/babs/working/strohbs/projects/hillc/ilaria.gori/RN19316_molecular_mechanism_underlying_Shpritzen_Goldberg_syndrome/BIOLOGICS_data_upload/bulkRNAseq_workflow/DESeq2_input/DESeq2_LRT/",
+  DEseq2External_LRT = NULL,
   #"/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/workdir/data/DEseq2External_LRT/",
   #stranded = TRUE,
   #read.length = "100bp",
   #paired.end = FALSE,
   #pathToRSEMresultsFiles = paste0("/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472_brains_from_drosophila_larvae_RN21220/workdir/", "RSEM/Ensembl/"),
-  projectFolder = "/camp/stp/babs/working/boeings/Projects/boeings/stefan.boeing/dev_test/",
-  experiment_id = "RN19316test",
-  project_name = "Molecular Mechanisms underlying Shprizen-Goldberg syndorme",
-  lims.id = "RN19316",
-  labname = "Hill",
+  projectFolder = projectDir,
+  experiment_id = "RN20202",
+  project_name = "TBD",
+  lims.id = "RN20202",
+  labname = "Lovell Badge",
   NtopGenes = 500,
   experiment.type = "bulk_rna_seq",
-  species = "homo_sapiens",
-  release = "release-89",
+  species = "mus_musculus",
+  release = "release-95",
   count.table.headline = "TPM-values for all Samples",
   count.table.sidelabel = "TPM",
   heatmap.headline.text = "Heatmap: Row-averaged Expr",
   designTScol = NULL,
   timecourse.units = NULL,
-  primDataDB = "chl_data",
+  primDataDB = "rll_data",
   db.user = "babs",
   host = "10.27.241.82",
-  lab.categories.table = "ch_lab_categories"
+  lab.categories.table = "ref_lab_categories"
 )
 
 
@@ -142,7 +142,7 @@ pipelineList <- biologicSeqTools2::assembleBiologicProject(
 
 <!-- Essential 1: (output required later): Set Parameters and directories and create Obio object Chapter/Module -->
 <!-- This section creates the plain Obio object without any data in it. -->
-```{r child = 'src/modules/settings/set.parameters.Rmd', eval=TRUE}
+```{r child = '../../src/modules/settings/set.parameters.Rmd', eval=TRUE}
 ```
 
 <!-- Create fastq analysis files-->
