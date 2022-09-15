@@ -66,7 +66,7 @@ upload.to.database <- TRUE
 
 ## Load nf-core basedesign file
 
-FN <- paste0(projectDir, "data/base.design.RN22179.txt")
+FN <- paste0(projectDir, "data/base.design.txt")
 
 dfbase <- readr::read_delim(FN, delim="\t")
 
@@ -76,9 +76,12 @@ dfSettings <- dfbase
 
 ## Get available files
 seqDir <-  c(
-    "/camp/stp/sequencing/outputs/babs/data/liv/sofia.pedersen/RN22179/primary_data/220801_A01366_0248_BHCHGTDMXY/fastq/",
-    "/camp/stp/sequencing/outputs/babs/data/liv/sofia.pedersen/RN22179/primary_data/220811_A01366_0258_BHFFK2DMXY/fastq/"
+    "/camp/stp/sequencing/outputs/babs/data/wacka/vasileios.samelis/RN22209/primary_data/220808_A01366_0254_AHTMGYDSX3/fastq/",
+    "/camp/stp/sequencing/outputs/babs/data/wacka/vasileios.samelis/RN22209/primary_data/220818_A01366_0265_AHG7N3DMXY/fastq/",
+    "/camp/stp/sequencing/outputs/babs/data/wacka/vasileios.samelis/RN22209/primary_data/220826_A01366_0271_AHF7H3DMXY/fastq/"
 )
+
+
 
 
 # Check available files - paired end
@@ -136,7 +139,7 @@ dfRes <- do.call(rbind,resList)
 
 dfRes$sampleID <- NULL
 dfRes$fastq <- NULL
-dfRes[["strandedness"]] <- "reverse"
+dfRes[["strandedness"]] <- "unstranded"
 names(dfRes) <- gsub("sample.id", "sample", names(dfRes))
 dfRes <- dfRes[,c("sample", "fastq_1", "fastq_2", "strandedness")]
 
@@ -150,7 +153,7 @@ biologicSeqTools2::createbulkRNASeqAnalysisNFcoreScript(
     outdir = workdir,
     genomeFa = "/camp/svc/reference/Genomics/babs/mus_musculus/ensembl/GRCm38/release-95/genome/Mus_musculus.GRCm38.dna_sm.toplevel.fa",
     GTFfile = "/camp/svc/reference/Genomics/babs/mus_musculus/ensembl/GRCm38/release-95/gtf/Mus_musculus.GRCm38.95.rnaseqc.gtf",
-    project_id = "RN22179",
+    project_id = "RN22209",
     scriptOutdir = paste0(projectDir, "scripts/"),
     NFcoreSettingsFN = paste0(projectDir, "scripts/bulkRNAseq_workflow/design/nf.core.settings.file.csv"),
     scriptVecSlot = "scriptVec"
@@ -188,7 +191,7 @@ biologicSeqTools2::createbulkRNASeqAnalysisNFcoreScript(
 
 # Load design file from file:
 
-baseDesignFN <- paste0(projectDir, "data/base.design.RN22179.txt")
+baseDesignFN <- paste0(projectDir, "data/base.design.txt")
 
 
 
@@ -266,16 +269,16 @@ if (length(pos) == 0){
 ## Add DGE comparisons                                                       ##
 
 ## Here already done in the base design file
-comparisonList = list(
-    "comp_1" = c("Disease", "Control"),
-    "comp_2" = c("Female_Disease", "Female_Control"),
-    "comp_3" = c("Male_Disease", "Male_Control")
-)
-
-dfDesign <-  biologicSeqTools2::addDGEcomparisons2DesignFile(
-    dfDesign = dfDesign,
-    comparisonList = comparisonList
-)
+# comparisonList = list(
+#     "comp_1" = c("Disease", "Control"),
+#     "comp_2" = c("Female_Disease", "Female_Control"),
+#     "comp_3" = c("Male_Disease", "Male_Control")
+# )
+# 
+# dfDesign <-  biologicSeqTools2::addDGEcomparisons2DesignFile(
+#     dfDesign = dfDesign,
+#     comparisonList = comparisonList
+# )
 
 
 designFN <- paste0(
@@ -283,8 +286,9 @@ designFN <- paste0(
   "scripts/bulkRNAseq_workflow/design/design.table.txt"
 )
 
-
-dfDesign <- dfDesign[order(dfDesign$f_Status, dfDesign$f_Sex, dfDesign$f_Batch),]
+dfDesign <- dfDesign[order(dfDesign$sample.id, decreasing = F),]
+dfDesign <- dfDesign[order(dfDesign$LRT_WT_KO, decreasing = T),]
+dfDesign <- dfDesign[order(dfDesign$LRT_Celltype, decreasing = T),]
 
 readr::write_delim(
     dfDesign,
@@ -372,7 +376,7 @@ for (i in 1:length(comparisonID)){
 test <- rep("Wald", length(comparison))
 type <- rep("DGE", length(comparison))
 
-model <- c("~ f_Batch + f_Sex + condition",rep("~ f_Batch + condition", length(comparison)-1))
+model <- rep("~ condition", length(comparison))
 
 ## You might need to replace the above model vector with a bespoke model
 # for each comparison
@@ -390,7 +394,7 @@ reducedModel <- rep("", length(comparison))
 
 ## Normalise all samples together, or just those involved in the DGE comparison
 normalizeAllSamplesTogether <- rep(FALSE, length(comparison))
-betaPrior <- c(rep(FALSE, length(comparison)))
+betaPrior <- c(rep(TRUE, length(comparison)))
 
 
 dfModel <- data.frame(
@@ -471,7 +475,7 @@ write.table(
 
 countTableFN = paste0(
     projectDir, 
-    "data/rsem.merged.gene_counts.tsv"
+    "/workdir/star_rsem/rsem.merged.gene_counts.tsv"
 )
 
 
@@ -528,37 +532,37 @@ countTableFN <- paste0(
 write.table(dfRSEM, countTableFN, sep = "\t", row.names=F)
 
 
-dfCount <- dfRSEM
-names(dfCount)
-dfCount$transcript_id.s. <- NULL
-
-checkNames <- names(dfCount)
-checkNames <- checkNames[checkNames != "gene_id"]
-designNames <- unique(dfDesign$sample.id)
-
-if (sum(designNames %in% checkNames) != length(designNames)){
-    stop("Check if the sample.ids given in the Count file match those in the design file.")
-} else {
-    print("Count file ok. ")
-}
-
-
-## Adjust TPM file order to the order given in the design file
-countOrder <- c(
-    "gene_id",
-    paste0(
-        as.vector(dfDesign$sample.id)
-    )
-)
-
-dfCount <- unique(dfCount[, countOrder])
-
-countTableFN <- paste0(
-    projectDir,
-    "data/rsem.count.txt"
-)
-
-write.table(dfRSEM, countTableFN, sep = "\t", row.names=F)
+# dfCount <- dfRSEM
+# names(dfCount)
+# dfCount$transcript_id.s. <- NULL
+# 
+# checkNames <- names(dfCount)
+# checkNames <- checkNames[checkNames != "gene_id"]
+# designNames <- unique(dfDesign$sample.id)
+# 
+# if (sum(designNames %in% checkNames) != length(designNames)){
+#     stop("Check if the sample.ids given in the Count file match those in the design file.")
+# } else {
+#     print("Count file ok. ")
+# }
+# 
+# 
+# ## Adjust TPM file order to the order given in the design file
+# countOrder <- c(
+#     "gene_id",
+#     paste0(
+#         as.vector(dfDesign$sample.id)
+#     )
+# )
+# 
+# dfCount <- unique(dfCount[, countOrder])
+# 
+# countTableFN <- paste0(
+#     projectDir,
+#     "data/rsem.count.txt"
+# )
+# 
+# write.table(dfRSEM, countTableFN, sep = "\t", row.names=F)
 
 
 ## Done adding count file                                                    ##
@@ -586,7 +590,7 @@ write.table(dfRSEM, countTableFN, sep = "\t", row.names=F)
 
 TpmTableFN = paste0(
     projectDir,
-    "data/rsem.merged.gene_tpm.tsv"
+    "/workdir/star_rsem/rsem.merged.gene_tpm.tsv"
 )
 
 
