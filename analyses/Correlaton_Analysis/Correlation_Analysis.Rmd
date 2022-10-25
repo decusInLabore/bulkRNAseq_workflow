@@ -908,7 +908,6 @@ plotList <- df.median$plotList
 ```{r cat_plot_medians_plot, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
 cat(paste(knit(text = chnkVec, quiet = T), collapse = '\n'))
 
-DT::datatable(unique(Obio@dfDesign[,c("dataseries", "dataseries_color")]))
 ```
 
 ## Correlation Cluster Table {.tabset .tabset-fade .tabset-pills}
