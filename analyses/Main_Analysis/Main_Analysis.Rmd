@@ -19,6 +19,24 @@ always_allow_html: yes
 
 # module purge;source /camp/stp/babs/working/software/modulepath_new_software_tree_2018-08-13;module load pandoc/2.2.3.2-foss-2016b;ml R/4.0.3-foss-2020a
 
+
+if (!require("remotes")){
+  install.packages("remotes")
+}
+
+
+if (!require("renv")){
+  remotes::install_github("rstudio/renv")
+}
+
+
+if (!file.exists("renv.lock")){
+    renv::init()
+} else {
+    renv::restore(prompt = FALSE)
+}
+
+
 ## Done                                                                      ##
 ###############################################################################
 
