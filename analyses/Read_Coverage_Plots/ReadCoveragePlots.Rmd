@@ -112,7 +112,7 @@ library(ggplot2)
 #library(DT)
 
 
-geneCoveragePlotVec <- c("Ifnar1", "Ifnar2")
+geneCoveragePlotVec <- c("DMRT1", "FOXL2", "SOX9")
 
 
 figureCount <- 1
@@ -185,19 +185,53 @@ figureCount <- 1
 ```{r create_bigwig2, echo=T, eval=TRUE, warning=FALSE, result=F, warning= F, include = F}
 
 #library(biomaRt)
-ensembl_mart = biomaRt::useMart("ENSEMBL_MART_ENSEMBL", host = "http://jan2019.archive.ensembl.org")
+
+species <- Obio@parameterList$species
+
+species <- unlist(strsplit(species, "_"))
+species[1] <- substr(species[1], 1, 1)
+selString <- paste0(species, collapse = "") 
+selString <- paste0(selString, "_gene_ensembl")
+
+if (is.null(Obio@parameterList$release)){
+    release <- 95
+} else {
+    release <- Obio@parameterList$release
+}
+
+releaseID <- gsub("release-", "", tolower(release))
+
+## Lookup biomart url
+lookupTable <- biomaRt::listEnsemblArchives()
+lookupTable <- lookupTable[lookupTable$version  == releaseID, ]
+
+if (nrow(lookupTable) > 0){
+    biomartURL <- as.vector(lookupTable[1,"url"])
+} else {
+    stop("No ensembl biomart table available for this release.")
+}
+
+
+primaryAlignmentGeneID <- Obio@parameterList$primaryAlignmentGeneID
+geneIDcolumn <- Obio@parameterList$geneIDcolumn
+
+
+ensembl_mart = biomaRt::useMart("ENSEMBL_MART_ENSEMBL", host = biomartURL)
 
 if (Obio@parameterList$species == "mus_musculus"){
     selString <- "mmusculus"
 } else if (Obio@parameterList$species == "homo_sapiens") {
    selString <- "hsapiens"
+} else if (Obio@parameterList$species == "gallus_gallus") {
+   selString <- "ggallus"
 } else{
     stop()
 }
 
+
 ensembl_dataset = biomaRt::useDataset(paste0(selString, "_gene_ensembl"),mart=ensembl_mart)
 
-print(ensembl_dataset)
+#print(ensembl_dataset)
 
 selected_attributes = c("ensembl_transcript_id", "ensembl_gene_id", 
                         "external_gene_name", "strand", "chromosome_name", "start_position", "end_position", 

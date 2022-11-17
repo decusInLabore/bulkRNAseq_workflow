@@ -41,7 +41,7 @@ pipelineList <- biologicSeqTools2::assembleBiologicProject(
   calculate_DGE = TRUE,
   calculate_LRT = TRUE,
   ## Path to external DEseq2 output files
-  DEseq2External_DGE = NULL,
+  DEseq2External_DGE = "/camp/stp/babs/working/boeings/Projects/lovellbadger/gunes.taylor/483_vis_E07_E10_E14_merged/data/DEseq2External/",
   #"/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/workdir/data/DEseq2External_DGE/",
   DEseq2External_LRT = NULL,
   #"/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/workdir/data/DEseq2External_LRT/",
@@ -50,23 +50,24 @@ pipelineList <- biologicSeqTools2::assembleBiologicProject(
   #paired.end = FALSE,
   #pathToRSEMresultsFiles = paste0("/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472_brains_from_drosophila_larvae_RN21220/workdir/", "RSEM/Ensembl/"),
   projectFolder = projectDir,
-  experiment_id = "RN22209",
-  project_name = "Type I Interferon",
-  lims.id = "RN22209",
-  labname = "Wack",
-  NtopGenes = 1000,
+  experiment_id = "E7E10E14V3",
+  project_name = "Sex Determination in Chicken",
+  lims.id = "RN20094",
+  labname = "Lovell Badge",
+  NtopGenes = 500,
   experiment.type = "bulk_rna_seq",
-  species = "mus_musculus",
+  species = "gallus_gallus",
   release = "release-95",
   count.table.headline = "TPM-values for all Samples",
   count.table.sidelabel = "TPM",
   heatmap.headline.text = "Heatmap: Row-averaged Expr",
-  designTScol = NULL,
-  timecourse.units = NULL,
-  primDataDB = "wacka_data",
+  designTScol = "f_timepoint",
+  timecourse.units = "Days",
+  primDataDB = "rll_data",
   db.user = "babs",
   host = "10.27.241.82",
-  lab.categories.table = "wack_lab_categories"
+  lab.categories.table = "rl_lab_categories",
+  corGeneVec = c("DMRT1", "FOXL2", "SOX9")
 )
 
 

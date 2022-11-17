@@ -421,6 +421,7 @@ for (k in 1:length(HmDisplayCatsFromDb)){
     geneSel <- HmDisplayCatsFromDb[[k]]$geneVec
     
     geneSel <- unique(geneSel)
+    geneSel <- geneSel[geneSel != ""]
     
     if (length(geneSel) > 2){
         dfDataTable <- dfMainData

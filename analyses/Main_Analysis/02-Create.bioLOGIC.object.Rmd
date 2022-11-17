@@ -130,7 +130,8 @@ projectDetailList <- list(
     "count.table.headline" = as.vector(dfObio$count.table.headline[1]),
     "count.table.sidelabel" = as.vector(dfObio$count.table.headline[1]),
     "heamap.headline.text" = as.vector(dfObio$count.table.headline[1]),
-    "pathToSeqStorageFolder" = fastqFolders
+    "pathToSeqStorageFolder" = fastqFolders,
+    "corGeneVec" = dfObio$corGeneVec[dfObio$corGeneVec != ""]
 )
 ## End project detail list                                                   ##
 ###############################################################################
@@ -292,6 +293,9 @@ if (Obio@parameterList$species == "homo_sapiens"){
 } else if (Obio@parameterList$species == "mus_musculus"){
     Obio@parameterList$primaryAlignmentGeneID <- "ENSMUSG"
     Obio@parameterList$geneIDcolumn <- "mgi_symbol"
+} else if (Obio@parameterList$species == "gallus_gallus"){
+    Obio@parameterList$primaryAlignmentGeneID <- "ENSGALG"
+    Obio@parameterList$geneIDcolumn <- "gg_symbol"
 } else {
     hstring <- unlist(strsplit(Obio@parameterList$species, "_"))
     
@@ -352,6 +356,7 @@ if (nrow(lookupTable) > 0){
 primaryAlignmentGeneID <- Obio@parameterList$primaryAlignmentGeneID
 geneIDcolumn <- Obio@parameterList$geneIDcolumn
 
+Obio@parameterList$path2GeneIDtable <- paste0(projectDir, "data/project.gene.annotation.txt")
 
 if (is.null(Obio@parameterList$path2GeneIDtable)){
     dfAnno <- biologicSeqTools2::createGeneNameTable(
@@ -362,6 +367,8 @@ if (is.null(Obio@parameterList$path2GeneIDtable)){
         primaryAlignmentGeneID = primaryAlignmentGeneID,
         geneIDcolumn = geneIDcolumn
     )
+    
+    dfAnno[dfAnno[,geneIDcolumn] == "", geneIDcolumn] <- dfAnno[dfAnno[,geneIDcolumn] == "", primaryAlignmentGeneID]
     
     write.table(dfAnno, paste0(projectDir, "data/project.gene.annotation.txt"), row.names=F, sep="\t")
     

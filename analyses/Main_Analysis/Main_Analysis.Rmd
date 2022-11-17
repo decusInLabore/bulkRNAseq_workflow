@@ -360,6 +360,9 @@ projectParams <- lapply(
 ```{r documentation, eval=TRUE, echo=F, results=T, error=F}
 #renv::snapshot(prompt=FALSE)
 
+print(paste0("Projectfolder: ", getwd()))
+print(paste0("Project ID: ", Obio@parameterList$project_id))
+
 sessionInfo()
 ```
 

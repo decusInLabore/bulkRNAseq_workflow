@@ -25,9 +25,7 @@ if (is.null(Obio@parameterList$path2GeneIDtable)){
 
 # In the future this will be done using the more general
 #Obio <- biologicSeqTools2::setGenomeAndGeneNameTable()
-Obio@parameterList$species == "mus_musculus"
-Obio@parameterList$primaryAlignmentGeneID <- "ENSMUSG"
-Obio@parameterList$geneIDcolumn <-  "mgi_symbol"
+
 
 
 ## Create analysis folders in the working directory
