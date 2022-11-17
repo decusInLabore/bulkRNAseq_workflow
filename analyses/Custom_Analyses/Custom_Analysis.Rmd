@@ -1,8 +1,8 @@
 ---
-title: "Custom Heatmaps"
+title: "Custom Heatmap Chapter"
 author: "Stefan Boeing stefan.boeing@crick.ac.uk"
 date: 'Compiled: `r format(Sys.Date(), "%B %d, %Y")`'
-abstract: "This module provides a correlation analysis for a bulk RNA-Sequencing Experiment."
+abstract: "The main purpose of this module is to give you a copy-and-paste option to create custom heatmaps for your project. In the first part you will be able do download all relevant data directly into your R-session. For this you need to be inside the Crick or VPN connected to the Crick. Once you have the data loaded into your R-session, you can copy and paste the bits generating the heatmap. You may change the gene vector determining the gene selection for the heatmap. In order to find suitable gene selections, you could  use the filtering options provided in the VennView section. Alternatively you can download the Excel result spreadsheet and filter suitable subsets in there. "
 output: 
     html_document:
         code_folding: hide
@@ -26,7 +26,7 @@ always_allow_html: yes
 
 ```
 
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, warning=FALSE, message=F, echo=F, results=F}
 knitr::opts_chunk$set(
     tidy = TRUE,
     tidy.opts = list(width.cutoff = 120),
@@ -53,7 +53,7 @@ urlString <- "biologic.crick.ac.uk"
 
 
 
-```{r set_directories, eval=T}
+```{r set_directories, eval=T, echo=F, results=F}
 ## Setup plot collection object
 library(knitr)
 library(ggplot2)
@@ -137,74 +137,75 @@ figureCount <- 1
 
 ```
 
-## Correlation Heatmap
-The correlation heatmap is based on the 500 most time-variable genes in this experiment. 
 
-```{r alignment_dat, echo=F, eval=TRUE, warning=FALSE, result="asis", include = FALSE}
+<!-- Optional set data access parameters for R-users ------------------------->
+```{r child = '02-B.1.2.set.data.access.parameters.for.R.data.import.Rmd', eval=TRUE}
+```
 
-###############################################################################
-## Set parameters                                                            ##
-dist.method <- "euclidean"
-hclust.method <- "ward.D2"
-k.number <- 7
-spanPar = 0.75 # Default =0.75
-NtopTsGenes <- Obio@parameterList$NtopGenes
-TsLRTcol <- "contrast_L_lg10p_LRT_timepoint"
+## Custom Heatmap Creation
+You can use the provided code to generate a custom heatmap. 
 
-minTPMavgTPMperSample <- 1
-colSelVec <- colnames(Obio@databaseTable)[grep("norm_counts_", colnames(Obio@databaseTable))]
-highlightGenes <- c("FOXL2", "DMRT1")
+```{r alignment_dat, echo=TRUE, eval=TRUE, warning=FALSE, result="asis"}
 
-
-uploadLabCategories <- F
-
-## Done with parameters                                                      ##
-###############################################################################
 
 ###############################################################################
 ## Prepare annotation                                                        ##
 ## Annotate highlight genes
-dfAnno <- unique(Obio@dfGeneAnnotation[,c(Obio@parameterList$geneIDcolumn, Obio@parameterList$primaryAlignmentGeneID)])
+dfAnno <- unique(dfMainData[,c(geneIDcolumn, alignmentGeneID)])
 
-dfAnnoHL <- dfAnno[dfAnno[,Obio@parameterList$geneIDcolumn] %in% highlightGenes,]
+# dfAnnoHL <- dfAnno[dfAnno[,geneIDcolumn] %in% highlightGenes,]
 
 
 ## Done with annotation                                                      ##
 ###############################################################################
 
 ###############################################################################
-## Retrieve most variable genes                                              ##
+## select heatmap genes                                                      ##
 
-## Select genes for the heatmap ##
+## Gene selection for the heatmap:
+## As a default we will start with the most variable genes. But you can put here 
+# any vector of genes, e.g. 
+# geneSel <- c("FOXL2", "DMRT1", "SOX9")
+geneSel <- mostVarGenes
 
-mostVarGenes <- Obio@dataTableList$Ntop4pcaGeneSelection
+## Making sure that all genes are present in the dataset:
+geneSel <- unique(geneSel[geneSel %in% dfMainData[,geneIDcolumn]])
 
-dfTPM <- Obio@dfTPM
+## Check genes used for the heatmap:
+# sort(geneSel)
 
-names(dfTPM) <- gsub("gene_id", Obio@parameterList$primaryAlignmentGeneID, names(dfTPM))
-row.names(dfTPM) <- dfTPM[,Obio@parameterList$primaryAlignmentGeneID]
-dfTPM <- dfTPM[mostVarGenes, ]
-dfAnno <- unique(Obio@dfGeneAnnotation[,c(Obio@parameterList$geneIDcolumn, Obio@parameterList$primaryAlignmentGeneID)])
+## Select TPM data for the heatmap
+selVec <- c(geneIDcolumn, alignmentGeneID, names(dfMainData)[grep("norm_counts", names(dfMainData))])
+dfTPM <- unique(dfMainData[dfMainData[, geneIDcolumn] %in% geneSel, selVec])
+## Adjust column names
+names(dfTPM) <- gsub("norm_counts_", "", names(dfTPM))
+names(dfTPM) <- gsub(geneIDcolumn, "gene_id",  names(dfTPM))
 
-dfAnnoHL <- dfAnno[dfAnno[,Obio@parameterList$primaryAlignmentGeneID] %in% mostVarGenes,]
+## Temporary fix: Remove duplicates:
+dfTPM <- dfTPM[!duplicated(dfTPM$gene_id), ]
 
-dfTPM <- merge(dfTPM, dfAnnoHL, by.x = Obio@parameterList$primaryAlignmentGeneID, by.y = Obio@parameterList$primaryAlignmentGeneID)
-
-dfTPM[,Obio@parameterList$primaryAlignmentGeneID] <- NULL
-dfTPM[duplicated(dfTPM[, Obio@parameterList$geneIDcolumn]),Obio@parameterList$geneIDcolumn] <- paste0(dfTPM[duplicated(dfTPM[, Obio@parameterList$geneIDcolumn]),Obio@parameterList$geneIDcolumn] ,1:nrow(dfTPM[duplicated(dfTPM[, Obio@parameterList$geneIDcolumn]),]))
-
-row.names(dfTPM) <- dfTPM[, Obio@parameterList$geneIDcolumn]
-
-
-## Replace gene ids ##
+## Remove duplicated gene names, if they exists
+dup <- sum(duplicated(dfTPM$gene_id))
 
 
-## Done retrieving top LRT genes                                             ##
+
+if (dup > 0){
+    #print(paste0(dup, " gene names in the heatmap data are duplicated."))
+    dfTPM[duplicated(dfTPM$gene_id),"gene_id"] <- paste0(dfTPM[duplicated(dfTPM$gene_id),"gene_id"], "_", dfTPM[duplicated(dfTPM$gene_id), alignmentGeneID])
+    
+}
+
+dfTPM[,alignmentGeneID] <- NULL
+
+row.names(dfTPM) <- dfTPM[,"gene_id"]
+dfTPM[,"gene_id"] <- NULL
+
+## Done                                                                      ##
 ###############################################################################
 
 
 ## Step 2 Calculate correlation on most variable genes
-dfTPM[,Obio@parameterList$geneIDcolumn] <- NULL
+
 df.data <- data.matrix(dfTPM)
 
 
@@ -214,21 +215,24 @@ df.data <- data.matrix(dfTPM)
 mHmBase <- df.data 
 #heat.dat   <- t(apply(heat.dat,1,function(x){(x-mean(x))/sd(x)}))
 mHmBase   <- t(apply(mHmBase,1,function(x){log2((x/mean(x)))}))
-mHmBase <- round(mHmBase, 3)
 mHmBase[mHmBase == -Inf] <- 0
+mHmBase <- round(mHmBase, 3)
+mHmBase <- na.omit(mHmBase)
 
 
-dfCol <- unique(Obio@dfDesign[,c("sample.group", "sample.group_color")])
-colVec <- dfCol$sample.group_color
-names(colVec) <- dfCol$sample.group
 
-dfCol2 <- unique(Obio@dfDesign[,c("dataseries", "dataseries_color")])
+dfCol <- unique(dfDesign[,c("sample_group", "sample_group_color")])
+colVec <- dfCol$sample_group_color
+names(colVec) <- dfCol$sample_group
+
+dfCol2 <- unique(dfDesign[,c("dataseries", "dataseries_color")])
 colVec2 <- dfCol2$dataseries_color
 names(colVec2) <- dfCol2$dataseries
 
+## Setting Heatmap Annotation and Colors
 ht.anno <- ComplexHeatmap::HeatmapAnnotation(
-    Series = Obio@dfDesign$dataseries,
-    Groups =  Obio@dfDesign$sample.group,
+    Series = dfDesign$dataseries,
+    Groups =  dfDesign$sample_group,
     col = list(
         Series = colVec2,
         Groups = colVec
@@ -238,8 +242,8 @@ ht.anno <- ComplexHeatmap::HeatmapAnnotation(
 
 
 
-
-dfSplit <- Obio@dfGeneAnnotation[,c("chromosome_name", "gg_symbol", "ENSGALG")]
+## Setup Split By Chromosome
+dfSplit <- unique(dfMainData[,c("chromosome_name", "gg_symbol", "ENSGALG")])
 dfSplit[dfSplit$chromosome_name != "Z" & dfSplit$chromosome_name != "W", "chromosome_name"] <- "Other"
 dfSplit <- dfSplit[dfSplit$gg_symbol %in% row.names(dfTPM), ]
 
@@ -255,14 +259,8 @@ for (i in 1:length(geneGroupList)){
 }
 
 
-
-showAllLegends <- TRUE
-# lrow_ha = ComplexHeatmap::rowAnnotation(foo = ComplexHeatmap::anno_block(gp = gpar(fill =  GroupVec)
-#         # labels = c("Up", "Down"), 
-#         #labels_gp = gpar(col = "white", fontsize = 10)
-#         ),
-#         show_legend = showAllLegends
-# )
+## Set options
+figureCount <- 1
 
 ComplexHeatmap::ht_opt(
     legend_border = "black",
@@ -270,7 +268,7 @@ ComplexHeatmap::ht_opt(
     annotation_border = TRUE
 )
 
-columnSplitVec <- Obio@dfDesign$dataseries
+columnSplitVec <- dfDesign$dataseries
 
 tag <- "Custom_Heatmap"
 plotListHM <- list()
@@ -281,33 +279,42 @@ plotListHM[[tag]] <- ComplexHeatmap::Heatmap(
     mHmBase,
     row_split               = rowSplitVec,
     name                    = "log2 row mean",
+    
+    show_column_names       = FALSE,
+    show_row_names          = FALSE,
+    
     column_title_gp         = grid::gpar(fontsize = 8),
     row_title_rot           = 0,
     column_split            = factor(columnSplitVec, levels=unique(columnSplitVec)),
-    #column_split            = factor(O@meta.data$clusterName, levels = Obio@parameterList$clusterNameOrder),
-    cluster_column_slices = FALSE,
+    cluster_column_slices   = FALSE,
     cluster_columns         = FALSE,
     cluster_rows            = TRUE,
-    show_row_names          = FALSE,
-    show_column_names       = TRUE,
     column_names_side       = "bottom",
     show_column_dend        = TRUE,
-    row_dend_width          = unit(20, "mm"),
+    row_dend_width          = grid::unit(20, "mm"),
     show_heatmap_legend     = FALSE,
-    column_names_max_height = unit(8, "cm"),
+    column_names_max_height = grid::unit(8, "cm"),
     row_names_gp            = grid::gpar(fontsize = 6),
     top_annotation          = ht.anno,
-    #col                     = colorRamp2(c(-2, 0, 2),magma(3)),
     col                     = circlize::colorRamp2(c(-3, 0, 3),c("#3060cf", "#fffbbc","#c4463a")),
     column_names_rot        = 90,
-    border = TRUE
+    border                  = TRUE
 ) 
 
+## To view the heatmap in an interactive sesssion run:
 
-## Option two split by cluster
+# print(plotListHM[[tag]])
+
+```
+
+```{r, echo=F, eval=TRUE, warning=FALSE, result="asis", include = FALSE}
+## Create a file name
+## Datestamp
+VersionPdfExt <- paste0(".V", gsub("-", "", Sys.Date()), ".pdf")
 
 
 FNbase <- paste0(tag, VersionPdfExt)
+
 FN <- paste0(Obio@parameterList$reportFigDir, FNbase)
 FNrel <- paste0("report_figures/", FNbase)
 
@@ -351,7 +358,7 @@ chnkVec <- unique(c(
 ## Upload correlation class genes as gene cats
 ```
 
-```{r knit_cor_plot_characterization_plot, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
+```{r knit_cor_plot_characterization_plot, echo=F, eval=TRUE, warning=FALSE, results="asis"}
 cat(paste(knit(text = chnkVec, quiet = T), collapse = '\n'))
 ```
 

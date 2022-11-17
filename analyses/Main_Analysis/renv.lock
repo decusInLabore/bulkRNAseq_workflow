@@ -702,8 +702,8 @@
       "RemoteUsername": "decusInLabore",
       "RemoteRepo": "biologicSeqTools2",
       "RemoteRef": "main",
-      "RemoteSha": "06f3b135e87099f18df2262298e5855d9cbd9750",
-      "Hash": "af9de37af3435faef4fdecb3f81215d8",
+      "RemoteSha": "ac14a6325d669fe1733834f9d87d5a13ed2fa6c3",
+      "Hash": "0e93ddc8d66eb4c5d7aaf453ec14b15c",
       "Requirements": [
         "DBI",
         "DESeq2",
