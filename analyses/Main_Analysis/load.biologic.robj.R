@@ -53,7 +53,7 @@ if (length(check) == 0){
     stop(paste0("More than one .biologic.Robj file is present in [projectDir]/data/biologic_active_object/. Please move the outdated biologic object into another folder"))
 } else {
     library(biologicSeqTools2)
-    load(paste0("../../../../data/biologic_active_object/", check))
+    base::load(paste0("../../../../data/biologic_active_object/", check))
 }
 
 ## Done loading biologic object                                              ##

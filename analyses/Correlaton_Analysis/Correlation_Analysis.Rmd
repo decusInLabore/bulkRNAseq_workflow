@@ -915,6 +915,12 @@ df.median <- createMedianTsPlots(
 chnkVec <- df.median$chnkVec
 plotList <- list()
 plotList <- df.median$plotList
+
+if (length(plotList) > 2){
+    tabVar <- ".tabset .tabset-fade .tabset-dropdown"
+} else {
+    tabVar <- ".tabset .tabset-fade .tabset-pills"
+}
 ```
 
 ```{r cat_plot_medians_plot, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
@@ -922,7 +928,7 @@ cat(paste(knit(text = chnkVec, quiet = T), collapse = '\n'))
 
 ```
 
-## Correlation Cluster Table {.tabset .tabset-fade .tabset-pills}
+## Correlation Cluster Table {`r tabVar`}
 ```{r, echo=T, eval=TRUE, warning=FALSE, result="asis",include = TRUE}
 library(DT)
 
@@ -1035,13 +1041,22 @@ chnkVec <- c(
             NewChnk
 )
 
+if (nrow(df.gmt) > 2){
+    tabVar <- ".tabset .tabset-fade .tabset-dropdown"
+} else {
+    tabVar <- ".tabset .tabset-fade .tabset-pills"
+}
+
 ```
 
 ```{r, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
 cat(paste(knit(text = chnkVec, quiet = T), collapse = '\n'))
 ```
 
-## Category Enrichment Analysis on Gene Sets {.tabset .tabset-fade .tabset-pills}
+
+
+
+## Category Enrichment Analysis on Gene Sets {`r tabVar`}
 ```{r make_enrichment_plots, echo=F, eval=TRUE, warning=FALSE, result="asis",include = FALSE}
 
 dfENRgmt <- df.gmt
@@ -1248,4 +1263,14 @@ cat(paste(knit(text = chnkVec, quiet = T), collapse = '\n'))
 ###############################################################################
 
 
+```
+
+## Documentation
+```{r documentation, eval=TRUE, echo=F, results=T, error=F}
+#renv::snapshot(prompt=FALSE)
+
+print(paste0("Projectfolder: ", getwd()))
+print(paste0("Project ID: ", Obio@parameterList$project_id))
+
+sessionInfo()
 ```

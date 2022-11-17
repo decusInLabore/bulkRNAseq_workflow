@@ -4,7 +4,7 @@ verbose: False
 out_file_for_raw_data: None
 numberOfSamples: None
 bedFile: None
-bamFilesList: ['/camp/stp/babs/working/boeings/Projects/liv/sofia.pedersen/503_bulkRNAseq_early_colorectal_cancer_RN22179/workdir/star_rsem/Male_Disease_2.markdup.sorted.bam']
+bamFilesList: ['/camp/stp/babs/working/boeings/Projects/lovellbadger/gunes.taylor/483_vis_E07_E10_E14_merged/workdir/star_rsem/HomFemale_ED14_1.markdup.sorted.bam']
 ignoreDuplicates: False
 numberOfProcessors: 16
 samFlag_exclude: None
@@ -14,7 +14,7 @@ smoothLength: 60
 center_read: True
 defaultFragmentLength: 150
 chrsToSkip: []
-region: 6:125160715:125167467:20
+region: 18:8784940:8790042:20
 maxPairedFragmentLength: 600
 samFlag_include: None
 binLength: 20

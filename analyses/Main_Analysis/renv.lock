@@ -699,11 +699,11 @@
       "Source": "GitHub",
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
-      "RemoteUsername": "decusinlabore",
+      "RemoteUsername": "decusInLabore",
       "RemoteRepo": "biologicSeqTools2",
       "RemoteRef": "main",
-      "RemoteSha": "a524876c0936a738a0576d761e3f6f0b3d5bdf5d",
-      "Hash": "54c3742f1e62b013faa87993493a575a",
+      "RemoteSha": "06f3b135e87099f18df2262298e5855d9cbd9750",
+      "Hash": "af9de37af3435faef4fdecb3f81215d8",
       "Requirements": [
         "DBI",
         "DESeq2",
@@ -2073,6 +2073,14 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "8c8298583adbbe76f3c2220eef71bebc",
+      "Requirements": []
+    },
+    "remotes": {
+      "Package": "remotes",
+      "Version": "2.1.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "57c3009534f805f0f6476ffee68483cc",
       "Requirements": []
     },
     "renv": {
