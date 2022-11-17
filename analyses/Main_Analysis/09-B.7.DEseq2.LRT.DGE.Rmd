@@ -346,7 +346,12 @@ Obio@databaseTable <- biologicSeqTools2::datatable.to.website.ptm(
 ###############################################################################
 ## Create Excel output files                                                 ##
 
-addedOutputCols <- names(Obio@databaseTable)[grep("corCoef", names(Obio@databaseTable))]
+addedOutputCols <- c(
+  names(Obio@databaseTable)[grep("corCoef", names(Obio@databaseTable))],
+  names(Obio@databaseTable)[grep("chromosome_name", names(Obio@databaseTable))]
+  
+)
+
 if (Obio@parameterList$geneIDcolumn != "hgnc_symbol"){
     addedOutputCols <- c(
         addedOutputCols,

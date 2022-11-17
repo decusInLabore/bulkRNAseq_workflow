@@ -1123,158 +1123,158 @@ row.names(dfTPM) <- dfTPM[, Obio@parameterList$geneIDcolumn]
 dfTPM[,Obio@parameterList$geneIDcolumn] <- NULL
 df.data <- data.matrix(dfTPM)
 
-plotListHM2 <- list()
+plotListHM <- list()
 chnkVec <- as.vector(NULL, mode="character")
 
 for (i in 1:length(gmt.list)){
-  geneVec <- gmt.list[[i]] 
-  geneVec <- geneVec[geneVec != ""]
-  tag <- geneVec[1]
-  geneVec <- geneVec[3:length(geneVec)]
-  
-  mHmBase <- df.data[geneVec, ] 
-  
-  mHmBase   <- t(apply(mHmBase,1,function(x){log2((x/mean(x)))}))
-  mHmBase <- round(mHmBase, 3)
-  mHmBase[mHmBase == -Inf] <- 0
-  
-  
-  dfCol <- unique(Obio@dfDesign[,c("sample.group", "sample.group_color")])
-  colVec <- dfCol$sample.group_color
-  names(colVec) <- dfCol$sample.group
-  
-  dfCol2 <- unique(Obio@dfDesign[,c("dataseries", "dataseries_color")])
-  colVec2 <- dfCol2$dataseries_color
-  names(colVec2) <- dfCol2$dataseries
-  
-  ht.anno <- ComplexHeatmap::HeatmapAnnotation(
-    Series = Obio@dfDesign$dataseries,
-    Groups =  Obio@dfDesign$sample.group,
-    col = list(
-      Series = colVec2,
-      Groups = colVec
+    geneVec <- gmt.list[[i]] 
+    geneVec <- geneVec[geneVec != ""]
+    tag <- geneVec[1]
+    geneVec <- geneVec[3:length(geneVec)]
+    
+    mHmBase <- df.data[geneVec, ] 
+    
+    mHmBase   <- t(apply(mHmBase,1,function(x){log2((x/mean(x)))}))
+    mHmBase <- round(mHmBase, 3)
+    mHmBase[mHmBase == -Inf] <- 0
+    
+    
+    dfCol <- unique(Obio@dfDesign[,c("sample.group", "sample.group_color")])
+    colVec <- dfCol$sample.group_color
+    names(colVec) <- dfCol$sample.group
+    
+    dfCol2 <- unique(Obio@dfDesign[,c("dataseries", "dataseries_color")])
+    colVec2 <- dfCol2$dataseries_color
+    names(colVec2) <- dfCol2$dataseries
+    
+    ht.anno <- ComplexHeatmap::HeatmapAnnotation(
+        Series = Obio@dfDesign$dataseries,
+        Groups =  Obio@dfDesign$sample.group,
+        col = list(
+            Series = colVec2,
+            Groups = colVec
+        )
     )
-  )
-  
-  
-  
-  
-  
-  dfSplit <- Obio@dfGeneAnnotation[,c("chromosome_name", "gg_symbol", "ENSGALG")]
-  dfSplit[dfSplit$chromosome_name != "Z" & dfSplit$chromosome_name != "W", "chromosome_name"] <- "Other"
-  dfSplit <- unique(dfSplit[dfSplit$gg_symbol %in% row.names(mHmBase), c("chromosome_name", "gg_symbol")])
-  
-  geneGroupList <- list(
-    "Z" = as.vector(dfSplit[dfSplit$chromosome_name == "Z", "gg_symbol"]),
-    "W" = as.vector(dfSplit[dfSplit$chromosome_name == "W", "gg_symbol"]),
-    "Other" = as.vector(dfSplit[dfSplit$chromosome_name == "Other", "gg_symbol"])
-  )
-  
-  rowSplitVec <- row.names(mHmBase)   
-  for (i in 1:length(geneGroupList)){
-    rowSplitVec[rowSplitVec %in% geneGroupList[[i]]] <- names(geneGroupList)[i]
-  }
-  
-  
-  if (nrow(mHmBase) < 100){
-    showAllLegends <- TRUE
-  } else {
-    showAllLegends <- FALSE
-  }
-  
-  # lrow_ha = ComplexHeatmap::rowAnnotation(foo = ComplexHeatmap::anno_block(gp = gpar(fill =  GroupVec)
-  #         # labels = c("Up", "Down"), 
-  #         #labels_gp = gpar(col = "white", fontsize = 10)
-  #         ),
-  #         show_legend = showAllLegends
-  # )
-  
-  ComplexHeatmap::ht_opt(
-    legend_border = "black",
-    heatmap_border = TRUE,
-    annotation_border = TRUE
-  )
-  
-  columnSplitVec <- Obio@dfDesign$dataseries
-  
-  
-  
-  
-  ## Create correlation heatmap and clustering
-  plotListHM2[[tag]] <- ComplexHeatmap::Heatmap(
-    mHmBase,
-    row_split               = rowSplitVec,
-    name                    = "log2 row mean",
-    column_title_gp         = grid::gpar(fontsize = 8),
-    row_title_rot           = 0,
-    column_split            = factor(columnSplitVec, levels=unique(columnSplitVec)),
-    #column_split            = factor(O@meta.data$clusterName, levels = Obio@parameterList$clusterNameOrder),
-    cluster_column_slices   = FALSE,
-    cluster_columns         = FALSE,
-    cluster_rows            = TRUE,
-    show_row_names          = showAllLegends,
-    show_column_names       = TRUE,
-    column_names_side       = "bottom",
-    show_column_dend        = TRUE,
-    row_dend_width          = unit(20, "mm"),
-    show_heatmap_legend     = FALSE,
-    column_names_max_height = unit(8, "cm"),
-    row_names_gp            = grid::gpar(fontsize = 6),
-    top_annotation          = ht.anno,
-    #col                     = colorRamp2(c(-2, 0, 2),magma(3)),
-    col                     = circlize::colorRamp2(c(-3, 0, 3),c("#3060cf", "#fffbbc","#c4463a")),
-    column_names_rot        = 90,
-    border = TRUE
-  ) 
-  
-  
-  ## Option two split by cluster
-  
-  
-  FNbase <- paste0(tag, VersionPdfExt)
-  FN <- paste0(Obio@parameterList$reportFigDir, FNbase)
-  FNrel <- paste0("report_figures/", FNbase)
-  
-  pdf(FN)
-  print(plotListHM2[[tag]])
-  dev.off()
-  
-  
-  ## Create R markdown chunk ##
-  figLegend <- paste0(
-    "**Figure ",
-    figureCount,
-    ":** Heatmap showing Correlation Cluster ",
-    tag,
-    " most variable genes in the time course. ",
-    "Download a pdf of this figure [here](", FNrel,"). "
-  )
-  
-  
-  figureCount <- figureCount + 1
-  
-  NewChnk <- paste0(
-    "### ", tag,
-    " \n```{r S",tag,", results='asis', echo=F, eval=TRUE, warning=FALSE, fig.cap='",
-    figLegend,"', fig.asp = 1, fig.align = 'center'}\n",
-    "\n",
-    "\n print(plotListHM2[['",tag,"']])",
-    "\n cat(  '\n')",
-    "\n\n\n```\n"
-  )
-  
-  
-  chnkVec <- unique(c(
-    chnkVec,
-    NewChnk
-  ))
+    
+    
+    
+    
+    
+    dfSplit <- Obio@dfGeneAnnotation[,c("chromosome_name", "gg_symbol", "ENSGALG")]
+    dfSplit[dfSplit$chromosome_name != "Z" & dfSplit$chromosome_name != "W", "chromosome_name"] <- "Other"
+    dfSplit <- unique(dfSplit[dfSplit$gg_symbol %in% row.names(mHmBase), c("chromosome_name", "gg_symbol")])
+    
+    geneGroupList <- list(
+        "Z" = as.vector(dfSplit[dfSplit$chromosome_name == "Z", "gg_symbol"]),
+        "W" = as.vector(dfSplit[dfSplit$chromosome_name == "W", "gg_symbol"]),
+        "Other" = as.vector(dfSplit[dfSplit$chromosome_name == "Other", "gg_symbol"])
+    )
+    
+    rowSplitVec <- row.names(mHmBase)   
+    for (i in 1:length(geneGroupList)){
+      rowSplitVec[rowSplitVec %in% geneGroupList[[i]]] <- names(geneGroupList)[i]
+    }
+    
+    
+    if (nrow(mHmBase) < 100){
+         showAllLegends <- TRUE
+    } else {
+         showAllLegends <- FALSE
+    }
+   
+    # lrow_ha = ComplexHeatmap::rowAnnotation(foo = ComplexHeatmap::anno_block(gp = gpar(fill =  GroupVec)
+    #         # labels = c("Up", "Down"), 
+    #         #labels_gp = gpar(col = "white", fontsize = 10)
+    #         ),
+    #         show_legend = showAllLegends
+    # )
+    
+    ComplexHeatmap::ht_opt(
+        legend_border = "black",
+        heatmap_border = TRUE,
+        annotation_border = TRUE
+    )
+    
+    columnSplitVec <- Obio@dfDesign$dataseries
+    
+    
+    
+    
+    ## Create correlation heatmap and clustering
+    plotListHM[[tag]] <- ComplexHeatmap::Heatmap(
+        mHmBase,
+        row_split               = rowSplitVec,
+        name                    = "log2 row mean",
+        column_title_gp         = grid::gpar(fontsize = 8),
+        row_title_rot           = 0,
+        column_split            = factor(columnSplitVec, levels=unique(columnSplitVec)),
+        #column_split            = factor(O@meta.data$clusterName, levels = Obio@parameterList$clusterNameOrder),
+        cluster_column_slices   = FALSE,
+        cluster_columns         = FALSE,
+        cluster_rows            = TRUE,
+        show_row_names          = showAllLegends,
+        show_column_names       = TRUE,
+        column_names_side       = "bottom",
+        show_column_dend        = TRUE,
+        row_dend_width          = unit(20, "mm"),
+        show_heatmap_legend     = FALSE,
+        column_names_max_height = unit(8, "cm"),
+        row_names_gp            = grid::gpar(fontsize = 6),
+        top_annotation          = ht.anno,
+        #col                     = colorRamp2(c(-2, 0, 2),magma(3)),
+        col                     = circlize::colorRamp2(c(-3, 0, 3),c("#3060cf", "#fffbbc","#c4463a")),
+        column_names_rot        = 90,
+        border = TRUE
+    ) 
+    
+    
+    ## Option two split by cluster
+    
+    
+    FNbase <- paste0(tag, VersionPdfExt)
+    FN <- paste0(Obio@parameterList$reportFigDir, FNbase)
+    FNrel <- paste0("report_figures/", FNbase)
+    
+    pdf(FN)
+        print(plotListHM[[tag]])
+    dev.off()
+    
+    
+    ## Create R markdown chunk ##
+    figLegend <- paste0(
+        "**Figure ",
+        figureCount,
+        ":** Heatmap showing Correlation Cluster ",
+        tag,
+        " most variable genes in the time course. ",
+        "Download a pdf of this figure [here](", FNrel,"). "
+    )
+    
+    
+    figureCount <- figureCount + 1
+    
+    NewChnk <- paste0(
+        "### ", tag,
+        " \n```{r ",tag,", results='asis', echo=F, eval=TRUE, warning=FALSE, fig.cap='",
+        figLegend,"', fig.asp = 1, fig.align = 'center'}\n",
+        "\n",
+        "\n print(plotListHM[['",tag,"']])",
+        "\n cat(  '\n')",
+        "\n\n\n```\n"
+    )
+    
+    
+    chnkVec <- unique(c(
+        chnkVec,
+        NewChnk
+    ))
 }
 
 
-if (length(plotListHM2) > 2){
-  tabVar <- ".tabset .tabset-fade .tabset-dropdown"
+if (length(plotListHM) > 2){
+    tabVar <- ".tabset .tabset-fade .tabset-dropdown"
 } else {
-  tabVar <- ".tabset .tabset-fade .tabset-pills"
+    tabVar <- ".tabset .tabset-fade .tabset-pills"
 }
 
 ```
