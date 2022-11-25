@@ -158,7 +158,7 @@ biologicSeqTools2::createbulkRNASeqAnalysisNFcoreScript(
 ```{r, echo=T, eval=TRUE, warning=FALSE, results="asis"}
 
 baseDesignFN <- paste0(
-  "../../../../workdir/data/E7E10E14.base.design.table.txt"
+  "../../../../data/base.design.txt"
 )
 
 
@@ -171,7 +171,7 @@ dfDesign <- read.delim(
 )
 
 
-dfDesign <- dfDesign[!(dfDesign$sample.id %in% c("HomFemale_ED07_5", "HomMale_ED07_3", "WtFemale_ED07_2")),]
+## Order dfDesign, if necessary. Samples will appear in the order of dfDesign in interactive displays. 
 
 # In case your sample.id names are organised in the following format:
 # [dataseries]_[sampleGroup]_[replicate]
@@ -196,18 +196,9 @@ if (length(pos) == 0){
 
 
             #library(scales)
-    #dataseries_color = scales::hue_pal()(length(dataseries_color))
+    dataseries_color = scales::hue_pal()(length(dataseries_color))
     
-    ## Avoid clashes with sample.group colors ##
-     #dataseries_color <- rainbow(length(dataseries_color))
-    ## Set custom colors
-    dataseries_color <- c(
-        "#931914", 
-        "#E2690E", 
-        "#FBB821", 
-        "#58327C", 
-        "#769E9C"
-    )
+    
             #sample.group_color = c("#990000", "#009900")
 
     dfSeriesColors <- unique(data.frame(dataseries, dataseries_color))
@@ -233,27 +224,11 @@ if (length(pos) == 0){
 
 
             #library(scales)
-    #sample.group_color = scales::hue_pal()(length(sample.group_color))
+    sample.group_color = scales::hue_pal()(length(sample.group_color))
             #sample.group_color = c("#990000", "#009900")
     
     ## set sample group colors manually
-    sample.group_color <- c(
-        "#F7D2AD",
-        "#E59a61",
-        "#E2690E",
-        "#F9E8C2",
-        "#F7CA7E",
-        "#FBB821",
-        "#F0F4F4",
-        "#BCCECC",
-        "#769E9C",
-        "#CE9393",
-        "#BD4340",
-        "#931914",
-        "#C2A7D0",
-        "#8062A4",
-        "#58327C"
-    )
+    
 
     dfGroupColors <- unique(data.frame(sample.group, sample.group_color))
 
@@ -261,10 +236,8 @@ if (length(pos) == 0){
 
 }
 
-dfDesign$dataseries <- factor(dfDesign$dataseries, levels = c("WtFemale",  "HetFemale", "HomFemale",    "WtMale", "HomMale"))
-dfDesign <- dfDesign[order(dfDesign$dataseries, dfDesign$f_timepoint, dfDesign$f_replicate),]
-dfDesign$dataseries <- as.vector(dfDesign$dataseries)
-
+## Order 
+dfDesign <- dfDesign[order(dfDesign$sample.group, decreasing = T),]
 
 
 
@@ -439,7 +412,7 @@ write.table(
 ## RSEM count file                                                           ##
 ###############################################################################
 
-countTableFN = "/camp/stp/babs/working/boeings/Projects/lovellbadger/gunes.taylor/483_vis_E07_E10_E14_merged/workdir/star_rsem/rsem.merged.gene_counts.tsv"
+countTableFN = "../../../../workdir/star_rsem/rsem.merged.gene_counts.tsv"
 
 
 
@@ -528,7 +501,7 @@ if (sum(designNames %in% checkNames) != length(designNames)){
 
 ## Example: process NF-core output TPM file
 
-TpmTableFN = "/camp/stp/babs/working/boeings/Projects/lovellbadger/gunes.taylor/483_vis_E07_E10_E14_merged/workdir/star_rsem/rsem.merged.gene_tpm.tsv"
+TpmTableFN = "../../../../workdir/star_rsem/rsem.merged.gene_tpm.tsv"
 
 dfTPM <- read.delim(
     TpmTableFN, 

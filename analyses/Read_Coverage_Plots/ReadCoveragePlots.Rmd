@@ -112,7 +112,7 @@ library(ggplot2)
 #library(DT)
 
 
-geneCoveragePlotVec <- c("DMRT1", "FOXL2", "SOX9")
+geneCoveragePlotVec <- c("Zdhhc20", "Gapdh")
 
 
 figureCount <- 1
