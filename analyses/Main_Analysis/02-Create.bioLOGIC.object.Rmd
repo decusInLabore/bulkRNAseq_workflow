@@ -356,7 +356,7 @@ if (nrow(lookupTable) > 0){
 primaryAlignmentGeneID <- Obio@parameterList$primaryAlignmentGeneID
 geneIDcolumn <- Obio@parameterList$geneIDcolumn
 
-Obio@parameterList$path2GeneIDtable <- paste0(projectDir, "data/project.gene.annotation.txt")
+# Obio@parameterList$path2GeneIDtable <- paste0(projectDir, "data/project.gene.annotation.txt")
 
 if (is.null(Obio@parameterList$path2GeneIDtable)){
     dfAnno <- biologicSeqTools2::createGeneNameTable(

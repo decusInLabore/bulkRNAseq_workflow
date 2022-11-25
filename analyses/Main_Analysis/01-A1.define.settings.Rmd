@@ -41,7 +41,7 @@ pipelineList <- biologicSeqTools2::assembleBiologicProject(
   calculate_DGE = TRUE,
   calculate_LRT = TRUE,
   ## Path to external DEseq2 output files
-  DEseq2External_DGE = "/camp/stp/babs/working/boeings/Projects/lovellbadger/gunes.taylor/483_vis_E07_E10_E14_merged/data/DEseq2External/",
+  DEseq2External_DGE = NULL,
   #"/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/workdir/data/DEseq2External_DGE/",
   DEseq2External_LRT = NULL,
   #"/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/workdir/data/DEseq2External_LRT/",
@@ -50,24 +50,24 @@ pipelineList <- biologicSeqTools2::assembleBiologicProject(
   #paired.end = FALSE,
   #pathToRSEMresultsFiles = paste0("/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472_brains_from_drosophila_larvae_RN21220/workdir/", "RSEM/Ensembl/"),
   projectFolder = projectDir,
-  experiment_id = "E7E10E14V3",
-  project_name = "Sex Determination in Chicken",
-  lims.id = "RN20094",
-  labname = "Lovell Badge",
+  experiment_id = "P182NEW",
+  project_name = "The Zdhhc20 Project",
+  lims.id = "P182NEW",
+  labname = "Tate",
   NtopGenes = 500,
   experiment.type = "bulk_rna_seq",
-  species = "gallus_gallus",
+  species = "mus_musculus",
   release = "release-95",
   count.table.headline = "TPM-values for all Samples",
   count.table.sidelabel = "TPM",
   heatmap.headline.text = "Heatmap: Row-averaged Expr",
-  designTScol = "f_timepoint",
-  timecourse.units = "Days",
-  primDataDB = "rll_data",
+  designTScol = NULL,
+  timecourse.units = NULL,
+  primDataDB = "etl_data",
   db.user = "babs",
   host = "10.27.241.82",
-  lab.categories.table = "rl_lab_categories",
-  corGeneVec = c("DMRT1", "FOXL2", "SOX9")
+  lab.categories.table = "et_lab_categories",
+  corGeneVec = c("Zdhhc20")
 )
 
 
