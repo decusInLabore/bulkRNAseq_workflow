@@ -136,11 +136,11 @@ Obio@parameterList[["urlString"]] <- "biologic.crick.ac.uk"
 
 ##############################################################################
 # In this case - set project params                                         ##
-Obio@documentationParams <- list(
-    "title" = "Zdhcc20 Crispr Bulk RNA-Seq Analysis",
-    "subtitle" = "Tony Ocasio and Goran Tomic - Tate Lab",
-    "abstract" = "In this project Cripr knockouts for Zdhcc20 were analysed."
-)
+# Obio@documentationParams <- list(
+#     "title" = "Zdhcc20 Crispr Bulk RNA-Seq Analysis",
+#     "subtitle" = "Tony Ocasio and Goran Tomic - Tate Lab",
+#     "abstract" = "In this project Cripr knockouts for Zdhcc20 were analysed."
+# )
 
 ## Done                                                                      ##
 ###############################################################################
