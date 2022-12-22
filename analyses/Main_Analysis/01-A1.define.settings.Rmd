@@ -50,10 +50,10 @@ pipelineList <- biologicSeqTools2::assembleBiologicProject(
   #paired.end = FALSE,
   #pathToRSEMresultsFiles = paste0("/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472_brains_from_drosophila_larvae_RN21220/workdir/", "RSEM/Ensembl/"),
   projectFolder = projectDir,
-  experiment_id = "P182NEW",
-  project_name = "The Zdhhc20 Project",
-  lims.id = "P182NEW",
-  labname = "Tate",
+  experiment_id = "RN22309",
+  project_name = "Wnt Signalling",
+  lims.id = "RN22309",
+  labname = "Li",
   NtopGenes = 500,
   experiment.type = "bulk_rna_seq",
   species = "mus_musculus",
@@ -61,13 +61,13 @@ pipelineList <- biologicSeqTools2::assembleBiologicProject(
   count.table.headline = "TPM-values for all Samples",
   count.table.sidelabel = "TPM",
   heatmap.headline.text = "Heatmap: Row-averaged Expr",
-  designTScol = NULL,
-  timecourse.units = NULL,
-  primDataDB = "etl_data",
+  designTScol = "timepoint",
+  timecourse.units = "Day",
+  primDataDB = "lil_data",
   db.user = "babs",
   host = "10.27.241.82",
   lab.categories.table = "et_lab_categories",
-  corGeneVec = c("Zdhhc20")
+  corGeneVec = c("Wnt1", "Ctnnb1")
 )
 
 

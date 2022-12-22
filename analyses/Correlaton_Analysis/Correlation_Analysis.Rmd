@@ -102,13 +102,13 @@ source("load.biologic.robj.R")
 # load(ObioFN)
 
 
-Obio <- setMountingPoint(Obio)
-Obio <- setAnalysisPaths(Obio)
-Obio <- setCrickGenomeAndGeneNameTable(Obio)
-Obio <- createAnalysisFolders(
-    Obio
-)
-Obio <- setDataBaseParameters(Obio)
+# Obio <- setMountingPoint(Obio)
+# Obio <- setAnalysisPaths(Obio)
+# Obio <- setCrickGenomeAndGeneNameTable(Obio)
+# Obio <- createAnalysisFolders(
+#     Obio
+# )
+# Obio <- setDataBaseParameters(Obio)
 
 
 if (is.null(Obio@parameterList[["reportFigDir"]])){
@@ -141,7 +141,7 @@ figureCount <- 1
 ## Correlation Heatmap
 The correlation heatmap is based on the 500 most time-variable genes in this experiment. 
 
-```{r alignment_dat, echo=F, eval=TRUE, warning=FALSE, result="asis", include = FALSE}
+```{r alignment_dat, echo=T, eval=TRUE, warning=FALSE, result="asis", include = TRUE}
 
 ###############################################################################
 ## Set parameters                                                            ##
@@ -1156,24 +1156,25 @@ for (i in 1:length(gmt.list)){
     )
   )
   
+  ## Mark transcription factors in result table
   
   
   
   
-  dfSplit <- Obio@dfGeneAnnotation[,c("chromosome_name", "gg_symbol", "ENSGALG")]
-  dfSplit[dfSplit$chromosome_name != "Z" & dfSplit$chromosome_name != "W", "chromosome_name"] <- "Other"
-  dfSplit <- unique(dfSplit[dfSplit$gg_symbol %in% row.names(mHmBase), c("chromosome_name", "gg_symbol")])
-  
-  geneGroupList <- list(
-    "Z" = as.vector(dfSplit[dfSplit$chromosome_name == "Z", "gg_symbol"]),
-    "W" = as.vector(dfSplit[dfSplit$chromosome_name == "W", "gg_symbol"]),
-    "Other" = as.vector(dfSplit[dfSplit$chromosome_name == "Other", "gg_symbol"])
-  )
-  
-  rowSplitVec <- row.names(mHmBase)   
-  for (i in 1:length(geneGroupList)){
-    rowSplitVec[rowSplitVec %in% geneGroupList[[i]]] <- names(geneGroupList)[i]
-  }
+  # dfSplit <- Obio@dfGeneAnnotation[,c("chromosome_name", "gg_symbol", "ENSGALG")]
+  # dfSplit[dfSplit$chromosome_name != "Z" & dfSplit$chromosome_name != "W", "chromosome_name"] <- "Other"
+  # dfSplit <- unique(dfSplit[dfSplit$gg_symbol %in% row.names(mHmBase), c("chromosome_name", "gg_symbol")])
+  # 
+  # geneGroupList <- list(
+  #   "Z" = as.vector(dfSplit[dfSplit$chromosome_name == "Z", "gg_symbol"]),
+  #   "W" = as.vector(dfSplit[dfSplit$chromosome_name == "W", "gg_symbol"]),
+  #   "Other" = as.vector(dfSplit[dfSplit$chromosome_name == "Other", "gg_symbol"])
+  # )
+  # 
+  # rowSplitVec <- row.names(mHmBase)   
+  # for (i in 1:length(geneGroupList)){
+  #   rowSplitVec[rowSplitVec %in% geneGroupList[[i]]] <- names(geneGroupList)[i]
+  # }
   
   
   if (nrow(mHmBase) < 100){
@@ -1203,7 +1204,7 @@ for (i in 1:length(gmt.list)){
   ## Create correlation heatmap and clustering
   plotListHM2[[tag]] <- ComplexHeatmap::Heatmap(
     mHmBase,
-    row_split               = rowSplitVec,
+    #row_split               = rowSplitVec,
     name                    = "log2 row mean",
     column_title_gp         = grid::gpar(fontsize = 8),
     row_title_rot           = 0,
