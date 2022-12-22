@@ -66,7 +66,7 @@ pipelineList <- biologicSeqTools2::assembleBiologicProject(
   primDataDB = "lil_data",
   db.user = "babs",
   host = "10.27.241.82",
-  lab.categories.table = "et_lab_categories",
+  lab.categories.table = "vl_lab_categories",
   corGeneVec = c("Wnt1", "Ctnnb1")
 )
 
