@@ -71,7 +71,8 @@ dfbase <- dfbase[,c("sampleID", "sample.id")]
 dfSettings <- dfbase
 ## Get available files
 seqDir <-  c(
-    "/camp/stp/sequencing/inputs/instruments/fastq/171201_K00102_0171_BHLW2VBBXX/fastq/Ocasio_180917/"
+    "/camp/stp/sequencing/outputs/babs/data/liv/colin.hutton/RN22309/primary_data/221125_A01366_0323_BHGG7KDMXY/fastq/",
+    "/camp/stp/sequencing/outputs/babs/data/liv/colin.hutton/RN22309/primary_data/221202_A01366_0326_AHHTTWDMXY/fastq/"
 )
 
 
@@ -176,8 +177,8 @@ dfDesign <- read.delim(
 # In case your sample.id names are organised in the following format:
 # [dataseries]_[sampleGroup]_[replicate]
 # You can use the function below to auto-complete the sample sheet
-# dfDesign <- biologicSeqTools2::completeDesignBasedOnSampleID(dfDesign)
-
+dfDesign <- biologicSeqTools2::completeDesignBasedOnSampleID(dfDesign)
+dfDesign$NGS <- NULL
 
 ## Check: Make sure the above required columns are present:
 names(dfDesign)
@@ -237,8 +238,12 @@ if (length(pos) == 0){
 }
 
 ## Order 
-dfDesign <- dfDesign[order(dfDesign$sample.group, decreasing = T),]
 
+## In this case
+if (sum(grepl("^timepoint$", names(dfDesign))) == 1){
+    dfDesign <- dfDesign[order(dfDesign$timepoint, decreasing = F),]
+}
+dfDesign <- dfDesign[order(dfDesign$dataseries, decreasing = T),]
 
 
 ## Save the design file and make sure its specified in the Setup function.
