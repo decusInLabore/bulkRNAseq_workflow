@@ -576,7 +576,7 @@ if (!is.null(Obio@parameterList$designTScol)){
 
 projectJSON <- biologicSeqTools2::createSettingsJSON(
     obj = Obio,
-    publicDataset = FALSE,
+    publicDataset = TRUE,
     df.data = Obio@databaseTable,
     defaultXcolName = xdefault,
     defaultYcolName = ydefault,

@@ -702,8 +702,8 @@
       "RemoteUsername": "decusInLabore",
       "RemoteRepo": "biologicSeqTools2",
       "RemoteRef": "main",
-      "RemoteSha": "ac14a6325d669fe1733834f9d87d5a13ed2fa6c3",
-      "Hash": "0e93ddc8d66eb4c5d7aaf453ec14b15c",
+      "RemoteSha": "eefbeed1069c5a282064aec38ca94691c37a8d5e",
+      "Hash": "2aa9c5c196e88755aa69fe5125bc08bc",
       "Requirements": [
         "DBI",
         "DESeq2",
@@ -846,6 +846,14 @@
         "fansi",
         "glue"
       ]
+    },
+    "clipr": {
+      "Package": "clipr",
+      "Version": "0.7.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "08cf4045c149a0f0eaf405324c7495bd",
+      "Requirements": []
     },
     "clue": {
       "Package": "clue",
@@ -2074,6 +2082,22 @@
       "Repository": "CRAN",
       "Hash": "8c8298583adbbe76f3c2220eef71bebc",
       "Requirements": []
+    },
+    "readr": {
+      "Package": "readr",
+      "Version": "1.3.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "af8ab99cd936773a148963905736907b",
+      "Requirements": [
+        "BH",
+        "R6",
+        "Rcpp",
+        "clipr",
+        "crayon",
+        "hms",
+        "tibble"
+      ]
     },
     "remotes": {
       "Package": "remotes",
