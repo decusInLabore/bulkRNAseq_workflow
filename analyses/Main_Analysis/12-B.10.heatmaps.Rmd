@@ -415,7 +415,8 @@ for (k in 1:length(HmDisplayCatsFromDb)){
     }
   
     ## Check ##
-    sampleSelection <- names(dfMainData)[unlist(sapply(sampleSelection, function(x) grep(x, names(dfMainData))))]
+     
+    sampleSelection <- unique(names(dfMainData)[unlist(sapply(paste0("^", sampleSelection, "$"), function(x) grep(x, names(dfMainData))))])
     selVec <- c(geneIDcolumn, sampleSelection )
     ## Get gene selection 
     geneSel <- HmDisplayCatsFromDb[[k]]$geneVec
