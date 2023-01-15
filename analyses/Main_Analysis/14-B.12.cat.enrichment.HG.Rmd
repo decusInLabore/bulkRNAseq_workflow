@@ -46,7 +46,10 @@ for (i in 1:length(DGEtagVec)){
     
     selVec <- c(
         geneIDcolumn,
-        names(dfAllPlots)[grep(paste0(DGEtagVec[i],"$"), names(dfAllPlots))]
+        names(dfAllPlots)[grep(paste0("lg2BaseMean_", DGEtagVec[i],"$"), names(dfAllPlots))],
+        names(dfAllPlots)[grep(paste0("logFC_",DGEtagVec[i],"$"), names(dfAllPlots))],
+        names(dfAllPlots)[grep(paste0("padj_",DGEtagVec[i],"$"), names(dfAllPlots))],
+        names(dfAllPlots)[grep(paste0("lg10p_",DGEtagVec[i],"$"), names(dfAllPlots))]
     )
     
     dfPlot <- dfAllPlots[,selVec]
@@ -64,6 +67,7 @@ for (i in 1:length(DGEtagVec)){
     
     dfPlot[dfPlot[,grep("_logFC_", names(dfPlot))] < -1 *lgFCsel & dfPlot[,grep("_padj_", names(dfPlot))] < 0.05, "DGE_Status"] <- "Down"
     EnrichedGenesList[[tagGLneg]] <- unique(dfPlot[dfPlot$DGE_Status == "Down", geneIDcolumn])
+    print(i)
 } 
 
 library(knitr)

@@ -314,7 +314,10 @@ for (i in 1:length(contrastVec)){
     
     selVec <- c(
         geneIDcolumn,
-        names(dfMainData)[grep(paste0("_", contrastVec[i], "$"), names(dfMainData))]
+        names(dfMainData)[grep(paste0("lg2BaseMean_", contrastVec[i], "$"), names(dfMainData))],
+        names(dfMainData)[grep(paste0("logFC_", contrastVec[i], "$"), names(dfMainData))],
+        names(dfMainData)[grep(paste0("padj_", contrastVec[i], "$"), names(dfMainData))],
+        names(dfMainData)[grep(paste0("lg10p_", contrastVec[i], "$"), names(dfMainData))]
     )
     
     dfPlotData <- unique(dfMainData[,selVec])
