@@ -14,11 +14,17 @@ git clone git@github.com:decusInLabore/bulkRNAseq_workflow.git
 cd bulkRNAseq_workflow/analyses/Main_Analysis
 
 ```
-Start R
-
+Start R with cluster modules:
 ```
 module purge;source /camp/stp/babs/working/software/modulepath_new_software_tree_2018-08-13;module load pandoc/2.2.3.2-foss-2016b;ml R/4.0.3-foss-2020a;R
 ```
+Start R in singularity container:
+```
+ml Singularity/3.11.3
+singularity shell --bind  /nemo:/nemo,/camp:/camp /nemo/stp/babs/working/boeings/singularity_images/r431.ubuntu.22.04.sif;
+R
+```
+
 
 Adjust paths in file Part_0_prepare_alignment_and_input_files_for_Crick_RNA_Seq.Rmd
 
