@@ -80,12 +80,14 @@ shinyBaseServerURL <- "shiny-bioinformatics.crick.ac.uk"
 
 ###############################################################################
 ## Load biologic object from part A                                          ##
-library(biologicSeqTools2)
+# library(biologicSeqTools2)
+#
+# biologicDir <- paste0(dataDir, "biologic_active_object/")
+#
+# FN <- paste0(biologicDir,list.files(biologicDir)[grep("bioLOGIC.Robj", list.files(biologicDir))])
+# load(FN)
 
-biologicDir <- paste0(dataDir, "biologic_active_object/")
-
-FN <- paste0(biologicDir,list.files(biologicDir)[grep("bioLOGIC.Robj", list.files(biologicDir))])
-load(FN)
+source("load.biologic.robj.R")
 ## Done                                                                      ##
 ###############################################################################
 
@@ -576,7 +578,7 @@ if (!is.null(Obio@parameterList$designTScol)){
 
 projectJSON <- biologicSeqTools2::createSettingsJSON(
     obj = Obio,
-    publicDataset = TRUE,
+    publicDataset = FALSE,
     df.data = Obio@databaseTable,
     defaultXcolName = xdefault,
     defaultYcolName = ydefault,

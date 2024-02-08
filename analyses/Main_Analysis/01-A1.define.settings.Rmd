@@ -38,10 +38,10 @@ pipelineList <- biologicSeqTools2::assembleBiologicProject(
   biologicSettingsFN = paste0(projectDir, "scripts/bulkRNAseq_workflow/design/biologic.settings.file.csv"),
   PcaFN =  NULL,
   #"/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/workdir/data/dfPca.txt",
-  calculate_DGE = FALSE,
+  calculate_DGE = TRUE,
   calculate_LRT = TRUE,
   ## Path to external DEseq2 output files
-  DEseq2External_DGE = "/camp/stp/babs/working/boeings/Projects/papayannopoulosv/tessa.swanton/529_rna_seq_visualization_RN22122/data/input_dge/",
+  DEseq2External_DGE = NULL,
   #"/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/workdir/data/DEseq2External_DGE/",
   DEseq2External_LRT = NULL,
   #"/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/workdir/data/DEseq2External_LRT/",
@@ -50,10 +50,10 @@ pipelineList <- biologicSeqTools2::assembleBiologicProject(
   #paired.end = FALSE,
   #pathToRSEMresultsFiles = paste0("/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472_brains_from_drosophila_larvae_RN21220/workdir/", "RSEM/Ensembl/"),
   projectFolder = projectDir,
-  experiment_id = "RN22122",
-  project_name = "Sepsis",
-  lims.id = "RN22122",
-  labname = "Papayannopoulos",
+  experiment_id = "RN23380",
+  project_name = "TGFbeta_in_enteric_glia_cells",
+  lims.id = "RN23380",
+  labname = "Pachnis",
   NtopGenes = 1000,
   experiment.type = "bulk_rna_seq",
   species = "mus_musculus",
@@ -61,13 +61,13 @@ pipelineList <- biologicSeqTools2::assembleBiologicProject(
   count.table.headline = "TPM-values for all Samples",
   count.table.sidelabel = "TPM",
   heatmap.headline.text = "Heatmap: Row-averaged Expr",
-  designTScol = "timepoint",
-  timecourse.units = "hours",
-  primDataDB = "papayannopoulos_data",
+  designTScol = NULL,
+  timecourse.units = NULL,
+  primDataDB = "vpl_data",
   db.user = "babs",
   host = "10.27.241.82",
-  lab.categories.table = "Papayannopoulos_lab_categories",
-  corGeneVec = NULL
+  lab.categories.table = "vp_lab_categories",
+  corGeneVec = c("Tgfb1", "Tgfb2")
 )
 
 

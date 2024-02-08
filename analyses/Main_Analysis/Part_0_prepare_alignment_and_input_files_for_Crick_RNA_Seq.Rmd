@@ -78,7 +78,7 @@ dfbase <- dfbase[,c("sampleID", "sample.id")]
 dfSettings <- dfbase
 ## Get available files
 seqDir <-  c(
-    "/nemo/stp/sequencing/outputs/babs/data/anastasioud/patricia.nunes/RN23138/primary_data/230718_A01366_0418_BHHGGWDSX7/fastq/"
+    "/nemo/stp/sequencing/outputs/babs/data/pachnisv/bethania.garcia-cassani/RN23380/primary_data/240126_A01366_0517_BH3YG3DSXC/fastq/"
 )
 
 
@@ -149,13 +149,15 @@ readr::write_csv(
     path = paste0(projectDir, "scripts/bulkRNAseq_workflow/design/nf.core.settings.file.csv")
 )
 ## Create NF-core script
+NFcoreSettingsFN = paste0(projectDir, "scripts/bulkRNAseq_workflow/design/nf.core.settings.file.csv")
+
 biologicSeqTools2::createbulkRNASeqAnalysisNFcoreScript(
     outdir = workdir,
     genomeFa = "/nemo/svc/reference/Genomics/babs/mus_musculus/ensembl/GRCm38/release-95/genome/Mus_musculus.GRCm38.dna_sm.toplevel.fa",
     GTFfile = "/nemo/svc/reference/Genomics/babs/mus_musculus/ensembl/GRCm38/release-95/gtf/Mus_musculus.GRCm38.95.rnaseqc.gtf",
-    project_id = "RN23138",
+    project_id = "RN23380",
     scriptOutdir = paste0(projectDir, "scripts/"),
-    NFcoreSettingsFN = paste0(projectDir, "scripts/bulkRNAseq_workflow/design/nf.core.settings.file.csv"),
+    NFcoreSettingsFN = NFcoreSettingsFN,
     scriptVecSlot = "scriptVec"
 )
 
@@ -168,18 +170,13 @@ biologicSeqTools2::createbulkRNASeqAnalysisNFcoreScript(
 ```{r, echo=T, eval=TRUE, warning=FALSE, results="asis"}
 
 
-## Create base design
+#g# Create base design
 dfTemp <- read.delim(
-    "/nemo/stp/babs/working/boeings/Projects/anastasioud/patricia.nunes/551_bulkRNAseq_GyKKO_PyglKO_AlbCre_RN23138/data/metadata/base.design.txt",
+    "/nemo/stp/babs/working/boeings/Projects/pachnisv/bethania.garcia.cassani/556_tgfb2_glia_RN23380/data/metadata/base.design.txt",
     sep = "\t"
 )
 
 
-## create numeric timepoint column
-dfTemp[["timepoint"]] <- dfTemp$f_Timepoint
-dfTemp$timepoint <- gsub("Early", "1", dfTemp$timepoint)
-dfTemp$timepoint <- gsub("Late", "2", dfTemp$timepoint)
-dfTemp$timepoint <- as.numeric(dfTemp$timepoint)
 
 
 
@@ -277,15 +274,15 @@ if (length(pos) == 0){
 ## In this case
 #dfDesign <- dfDesign[order(dfDesign$mouse, decreasing = F),]
 
-if (sum(grepl("^timepoint$", names(dfDesign))) == 1){
-    dfDesign <- dfDesign[order(dfDesign$timepoint, decreasing = F),]
-}
+#if (sum(grepl("^timepoint$", names(dfDesign))) == 1){
+#    dfDesign <- dfDesign[order(dfDesign$timepoint, decreasing = F),]
+#}
 
-dfDesign <- dfDesign[order(dfDesign$dataseries, decreasing = T),]
+#dfDesign <- dfDesign[order(dfDesign$dataseries, decreasing = T),]
 
 
 ## Save the design file and make sure its specified in the Setup function.
-designFN =  paste0(projectDir, "scripts/bulkRNAseq_workflow/design/design.table.txt")
+designFN <-  paste0(projectDir, "scripts/bulkRNAseq_workflow/design/design.table.txt")
 #designFN <- "design/E7E10E14.design.table.txt"
 
 write.table(
@@ -467,72 +464,6 @@ write.table(
 
 ## Get files to create sample sheet:
 
-FNbase <- paste0(projectDir , "input_data/id_mappings.csv")
-
-library(dplyr)
-dfBase <- readr::read_csv(FNbase) %>%
-    dplyr::select(run_accession, sample_title) %>%
-    dplyr::distinct() %>%
-    dplyr::rename(sample.id=sample_title)
-
-#dfBase[["f_Timepoint"]] <- paste0("T", sapply(dfBase$sample.id, function(x) unlist(strsplit(x, "_"))[2]))
-dfBase[["f_Genotype_1"]] <- sapply(dfBase$sample.id, function(x) unlist(strsplit(x, "_"))[1])
-dfBase[["f_Genotype_2"]] <- sapply(dfBase$sample.id, function(x) unlist(strsplit(x, "_"))[2])
-
-
-
-dfBase <- dfBase %>%
-    dplyr::group_by(f_Genotype_1) %>%
-    dplyr::arrange(desc(f_Genotype_1), desc(f_Genotype_2))
-
-dfBase[["dataseries"]] <- dfBase[["f_Genotype_1"]]
-
-dfBase[["sample.group"]] <- paste0(dfBase$dataseries, "_", dfBase$f_Genotype_2)
-
-readr::write_delim(
-    dfBase,
-    paste0(projectDir, "scripts/bulkRNAseq_workflow/design/basedesign.txt"),
-    delim = "\t"
-)
-
-
-## Create NF core settings file
-FASTQ_files <- list.files(paste0(projectDir, "FASTQ_files/"))
-FASTQ_files <- FASTQ_files[grep(".gz", FASTQ_files)]
-
-df <- data.frame(
-    FASTQ_files = FASTQ_files,
-    fastqFN = paste0(projectDir, "FASTQ_files/", FASTQ_files)
-)
-
-df[["run_accession"]] <- sapply(df$FASTQ_files, function(x) unlist(strsplit(x, ".fastq"))[1])
-
-dfAllign <- dplyr::full_join(
-  df,
-  dfBase,
-  by= c("run_accession"="run_accession")
-)
-
-dfAllign[["strandedness"]] <- "reverse"
-dfAllign[["fastq_1"]] <- dfAllign$fastqFN
-dfAllign[["fastq_2"]] <- ""
-dfAllign[["sample"]] <- dfAllign$sample.id
-
-#sample,fastq_1,fastq_2,strandedness
-dfSettings <- data.frame(
-    sample = dfAllign$sample,
-    fastq_1 = dfAllign$fastq_1,
-    fastq_2 = dfAllign$fastq_2,
-    strandedness = dfAllign$strandedness
-)
-
-NFcoreSettingsFN <- paste0(projectDir, "scripts/bulkRNAseq_workflow/design/NFcore.settings.csv")
-
-readr::write_csv(
-    dfSettings,
-    NFcoreSettingsFN
-)
-
 
 ## Create NF-core RNA-Seq script
 workdir <- paste0(projectDir, "workdir")
@@ -553,7 +484,7 @@ GTFfile <- paste0(
   "95",
   ".rnaseqc.gtf"
 )
-project_id <- "GSE130017"
+project_id <- "RN23380"
 
 tempShellScriptVector <- as.vector(NULL, mode = "character")
 tempShellScriptVector <- c(
@@ -587,6 +518,10 @@ tempShellScriptVector <- c(
          project_id, " -c 12 --mem-per-cpu=7000 -o NFC.slurm"
   )
 )
+
+if (!dir.exists(paste0(projectDir, "scripts/NF_core_RNAseq"))){
+  dir.create(paste0(projectDir, "scripts/NF_core_RNAseq"))
+}
 
 sink(paste0(projectDir, "scripts/NF_core_RNAseq/nf.core.script.sh"))
 scriptVec <- tempShellScriptVector
@@ -635,11 +570,13 @@ biologicSeqTools2::createbulkRNASeqAnalysisNFcoreScript(
 ## run the nf core script from the working directory ##
 
 ```
-
+```{r, echo=FALSE, eval=FALSE, warning=FALSE, results="asis"}
 ###############################################################################
 ## RSEM count file                                                           ##
 ###############################################################################
-
+if (!file.exists("renv.lock")){
+  renv::init()
+}
 
 countTableFN = "../../../../workdir/star_rsem/rsem.merged.gene_counts.tsv"
 
@@ -674,6 +611,16 @@ samplesPresent <- names(dfRSEM)[names(dfRSEM) != "gene_id"]
 samplesNotPresent <- dfDesign$sample.id[!(dfDesign$sample.id %in% names(dfRSEM))]
 
 ## Updating dfDesign
+projectDir <- gsub("scripts/bulkRNAseq_workflow/analyses/Main_Analysis", "", getwd())
+designFN <-  paste0(projectDir, "scripts/bulkRNAseq_workflow/design/design.table.txt")
+
+dfDesign <- read.delim(
+  designFN,
+  header=T,
+  sep="\t",
+  stringsAsFactors = F
+)
+
 dfDesign <- dfDesign[dfDesign$sample.id %in% samplesPresent, ]
 
 #designFN <- "design/E7E10E14.design.table.txt"
