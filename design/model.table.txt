@@ -1,8 +1,6 @@
 comparison	comparisonID	test	type	model	reducedModel	normalizeAllSamplesTogether	betaPrior
-KO_vs_WT	comp_1	Wald	DGE	~ f_Timepoint + condition		FALSE	FALSE
-KOearly_vs_WTearly	comp_2	Wald	DGE	~ condition		FALSE	TRUE
-KOlate_vs_WTlate	comp_3	Wald	DGE	~ condition		FALSE	TRUE
-WTlate_vs_WTearly	comp_4	Wald	DGE	~ condition		FALSE	TRUE
-KOlate_vs_KOearly	comp_5	Wald	DGE	~ condition		FALSE	TRUE
-LRT_Genotype	LRT_Genotype	LRT	LRT	~ condition	~1	FALSE	
-LRT_Timepoint	LRT_Timepoint	LRT	LRT	~ condition	~1	FALSE	
+KO_vs_Ctrl	comp_1	Wald	DGE	~ f_Location + condition		FALSE	FALSE
+KO_SIneg_vs_Ctrl_SIneg	comp_2	Wald	DGE	~ condition		FALSE	TRUE
+KO_SIpos_vs_Ctrl_SIpos	comp_3	Wald	DGE	~ condition		FALSE	TRUE
+Ctrl_SIneg_vs_Ctrl_SIpos	comp_4	Wald	DGE	~ condition		FALSE	TRUE
+KO_SIneg_vs_KO_SIpos	comp_5	Wald	DGE	~ condition		FALSE	TRUE

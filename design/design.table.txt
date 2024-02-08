@@ -1,19 +1,17 @@
-"dataseries"	"original.sample.id"	"sample.id"	"LRT_Genotype"	"LRT_Timepoint"	"f_Genotype"	"f_Timepoint"	"sample.group_color"	"comp_1"	"comp_2"	"comp_3"	"comp_4"	"comp_5"	"timepoint"	"sample.group"	"NGS"	"dataseries_color"
-"WT"	"PN_1"	"WT_TumorEarly_1"	"WT"	"Early"	"WT"	"Early"	"#3D3D3D"	"2_WT"	"2_WTearly"	""	"2_WTearly"	""	1	"WT_TumorEarly"	"WT_TumorEarly_1_R1.fastq.gz"	"#000000"
-"WT"	"PN_2"	"WT_TumorEarly_2"	"WT"	"Early"	"WT"	"Early"	"#3D3D3D"	"2_WT"	"2_WTearly"	""	"2_WTearly"	""	1	"WT_TumorEarly"	"WT_TumorEarly_2_R1.fastq.gz"	"#000000"
-"WT"	"PN_3"	"WT_TumorEarly_3"	"WT"	"Early"	"WT"	"Early"	"#3D3D3D"	"2_WT"	"2_WTearly"	""	"2_WTearly"	""	1	"WT_TumorEarly"	"WT_TumorEarly_3_R1.fastq.gz"	"#000000"
-"WT"	"PN_4"	"WT_TumorEarly_4"	"WT"	"Early"	"WT"	"Early"	"#3D3D3D"	"2_WT"	"2_WTearly"	""	"2_WTearly"	""	1	"WT_TumorEarly"	"WT_TumorEarly_4_R1.fastq.gz"	"#000000"
-"WT"	"PN_5"	"WT_TumorEarly_5"	"WT"	"Early"	"WT"	"Early"	"#3D3D3D"	"2_WT"	"2_WTearly"	""	"2_WTearly"	""	1	"WT_TumorEarly"	"WT_TumorEarly_5_R1.fastq.gz"	"#000000"
-"WT"	"PN_6"	"WT_TumorLate_1"	"WT"	"Late"	"WT"	"Late"	"#1F1F1F"	"2_WT"	""	"2_WTlate"	"1_WTlate"	""	2	"WT_TumorLate"	"WT_TumorLate_1_R1.fastq.gz"	"#000000"
-"WT"	"PN_7"	"WT_TumorLate_2"	"WT"	"Late"	"WT"	"Late"	"#1F1F1F"	"2_WT"	""	"2_WTlate"	"1_WTlate"	""	2	"WT_TumorLate"	"WT_TumorLate_2_R1.fastq.gz"	"#000000"
-"WT"	"PN_8"	"WT_TumorLate_3"	"WT"	"Late"	"WT"	"Late"	"#1F1F1F"	"2_WT"	""	"2_WTlate"	"1_WTlate"	""	2	"WT_TumorLate"	"WT_TumorLate_3_R1.fastq.gz"	"#000000"
-"WT"	"PN_9"	"WT_TumorLate_4"	"WT"	"Late"	"WT"	"Late"	"#1F1F1F"	"2_WT"	""	"2_WTlate"	"1_WTlate"	""	2	"WT_TumorLate"	"WT_TumorLate_4_R1.fastq.gz"	"#000000"
-"WT"	"PN_10"	"WT_TumorLate_5"	"WT"	"Late"	"WT"	"Late"	"#1F1F1F"	"2_WT"	""	"2_WTlate"	"1_WTlate"	""	2	"WT_TumorLate"	"WT_TumorLate_5_R1.fastq.gz"	"#000000"
-"KO"	"PN_11"	"KO_TumorEarly_1"	"KO"	"Early"	"KO"	"Early"	"#FF3333"	"1_KO"	"1_KOearly"	""	""	"2_KOearly"	1	"KO_TumorEarly"	"KO_TumorEarly_1_R1.fastq.gz"	"#FF0000"
-"KO"	"PN_12"	"KO_TumorEarly_2"	"KO"	"Early"	"KO"	"Early"	"#FF3333"	"1_KO"	"1_KOearly"	""	""	"2_KOearly"	1	"KO_TumorEarly"	"KO_TumorEarly_2_R1.fastq.gz"	"#FF0000"
-"KO"	"PN_13"	"KO_TumorEarly_3"	"KO"	"Early"	"KO"	"Early"	"#FF3333"	"1_KO"	"1_KOearly"	""	""	"2_KOearly"	1	"KO_TumorEarly"	"KO_TumorEarly_3_R1.fastq.gz"	"#FF0000"
-"KO"	"PN_14"	"KO_TumorEarly_4"	"KO"	"Early"	"KO"	"Early"	"#FF3333"	"1_KO"	"1_KOearly"	""	""	"2_KOearly"	1	"KO_TumorEarly"	"KO_TumorEarly_4_R1.fastq.gz"	"#FF0000"
-"KO"	"PN_15"	"KO_TumorLate_1"	"KO"	"Late"	"KO"	"Late"	"#E00000"	"1_KO"	""	"1_KOlate"	""	"1_KOlate"	2	"KO_TumorLate"	"KO_TumorLate_1_R1.fastq.gz"	"#FF0000"
-"KO"	"PN_16"	"KO_TumorLate_2"	"KO"	"Late"	"KO"	"Late"	"#E00000"	"1_KO"	""	"1_KOlate"	""	"1_KOlate"	2	"KO_TumorLate"	"KO_TumorLate_2_R1.fastq.gz"	"#FF0000"
-"KO"	"PN_17"	"KO_TumorLate_3"	"KO"	"Late"	"KO"	"Late"	"#E00000"	"1_KO"	""	"1_KOlate"	""	"1_KOlate"	2	"KO_TumorLate"	"KO_TumorLate_3_R1.fastq.gz"	"#FF0000"
-"KO"	"PN_18"	"KO_TumorLate_4"	"KO"	"Late"	"KO"	"Late"	"#E00000"	"1_KO"	""	"1_KOlate"	""	"1_KOlate"	2	"KO_TumorLate"	"KO_TumorLate_4_R1.fastq.gz"	"#FF0000"
+sample.group	dataseries	sampleID	sample.id	f_Location	f_Genotype	comp_1	comp_2	comp_3	comp_4	comp_5	dataseries_color	sample.group_color
+Ctrl_SIneg	Ctrl	GAR6619A9	Ctrl_SIneg_1	SIneg	Ctrl	2_Ctrl	2_Ctrl_SIneg		1_Ctrl_SIneg		#FFFFE5	#2B2D42
+Ctrl_SIneg	Ctrl	GAR6619A10	Ctrl_SIneg_2	SIneg	Ctrl	2_Ctrl	2_Ctrl_SIneg		1_Ctrl_SIneg		#FFFFE5	#2B2D42
+Ctrl_SIneg	Ctrl	GAR6619A11	Ctrl_SIneg_3	SIneg	Ctrl	2_Ctrl	2_Ctrl_SIneg		1_Ctrl_SIneg		#FFFFE5	#2B2D42
+Ctrl_SIneg	Ctrl	GAR6619A12	Ctrl_SIneg_4	SIneg	Ctrl	2_Ctrl	2_Ctrl_SIneg		1_Ctrl_SIneg		#FFFFE5	#2B2D42
+Ctrl_SIpos	Ctrl	GAR6619A1	Ctrl_SIpos_1	SIpos	Ctrl	2_Ctrl		2_Ctrl_SIpos	2_Ctrl_SIpos		#FFFFE5	#8D99AE
+Ctrl_SIpos	Ctrl	GAR6619A2	Ctrl_SIpos_2	SIpos	Ctrl	2_Ctrl		2_Ctrl_SIpos	2_Ctrl_SIpos		#FFFFE5	#8D99AE
+Ctrl_SIpos	Ctrl	GAR6619A3	Ctrl_SIpos_3	SIpos	Ctrl	2_Ctrl		2_Ctrl_SIpos	2_Ctrl_SIpos		#FFFFE5	#8D99AE
+Ctrl_SIpos	Ctrl	GAR6619A4	Ctrl_SIpos_4	SIpos	Ctrl	2_Ctrl		2_Ctrl_SIpos	2_Ctrl_SIpos		#FFFFE5	#8D99AE
+KO_SIneg	KO	GAR6619A13	KO_SIneg_1	SIneg	KO	1_KO	1_KO_SIneg			1_KO_SIneg	#662506	#EF233C
+KO_SIneg	KO	GAR6619A14	KO_SIneg_2	SIneg	KO	1_KO	1_KO_SIneg			1_KO_SIneg	#662506	#EF233C
+KO_SIneg	KO	GAR6619A15	KO_SIneg_3	SIneg	KO	1_KO	1_KO_SIneg			1_KO_SIneg	#662506	#EF233C
+KO_SIneg	KO	GAR6619A16	KO_SIneg_4	SIneg	KO	1_KO	1_KO_SIneg			1_KO_SIneg	#662506	#EF233C
+KO_SIpos	KO	GAR6619A5	KO_SIpos_1	SIpos	KO	1_KO		1_KO_SIpos		2_KO_SIpos	#662506	#D90429
+KO_SIpos	KO	GAR6619A6	KO_SIpos_2	SIpos	KO	1_KO		1_KO_SIpos		2_KO_SIpos	#662506	#D90429
+KO_SIpos	KO	GAR6619A7	KO_SIpos_3	SIpos	KO	1_KO		1_KO_SIpos		2_KO_SIpos	#662506	#D90429
+KO_SIpos	KO	GAR6619A8	KO_SIpos_4	SIpos	KO	1_KO		1_KO_SIpos		2_KO_SIpos	#662506	#D90429
