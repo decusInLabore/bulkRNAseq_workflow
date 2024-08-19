@@ -1,0 +1,17 @@
+sample.group	dataseries	sampleID	sample.id	f_Location	f_Genotype	comp_1	comp_2	comp_3	comp_4	comp_5	dataseries_color	sample.group_color
+Ctrl_SIneg	Ctrl	GAR6619A9	Ctrl_SIneg_1	SIneg	Ctrl	2_Ctrl	2_Ctrl_SIneg		1_Ctrl_SIneg		#FFFFE5	#2B2D42
+Ctrl_SIneg	Ctrl	GAR6619A10	Ctrl_SIneg_2	SIneg	Ctrl	2_Ctrl	2_Ctrl_SIneg		1_Ctrl_SIneg		#FFFFE5	#2B2D42
+Ctrl_SIneg	Ctrl	GAR6619A11	Ctrl_SIneg_3	SIneg	Ctrl	2_Ctrl	2_Ctrl_SIneg		1_Ctrl_SIneg		#FFFFE5	#2B2D42
+Ctrl_SIneg	Ctrl	GAR6619A12	Ctrl_SIneg_4	SIneg	Ctrl	2_Ctrl	2_Ctrl_SIneg		1_Ctrl_SIneg		#FFFFE5	#2B2D42
+Ctrl_SIpos	Ctrl	GAR6619A1	Ctrl_SIpos_1	SIpos	Ctrl	2_Ctrl		2_Ctrl_SIpos	2_Ctrl_SIpos		#FFFFE5	#8D99AE
+Ctrl_SIpos	Ctrl	GAR6619A2	Ctrl_SIpos_2	SIpos	Ctrl	2_Ctrl		2_Ctrl_SIpos	2_Ctrl_SIpos		#FFFFE5	#8D99AE
+Ctrl_SIpos	Ctrl	GAR6619A3	Ctrl_SIpos_3	SIpos	Ctrl	2_Ctrl		2_Ctrl_SIpos	2_Ctrl_SIpos		#FFFFE5	#8D99AE
+Ctrl_SIpos	Ctrl	GAR6619A4	Ctrl_SIpos_4	SIpos	Ctrl	2_Ctrl		2_Ctrl_SIpos	2_Ctrl_SIpos		#FFFFE5	#8D99AE
+KO_SIneg	KO	GAR6619A13	KO_SIneg_1	SIneg	KO	1_KO	1_KO_SIneg			1_KO_SIneg	#662506	#EF233C
+KO_SIneg	KO	GAR6619A14	KO_SIneg_2	SIneg	KO	1_KO	1_KO_SIneg			1_KO_SIneg	#662506	#EF233C
+KO_SIneg	KO	GAR6619A15	KO_SIneg_3	SIneg	KO	1_KO	1_KO_SIneg			1_KO_SIneg	#662506	#EF233C
+KO_SIneg	KO	GAR6619A16	KO_SIneg_4	SIneg	KO	1_KO	1_KO_SIneg			1_KO_SIneg	#662506	#EF233C
+KO_SIpos	KO	GAR6619A5	KO_SIpos_1	SIpos	KO	1_KO		1_KO_SIpos		2_KO_SIpos	#662506	#D90429
+KO_SIpos	KO	GAR6619A6	KO_SIpos_2	SIpos	KO	1_KO		1_KO_SIpos		2_KO_SIpos	#662506	#D90429
+KO_SIpos	KO	GAR6619A7	KO_SIpos_3	SIpos	KO	1_KO		1_KO_SIpos		2_KO_SIpos	#662506	#D90429
+KO_SIpos	KO	GAR6619A8	KO_SIpos_4	SIpos	KO	1_KO		1_KO_SIpos		2_KO_SIpos	#662506	#D90429

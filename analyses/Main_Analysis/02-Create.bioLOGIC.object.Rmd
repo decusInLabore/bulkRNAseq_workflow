@@ -336,9 +336,14 @@ selString <- paste0(species, collapse = "")
 selString <- paste0(selString, "_gene_ensembl")
 
 if (is.null(Obio@parameterList$release)){
-    release <- 95
+    release <- "release-95"
 } else {
     release <- Obio@parameterList$release
+}
+
+## release95 is no longer available
+if (release == "release-95"){
+    release <- "release-98"
 }
 
 releaseID <- gsub("release-", "", tolower(release))

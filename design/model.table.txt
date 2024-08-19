@@ -1,6 +1,6 @@
-comparison	comparisonID	test	type	model	reducedModel	normalizeAllSamplesTogether	betaPrior
-KO_vs_Ctrl	comp_1	Wald	DGE	~ f_Location + condition		FALSE	FALSE
-KO_SIneg_vs_Ctrl_SIneg	comp_2	Wald	DGE	~ condition		FALSE	TRUE
-KO_SIpos_vs_Ctrl_SIpos	comp_3	Wald	DGE	~ condition		FALSE	TRUE
-Ctrl_SIneg_vs_Ctrl_SIpos	comp_4	Wald	DGE	~ condition		FALSE	TRUE
-KO_SIneg_vs_KO_SIpos	comp_5	Wald	DGE	~ condition		FALSE	TRUE
+"comparison"	"comparisonID"	"test"	"type"	"model"	"reducedModel"	"normalizeAllSamplesTogether"	"betaPrior"
+"RNA_4hmAb21_vs_RNA_4hIrrelevant"	"comp_1"	"Wald"	"DGE"	"~ condition"	""	FALSE	"TRUE"
+"RNA_0hHoxb8_vs_RNA_4hIrrelevant"	"comp_2"	"Wald"	"DGE"	"~ condition"	""	FALSE	"TRUE"
+"RNA_4hmAb21_vs_RNA_0hHoxb8"	"comp_3"	"Wald"	"DGE"	"~ condition"	""	FALSE	"TRUE"
+"LRT_Timepoint"	"LRT_Timepoint"	"LRT"	"LRT"	"~ condition"	"~1"	FALSE	""
+"LRT_Treatment"	"LRT_Treatment"	"LRT"	"LRT"	"~ condition"	"~1"	FALSE	""

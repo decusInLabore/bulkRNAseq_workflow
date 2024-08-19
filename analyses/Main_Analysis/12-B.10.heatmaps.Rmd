@@ -379,6 +379,170 @@ if (createProjectRefDbTables){
 }
 ## Upload to database                                                        ##
 ###############################################################################
+
+###############################################################################
+## Add gene categories from database for heatmap display                     ##
+
+#names(HmDisplayCatsFromDb[[1]])
+#[1] "cat_type"             "data_source"          "cat.description.text"
+#[4] "geneVec"              "catID"                "comparisonID"
+#[7] "cat_id"
+
+
+## TFs
+
+if (Obio@parameterList$geneIDcolumn != "mgi_symbol" & Obio@parameterList$geneIDcolumn != "hgnc_symbol") {
+  queryGS <- "hgnc_symbol"
+} else {
+  queryGS <- Obio@parameterList$geneIDcolumn
+}
+
+TFs = retrieve.gene.category.from.db(
+  cat_id = "ag_lab_categories__10",
+  password = db.pwd,
+  gene.symbol = queryGS,
+  user = Obio@dbDetailList$db.user,
+  host = Obio@dbDetailList$host
+)
+
+## Filter for most variable ##
+if (exists("Ntop4pcaGeneSelection") && !is.null(Ntop4pcaGeneSelection) |
+  length(Ntop4pcaGeneSelection) > 3){
+  dfDataTable <- dfMainData
+
+  MVgeneVec <- as.vector(unique(dfDataTable[dfDataTable[,alignmentGeneID] %in% Ntop4pcaGeneSelection,geneIDcolumn]))
+} else {
+  MVgeneVec <- unique(dfMainData[dfMainData$logFC_cut_off == 1, geneIDcolumn])
+  Ntop4pcaGeneSelection <- geneVec
+}
+
+geneVec <- unique(TFs[TFs %in% MVgeneVec])
+
+if (length(geneVec) > 0){
+    HmDisplayCatsFromDb[["TFs_in_most_variable_genes"]] <- list(
+      "cat_type" = "temp",
+      "data_source" = "bioLOGIC Reference",
+      "cat.description.text" = "Transcription factors",
+      "geneVec" = TFs[TFs %in% MVgeneVec],
+      "catID" = "ag_lab_categories__10",
+      "comparisonID" = NULL
+    )
+}
+
+
+## Ligands
+catGenes = retrieve.gene.category.from.db(
+  cat_id = "sc_lab_categories__1597",
+  password = db.pwd,
+  gene.symbol = queryGS,
+  user = Obio@dbDetailList$db.user,
+  host = Obio@dbDetailList$host
+)
+
+## Filter for most variable ##
+if (exists("Ntop4pcaGeneSelection") && !is.null(Ntop4pcaGeneSelection) |
+  length(Ntop4pcaGeneSelection) > 3){
+  dfDataTable <- dfMainData
+
+  MVgeneVec <- as.vector(unique(dfDataTable[dfDataTable[,alignmentGeneID] %in% Ntop4pcaGeneSelection,geneIDcolumn]))
+} else {
+  MVgeneVec <- unique(dfMainData[dfMainData$logFC_cut_off == 1, geneIDcolumn])
+  Ntop4pcaGeneSelection <- geneVec
+}
+
+geneVec <- unique(catGenes[catGenes %in% MVgeneVec])
+
+if (length(geneVec) > 0){
+  HmDisplayCatsFromDb[["Ligands_in_most_variable_genes"]] <- list(
+    "cat_type" = "temp",
+    "data_source" = "bioLOGIC Reference",
+    "cat.description.text" = "Transcription factors",
+    "geneVec" = geneVec,
+    "catID" = "ag_lab_categories__10",
+    "comparisonID" = NULL
+  )
+}
+
+## Cleanup
+rm(geneVec)
+
+
+## Receptors
+catGenes = retrieve.gene.category.from.db(
+  cat_id = "sc_lab_categories__1597",
+  password = db.pwd,
+  gene.symbol = queryGS,
+  user = Obio@dbDetailList$db.user,
+  host = Obio@dbDetailList$host
+)
+
+## Filter for most variable ##
+if (exists("Ntop4pcaGeneSelection") && !is.null(Ntop4pcaGeneSelection) |
+  length(Ntop4pcaGeneSelection) > 3){
+  dfDataTable <- dfMainData
+
+  MVgeneVec <- as.vector(unique(dfDataTable[dfDataTable[,alignmentGeneID] %in% Ntop4pcaGeneSelection,geneIDcolumn]))
+} else {
+  MVgeneVec <- unique(dfMainData[dfMainData$logFC_cut_off == 1, geneIDcolumn])
+  Ntop4pcaGeneSelection <- geneVec
+}
+
+geneVec <- unique(catGenes[catGenes %in% MVgeneVec])
+
+if (length(geneVec) > 0){
+  HmDisplayCatsFromDb[["Receptors_in_most_variable_genes"]] <- list(
+    "cat_type" = "temp",
+    "data_source" = "bioLOGIC Reference",
+    "cat.description.text" = "Transcription factors",
+    "geneVec" = geneVec,
+    "catID" = "sc_lab_categories__1598",
+    "comparisonID" = NULL
+  )
+}
+
+## Cleanup
+rm(geneVec)
+
+## Cytokines
+catGenes = retrieve.gene.category.from.db(
+  cat_id = "sc_lab_categories__1597",
+  password = db.pwd,
+  gene.symbol = queryGS,
+  user = Obio@dbDetailList$db.user,
+  host = Obio@dbDetailList$host
+)
+
+## Filter for most variable ##
+if (exists("Ntop4pcaGeneSelection") && !is.null(Ntop4pcaGeneSelection) |
+  length(Ntop4pcaGeneSelection) > 3){
+  dfDataTable <- dfMainData
+
+  MVgeneVec <- as.vector(unique(dfDataTable[dfDataTable[,alignmentGeneID] %in% Ntop4pcaGeneSelection,geneIDcolumn]))
+} else {
+  MVgeneVec <- unique(dfMainData[dfMainData$logFC_cut_off == 1, geneIDcolumn])
+  Ntop4pcaGeneSelection <- geneVec
+}
+
+geneVec <- unique(catGenes[catGenes %in% MVgeneVec])
+
+if (length(geneVec) > 0){
+  HmDisplayCatsFromDb[["GO_Cytokines"]] <- list(
+    "cat_type" = "temp",
+    "data_source" = "bioLOGIC Reference",
+    "cat.description.text" = "Transcription factors",
+    "geneVec" = geneVec,
+    "catID" = "mysigdb_c5_BP__3745",
+    "comparisonID" = NULL
+  )
+}
+
+## Cleanup
+rm(geneVec)
+
+
+##
+###############################################################################
+
 ```
 
 ```{r, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
@@ -396,6 +560,9 @@ if (length(pos) > 0){
 }
 ##                                                                           ##
 ###############################################################################
+
+
+
 ## Begin heatmap plotting loop ##
 for (k in 1:length(HmDisplayCatsFromDb)){
     
@@ -464,7 +631,7 @@ for (k in 1:length(HmDisplayCatsFromDb)){
             
         mHmBase <- data.matrix(dfHmBase)
             
-        if ( nrow(mHmBase) < 51){
+        if ( nrow(mHmBase) < 101){
             showRowNames <- TRUE
         } else {
             showRowNames <- FALSE
@@ -532,7 +699,12 @@ for (k in 1:length(HmDisplayCatsFromDb)){
         } else {
             hmTitle <- names(HmDisplayCatsFromDb)[k]
         }
-        
+
+        rowFontSize <- 10
+        if (nrow(mHmBase) > 50){
+            rowFontSize <- 5
+        }
+
         HMplotList[[names(HmDisplayCatsFromDb)[k]]] = ComplexHeatmap::Heatmap(
             mHmBase,
             column_title = gsub(
@@ -546,6 +718,8 @@ for (k in 1:length(HmDisplayCatsFromDb)){
            
             show_column_names = T,
             show_row_names = showRowNames,
+            ## row text size
+            row_names_gp = grid::gpar(fontsize = rowFontSize),
             border = TRUE,
             
             #Dendrogram configurations: columns
