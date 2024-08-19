@@ -9,12 +9,29 @@ VersionPdfExt <- VersionPdfExt <- paste0(".",chnkPrefix,"V", gsub("-", "", Sys.D
 
 ## Create gene annotation if it is not present ##
 ## To be activated ##
+
+## This reference for Grcm38-release-95 is no longer available.
+# if (is.null(Obio@parameterList$path2GeneIDtable)){
+#     dfAnno <- biologicSeqTools2::createGeneNameTable(
+#         obj = Obio,
+#         biomart = "ENSEMBL_MART_ENSEMBL",
+#         selString = "mmusculus_gene_ensembl",
+#         host= "http://may2017.archive.ensembl.org",
+#         primaryAlignmentGeneID = "ENSMUSG",
+#         geneIDcolumn = "mgi_symbol"
+#     )
+# }
+
+## Release 105 is used for the current analysis
+
+
+
 if (is.null(Obio@parameterList$path2GeneIDtable)){
     dfAnno <- biologicSeqTools2::createGeneNameTable(
         obj = Obio,
         biomart = "ENSEMBL_MART_ENSEMBL",
         selString = "mmusculus_gene_ensembl",
-        host= "http://may2017.archive.ensembl.org",
+        host= "http://sep2019.archive.ensembl.org",
         primaryAlignmentGeneID = "ENSMUSG",
         geneIDcolumn = "mgi_symbol"
     )

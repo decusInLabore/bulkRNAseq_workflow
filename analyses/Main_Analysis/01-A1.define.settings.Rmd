@@ -16,14 +16,16 @@ VersionPdfExt <- VersionPdfExt <- paste0(".",chnkPrefix,"V", gsub("-", "", Sys.D
 ###############################################################################
 
 ## Set project directory
-projectDir <- gsub("scripts/bulkRNAseq_workflow/analyses/Main_Analysis", "", getwd())
+# projectDir <- gsub("scripts/bulkRNAseq_workflow/analyses/Main_Analysis", "", getwd())
+projectDir <- paste0(unlist(strsplit(getwd(), "scripts"))[1])
+designDir <- unlist(strsplit(getwd(), "analyses/"))[1]
 
 pipelineList <- biologicSeqTools2::assembleBiologicProject(
   ## Path to the design file. Essential columns: sample.id, sample.group, dataseries. ##
   ## Ideal sample name: [dataseries]_[sample.group]_[replicate]
-  designFN =  paste0(projectDir, "scripts/bulkRNAseq_workflow/design/design.table.txt"),
+  designFN =  paste0(designDir, "design/design.table.txt"),
   ## Path to model table ##
-  modelFN =  paste0(projectDir, "scripts/bulkRNAseq_workflow/design/model.table.txt"),
+  modelFN =  paste0(designDir, "design/model.table.txt"),
   ## Path to NFcore setting file. Set to NULL in no-alignment mode.
   #NFcoreSettingsFN = "/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/workdir/bulkRNAseq_workflow/design/RN21220test.NFcore.samplesheet.file.csv",
   ## Path to relevant FASTQ files.
@@ -35,7 +37,7 @@ pipelineList <- biologicSeqTools2::assembleBiologicProject(
   countTableFN = paste0(projectDir, "data/rsem.count.txt"),
   ## Path to TPM table.
   TpmTableFN =   paste0(projectDir, "data/dfTPM.txt"),
-  biologicSettingsFN = paste0(projectDir, "scripts/bulkRNAseq_workflow/design/biologic.settings.file.csv"),
+  biologicSettingsFN = paste0(designDir, "design/biologic.settings.file.csv"),
   PcaFN =  NULL,
   #"/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/workdir/data/dfPca.txt",
   calculate_DGE = TRUE,
@@ -45,19 +47,19 @@ pipelineList <- biologicSeqTools2::assembleBiologicProject(
   #"/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/workdir/data/DEseq2External_DGE/",
   DEseq2External_LRT = NULL,
   #"/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472A_brains_from_drosophila_larvae_RN21220/workdir/data/DEseq2External_LRT/",
-  #stranded = TRUE,
-  #read.length = "100bp",
-  #paired.end = FALSE,
+  stranded = TRUE,
+  read.length = "75bp",
+  paired.end = TRUE,
   #pathToRSEMresultsFiles = paste0("/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472_brains_from_drosophila_larvae_RN21220/workdir/", "RSEM/Ensembl/"),
   projectFolder = projectDir,
-  experiment_id = "RN23380",
-  project_name = "TGFbeta_in_enteric_glia_cells",
-  lims.id = "RN23380",
-  labname = "Pachnis",
+  experiment_id = "RN24057",
+  project_name = "RNA_expression_changes_after_FcR_triggering_in_Hoxb8_with_an_anti_F_actin_mAb_bound_to_dead_cells ",
+  lims.id = "RN24057",
+  labname = "Reisesousa",
   NtopGenes = 1000,
   experiment.type = "bulk_rna_seq",
   species = "mus_musculus",
-  release = "release-95",
+  release = "release-105",
   count.table.headline = "TPM-values for all Samples",
   count.table.sidelabel = "TPM",
   heatmap.headline.text = "Heatmap: Row-averaged Expr",
@@ -66,8 +68,9 @@ pipelineList <- biologicSeqTools2::assembleBiologicProject(
   primDataDB = "vpl_data",
   db.user = "babs",
   host = "10.27.241.82",
-  lab.categories.table = "vp_lab_categories",
-  corGeneVec = c("Tgfb1", "Tgfb2")
+  lab.categories.table = "reisesousa_lab_categories",
+  #corGeneVec = c("Tgfb1", "Tgfb2")
+  corGeneVec = NULL
 )
 
 
