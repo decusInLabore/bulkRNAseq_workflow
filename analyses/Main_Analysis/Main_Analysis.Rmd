@@ -250,7 +250,7 @@ if (Obio@parameterList[["upload.results.to.database"]]){
 ```
 
 <!-- Optional 13: (output only): Category Enrichment fGSEA Method Chapter/Module -->
-```{r child = '15-B.13.cat.enrichment.fGSEA.Rmd', eval=TRUE}
+```{r child = '15-B.13.cat.enrichment.fGSEA.Rmd', eval=FALSE}
 ```
 
 

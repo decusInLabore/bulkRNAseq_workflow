@@ -84,8 +84,10 @@ dfSettings <- dfbase
 ## Get available files
 
 seqDir <-  c(
-    "/nemo/stp/sequencing/outputs/babs/data/reisesousac/lucia.gandullo-sanchez/RN24057/primary_data/20240604_LH00442_0015_B22JNVJLT3/fastq/",
-    "/nemo/stp/sequencing/outputs/babs/data/reisesousac/lucia.gandullo-sanchez/RN24057/primary_data/240614_A01366_0550_BHHJYJDSXC/fastq/"
+
+"/nemo/stp/sequencing/outputs/babs/data/liv/colin.hutton/RN24046/primary_data/20240627_LH00442_0027_B22JLT3LT3/fastq/",
+
+"/nemo/stp/sequencing/outputs/babs/data/liv/colin.hutton/RN24046/primary_data/240516_A01366_0546_BHHGK5DSXC/fastq/"
 )
 
 
@@ -178,7 +180,7 @@ GTFfile <- "/flask/reference/Genomics/babs_nfcore/genomes/mus_musculus/ensembl/G
 #genomeFa <- "/flask/reference/Genomics/babs/mus_musculus/ensembl/GRCm38/release-95/genome/Mus_musculus.GRCm38.dna_sm.toplevel.fa"
 #GTFfile <- "/flask/reference/Genomics/babs/mus_musculus/ensembl/GRCm38/release-95/gtf/Mus_musculus.GRCm38.95.rnaseqc.gtf"
 
-project_id = "RN24057"
+project_id = "RN24046"
 
 biologicSeqTools2::createbulkRNASeqAnalysisNFcoreScript(
     outdir = workdir,

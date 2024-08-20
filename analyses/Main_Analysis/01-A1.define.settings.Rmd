@@ -52,10 +52,10 @@ pipelineList <- biologicSeqTools2::assembleBiologicProject(
   paired.end = TRUE,
   #pathToRSEMresultsFiles = paste0("/camp/stp/babs/working/boeings/Projects/goulda/adrien.franchet/472_brains_from_drosophila_larvae_RN21220/workdir/", "RSEM/Ensembl/"),
   projectFolder = projectDir,
-  experiment_id = "RN24057",
+  experiment_id = "RN24046",
   project_name = "RNA_expression_changes_after_FcR_triggering_in_Hoxb8_with_an_anti_F_actin_mAb_bound_to_dead_cells ",
-  lims.id = "RN24057",
-  labname = "Reisesousa",
+  lims.id = "RN24046",
+  labname = "Li",
   NtopGenes = 1000,
   experiment.type = "bulk_rna_seq",
   species = "mus_musculus",
@@ -65,10 +65,10 @@ pipelineList <- biologicSeqTools2::assembleBiologicProject(
   heatmap.headline.text = "Heatmap: Row-averaged Expr",
   designTScol = NULL,
   timecourse.units = NULL,
-  primDataDB = "vpl_data",
+  primDataDB = "li_lab_data",
   db.user = "babs",
   host = "10.27.241.82",
-  lab.categories.table = "reisesousa_lab_categories",
+  lab.categories.table = "li_lab_categories",
   #corGeneVec = c("Tgfb1", "Tgfb2")
   corGeneVec = NULL
 )
