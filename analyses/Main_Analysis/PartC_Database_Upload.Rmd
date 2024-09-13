@@ -17,7 +17,7 @@ always_allow_html: yes
 ###############################################################################
 ## Recommended R-version                                                     ##
 
-# module purge;source /camp/stp/babs/working/software/modulepath_new_software_tree_2018-08-13;module load pandoc/2.2.3.2-foss-2016b;ml R/4.0.3-foss-2020a;R
+# module purge;source /nemo/stp/babs/working/software/modulepath_new_software_tree_2018-08-13;module load pandoc/2.2.3.2-foss-2016b;ml R/4.0.3-foss-2020a;R
 
 ## Done                                                                      ##
 ###############################################################################
@@ -65,8 +65,10 @@ knitr::opts_chunk$set(
 ###############################################################################
 ## Set global variables                                                      ##
 
-workdir <- gsub("scripts/bulkRNAseq_workflow/analyses/Main_Analysis","workdir/",getwd())
-projectDir <-  gsub("scripts/bulkRNAseq_workflow/analyses/Main_Analysis" ,"",getwd())
+# projectDir <-  gsub("scripts/bulkRNAseq_workflow/analyses/Main_Analysis" ,"",getwd())
+projectDir <- paste0(unlist(strsplit(getwd(), "scripts"))[1])
+workdir <- paste0(projectDir, "workdir/")
+
 dataDir <- paste0(projectDir, "data/")
 
 figureCount <- 1
@@ -99,7 +101,7 @@ source("load.biologic.robj.R")
 ###############################################################################
 ## Recommended R-version                                                     ##
 
-baseWebDir <- "/camp/stp/babs/www/boeings/bioLOGIC_external/data/"
+baseWebDir <- "/nemo/stp/babs/www/boeings/bioLOGIC_external/data/"
 
 projectWebDir <- paste0(
     baseWebDir,
@@ -138,8 +140,8 @@ if (dir.exists("/Volumes/babs/working/boeings/")){
     hpc.mount <- "/Volumes/babs/working/boeings/"
 } else if (dir.exists("Y:/working/boeings/")){
     hpc.mount <- "Y:/working/boeings/"
-} else if (dir.exists("/camp/stp/babs/working/boeings/")){
-    hpc.mount <- "/camp/stp/babs/working/boeings/"
+} else if (dir.exists("/nemo/stp/babs/working/boeings/")){
+    hpc.mount <- "/nemo/stp/babs/working/boeings/"
 } else {
     hpc.mount <- ""
 }
@@ -349,6 +351,11 @@ doQuery(Obio, query = query4)
 
 
 #pos1 <- grep("_TPM", names)
+
+## Order df Design
+Obio@dfDesign[["orderID"]] <- as.numeric(gsub("HUT6877A", "", Obio@dfDesign$sampleID))
+Obio@dfDesign <- Obio@dfDesign[order(Obio@dfDesign$orderID),]
+Obio@dfDesign$orderID <- NULL
 
 sample.order <- unique(paste0(
   "norm_counts_",

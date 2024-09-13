@@ -25,18 +25,29 @@ always_allow_html: yes
 
 ```
 
-```{r setup, include=FALSE}
+```{bash setup, eval = F, include=FALSE}
 ###############################################################################
 ## Recommended R-version                                                     ##
 
-# module purge;source /nemo/stp/babs/working/software/modulepath_new_software_tree_2018-08-13;module load pandoc/2.2.3.2-foss-2016b;ml R/4.0.3-foss-2020a;R
+# old :module purge;source /nemo/stp/babs/working/software/modulepath_new_software_tree_2018-08-13;module load pandoc/2.2.3.2-foss-2016b;ml R/4.0.3-foss-2020a;R
 
+# New
+module load R/4.3.2-gfbf-2023a
 
+ml Singularity/3.6.4
+
+## --cleanenv is optional. It prevents the transfer of host system environmental variables into the singularity container.
+
+singularity shell --cleanenv --bind  /nemo:/nemo,/camp:/camp  /flask/apps/containers/all-singularity-images/r431.ubuntu.22.04.sif;
+
+R
 
 ## Done                                                                      ##
 ###############################################################################
 
 
+```
+```{r setupr, include=FALSE}
 
 
 ###############################################################################
@@ -80,9 +91,11 @@ knitr::opts_chunk$set(
 ###############################################################################
 ## Set global variables                                                      ##
 
-workdir <- gsub("scripts/bulkRNAseq_workflow/analyses/Read_Coverage_Plots","workdir/",getwd())
-projectDir <-  gsub("scripts/bulkRNAseq_workflow/analyses/Read_Coverage_Plots" ,"",getwd())
+projectDir <- paste0(unlist(strsplit(getwd(), "scripts"))[1])
+workdir <- paste0(projectDir, "workdir/")
 dataDir <- paste0(projectDir, "data/")
+
+
 
 figureCount <- 1
 tableCount <- 1
@@ -115,7 +128,24 @@ library(ggplot2)
 #library(DT)
 
 
-geneCoveragePlotVec <- c("Tgfb1", "Tgfb2", "Gapdh")
+geneCoveragePlotVec <- c(
+        "Yap1",
+        "Wwtr1",
+        "Ctnnb1",
+        "Jak1",
+        "Apc",
+        "Kras",
+        "Trp53",
+        "Tgfbr2",
+        "Smad4",
+        "Pik3ca",
+        "Pten",
+        "Fbxw7",
+        "Mlh1",
+        "Msh2",
+        "Msh6",
+        "Pms2"
+)
 
 
 figureCount <- 1
@@ -1142,6 +1172,11 @@ makeTxDbFromBiomart <- function(biomart="ENSEMBL_MART_ENSEMBL",
   message("OK")
   txdb
 }
+
+biomartURL <- gsub("https:", "http:", biomartURL)
+
+
+
 txdb = GenomicFeatures::makeTxDbFromBiomart(
     biomart = "ENSEMBL_MART_ENSEMBL",
     dataset = selString,
