@@ -60,11 +60,14 @@ if (is.null(Obio@parameterList$PCAdbTableName)){
 }
 pcaTB <- Obio@parameterList$PCAdbTableName
 
+countDbTable <- paste0(Obio@parameterList$project_id, "_count_table")
+
 host <- Obio@dbDetailList$host
 db <- Obio@dbDetailList$primDataDB
 designString <- designTB
 mainTBstring <- mainTB
 pcaDbTable <- pcaTB
+countDbTable <- countDbTable
 ## Done installing package                                                   ##
 ###############################################################################
 userString <- paste0('username <- "', username,'"')
@@ -74,6 +77,7 @@ dbString <- paste0('db <- "', db,'"')
 designString <- paste0('designTB <- "', designTB,'"')
 mainTBstring <- paste0('mainTB <- "', mainTB,'"')
 pcaDbTable <- paste0('pcaTB <- "', pcaTB,'"')
+countDbTable <- paste0('countTB <- "', countDbTable,'"')
 species <- Obio@parameterList$species
 geneIDcolumn <- Obio@parameterList$geneIDcolumn
 alignmentGeneID <- Obio@parameterList$primaryAlignmentGeneID
@@ -132,6 +136,8 @@ Here we define the tables from which we draw the data:
                 mainTBstring,
                 "\n",
                 pcaDbTable,
+                "\n",
+                countDbTable,
                 "\n"
             )
             
@@ -154,7 +160,9 @@ threeString <- paste0(
     "\n",
     timepointString,
     "\n",
-    NtopGenesString
+    NtopGenesString,
+    "\n",
+    "figureCount <- 1"
 )
 cat(threeString)
 ```
@@ -163,10 +171,17 @@ cat(threeString)
 ## Load Data into R
 Next, let's load your project data. We will need this as a basis for making the plots further down. 
 
-```{r, echo=TRUE, eval=F, warning=FALSE, class.source = 'fold-show'}
+```{r, echo=TRUE, eval=F, warning=FALSE, class.source = 'fold-show', tidy=TRUE}
 
 ## The line below will install an R-package that we need to connect to the  Crick database
-devtools::install_github("decusinlabore/bioLOGIC")
+if (!requireNamespace("remotes")){
+  install.packages("remotes")
+}
+
+if (!requireNamespace("bioLOGIC")){
+  remotes::install_github("decusinlabore/bioLOGIC")
+}
+
 
 library(bioLOGIC)
 ## Load the design table from database. Here we will retrieve information on samples. 
@@ -193,6 +208,19 @@ dfPCA <- import.db.table.from.db(
     user = username,
     password = pass
 )
+
+## Load count data
+dfCount <- import.db.table.from.db(
+  dbname = db,
+  dbtable = countTB,
+  host = host,
+  user = username,
+  password = pass
+)
+row.names(dfCount) <- dfCount[, alignmentGeneID]
+dfCount$row_names <- NULL
+dfCount <- data.matrix(dfCount)
+
 ## For some plots we want to limit the number of genes to the most interesting, so let's get those in a vector:
 # Most variable gene names
 dfVar <- dfMainData[dfMainData$logFC_cut_off != 0 ,c(geneIDcolumn, alignmentGeneID)]
@@ -207,7 +235,7 @@ mostVarIDs <- na.omit(mostVarIDs[mostVarIDs != ""])
 ```
 
 
-```{r, echo=F, eval=T, warning=FALSE,comment=NA}
+```{r, echo=F, eval=T, warning=FALSE,comment=NA, tidy=TRUE}
 ## In this section the data for this report is loaded from file in order to maintain version control. The data loaded in this section should be identical with the version of the proejct kept in the database. 
 dfDesign <- Obio@dfDesign
 names(dfDesign) <- gsub("\\.", "_", names(dfDesign))
@@ -215,6 +243,7 @@ names(dfDesign) <- gsub("\\.", "_", names(dfDesign))
 dfMainData <- Obio@databaseTable
 dfPCA <- Obio@dfPCA
 dfModel <- Obio@dfModel
+dfCount <- Obio@RSEMcountMatrix
 dfVar <- dfMainData[dfMainData$logFC_cut_off != 0 ,c(geneIDcolumn, alignmentGeneID)]
 mostVarGenes <- as.vector(unique(sort(dfVar[,geneIDcolumn])))
 mostVarGenes <- na.omit(mostVarGenes[mostVarGenes != ""])
