@@ -90,6 +90,10 @@ shinyBaseServerURL <- "shiny-bioinformatics.crick.ac.uk"
 # load(FN)
 
 source("load.biologic.robj.R")
+
+if (is.null(Obio@dbDetailList$port)){
+    Obio@dbDetailList$port <- 6008
+}
 ## Done                                                                      ##
 ###############################################################################
 
@@ -200,6 +204,7 @@ names(dfPCA) <- gsub("sample.group_color", "sample_group_colors", names(dfPCA))
 biologicSeqTools2::upload.pca.table.to.db(
     df.pca = dfPCA,
     host =Obio@dbDetailList$host,
+    port = Obio@dbDetailList$port,
     prim.data.db = Obio@dbDetailList$primDataDB,
     password = db.pwd,
     db.user = Obio@dbDetailList$db.user,
@@ -242,6 +247,7 @@ names(dfDesign4upload) <- gsub("\\.", "_", names(dfDesign4upload))
 
 cmd.vec <- biologicSeqTools2::upload.datatable.to.database(
   host = Obio@dbDetailList$host,
+  port = Obio@dbDetailList$port,
   user = Obio@dbDetailList$db.user,
   password = db.pwd,
   prim.data.db = Obio@dbDetailList$primDataDB,
@@ -264,6 +270,7 @@ Obio@databaseTable$Gene_description <- NULL
 
 cmd.vec <- biologicSeqTools2::upload.datatable.to.database(
     host = Obio@dbDetailList$host,
+    port = Obio@dbDetailList$port,
     user = Obio@dbDetailList$db.user,
     password = db.pwd,
     prim.data.db = Obio@dbDetailList$primDataDB,
@@ -291,6 +298,7 @@ doQuery <- function(
         user = Obio@dbDetailList$db.user, 
         password = db.pwd, 
         host = Obio@dbDetailList$host,
+        port = Obio@dbDetailList$port,
         dbname = Obio@dbDetailList$primDataDB
     ) 
     tryCatch(res <- DBI::dbGetQuery(dbDB, query), error = function(c) {
@@ -647,7 +655,8 @@ dbDB <- DBI::dbConnect(
     drv = RMySQL::MySQL(), 
     user = Obio@dbDetailList$db.user, 
     password = db.pwd, 
-    host = Obio@dbDetailList$host, 
+    host = Obio@dbDetailList$host,
+    port = Obio@dbDetailList$port,
     dbname = "operational"
 )
 
@@ -666,7 +675,8 @@ if (nrow(dfTest) ==1){
         drv = RMySQL::MySQL(), 
         user = Obio@dbDetailList$db.user, 
         password = db.pwd, 
-        host = Obio@dbDetailList$host, 
+        host = Obio@dbDetailList$host,
+        port = Obio@dbDetailList$port,
         dbname = "operational"
     )
     query <- paste0("DELETE FROM settings WHERE experiment_code = '",Obio@parameterList$project_id,"';")
@@ -684,6 +694,7 @@ dfUpload[["updated_at"]] <- timeStamp
 
 biologicSeqTools2::upload.datatable.to.database(
     host = Obio@dbDetailList$host,
+    port = 6008,
     user = Obio@dbDetailList$db.user,
     password = db.pwd,
     prim.data.db = "operational",
@@ -727,7 +738,8 @@ dbDB <- DBI::dbConnect(
     drv = RMySQL::MySQL(), 
     user = Obio@dbDetailList$db.user, 
     password = db.pwd, 
-    host = Obio@dbDetailList$host, 
+    host = Obio@dbDetailList$host,
+    port = Obio@dbDetailList$port,
     dbname = "operational"
 )
 
@@ -765,6 +777,7 @@ if (nrow(dfTest) == 0){
     
     upload.datatable.to.database(
         host = Obio@dbDetailList$host,
+        port = Obio@dbDetailList$port,
         user = Obio@dbDetailList$db.user,
         password = db.pwd,
         prim.data.db = "operational",
@@ -791,7 +804,8 @@ if (nrow(dfTest) == 0){
         drv = RMySQL::MySQL(), 
         user = Obio@dbDetailList$db.user, 
         password = db.pwd, 
-        host = Obio@dbDetailList$host, 
+        host = Obio@dbDetailList$host,
+        port = Obio@dbDetailList$port,
         dbname = "operational"
     )
     
@@ -868,7 +882,8 @@ dbDB <- DBI::dbConnect(
     drv = RMySQL::MySQL(), 
     user = Obio@dbDetailList$db.user, 
     password = db.pwd, 
-    host = Obio@dbDetailList$host, 
+    host = Obio@dbDetailList$host,
+    port = Obio@dbDetailList$port,
     dbname = "operational"
 )
 
@@ -887,7 +902,8 @@ if (nrow(dfTest) ==1){
         drv = RMySQL::MySQL(), 
         user = Obio@dbDetailList$db.user, 
         password = db.pwd, 
-        host = Obio@dbDetailList$host, 
+        host = Obio@dbDetailList$host,
+        port = Obio@dbDetailList$port,
         dbname = "operational"
     )
     query <- paste0("DELETE FROM experiments WHERE experiment_code = '",Obio@parameterList$project_id,"';")
@@ -906,6 +922,7 @@ dfUpload[["updated_at"]] <- timeStamp
 
 biologicSeqTools2::upload.datatable.to.database(
     host = Obio@dbDetailList$host,
+    port = Obio@dbDetailList$port,
     user = Obio@dbDetailList$db.user,
     password = db.pwd,
     prim.data.db = "operational",
@@ -961,7 +978,8 @@ if (createProjectRefDbTables){
             drv = RMySQL::MySQL(), 
             user = Obio@dbDetailList$db.user, 
             password = db.pwd, 
-            host = Obio@dbDetailList$host, 
+            host = Obio@dbDetailList$host,
+            port = Obio@dbDetailList$port,
             dbname = Obio@dbDetailList$ref.cat.db
         )
         
@@ -984,7 +1002,8 @@ if (createProjectRefDbTables){
             drv = RMySQL::MySQL(), 
             user = Obio@dbDetailList$db.user, 
             password = db.pwd, 
-            host = Obio@dbDetailList$host, 
+            host = Obio@dbDetailList$host,
+            port = Obio@dbDetailList$port,
             dbname = Obio@dbDetailList$ref.cat.db
     )
     
@@ -1031,7 +1050,8 @@ if (createProjectRefDbTables){
             drv = RMySQL::MySQL(), 
             user = Obio@dbDetailList$db.user, 
             password = db.pwd, 
-            host = Obio@dbDetailList$host, 
+            host = Obio@dbDetailList$host,
+            port = Obio@dbDetailList$port,
             dbname = Obio@dbDetailList$ref.cat.db
         )
         
@@ -1047,6 +1067,7 @@ if (createProjectRefDbTables){
         
             catID <- biologicSeqTools2::add.category.to.lab.reference.table.hs(
             host = Obio@dbDetailList$host,
+            port = Obio@dbDetailList$port,
             pwd = db.pwd,
             user = Obio@dbDetailList$db.user,
             cat.ref.db = "reference_categories_db_new",
@@ -1063,7 +1084,7 @@ if (createProjectRefDbTables){
             cat.description.db  = "internal_categories",
             cat.description.db.table = "category_description",
             cat.description.text = UploadList[[i]]$cat.description.text,
-            lab.name = labname
+            lab.name = Obio@projectDetailList$labname
         )
         }
         
@@ -1091,6 +1112,7 @@ availableTables <- biologicSeqTools2::list.db.tables.in.db(
     dbname = "reference_categories_db_new",
     password = db.pwd,
     host=Obio@dbDetailList$host,
+    port = Obio@dbDetailList$port,
     user=Obio@dbDetailList$db.user
 )
 
@@ -1135,6 +1157,7 @@ length(relevant.genes)
 for (i in 1:length(Obio@referenceTableList)) {
     df.ref <- import.db.table.from.db(
         host = Obio@dbDetailList$host,
+        port = Obio@dbDetailList$port,
         dbname = Obio@dbDetailList$ref.cat.db,
         dbtable = Obio@referenceTableList[[i]],
         user = Obio@dbDetailList$db.user,
@@ -1204,6 +1227,7 @@ df.ref <- import.db.table.from.db(
     dbtable = Obio@parameterList$lab.categories.table,
     password = db.pwd,
     host = Obio@dbDetailList$host,
+    port = Obio@dbDetailList$port,
     user = Obio@dbDetailList$db.user
 )
 
@@ -1230,6 +1254,7 @@ if (exists("df.ref") & nrow(df.ref) > 0){
 ###############################################################################
 biologicSeqTools2::upload.datatable.to.database(
     host = Obio@dbDetailList$host,
+    port = Obio@dbDetailList$port,
     user = Obio@dbDetailList$db.user,
     password = db.pwd,
     prim.data.db = Obio@dbDetailList$primDataDB,
@@ -1258,7 +1283,8 @@ dbDB <- DBI::dbConnect(
     drv = RMySQL::MySQL(), 
     user = Obio@dbDetailList$db.user, 
     password = db.pwd, 
-    host = Obio@dbDetailList$host, 
+    host = Obio@dbDetailList$host,
+    port = Obio@dbDetailList$port,
     dbname = "operational"
 )
 
@@ -1279,7 +1305,8 @@ dbDB <- DBI::dbConnect(
     drv = RMySQL::MySQL(), 
     user = Obio@dbDetailList$db.user, 
     password = db.pwd, 
-    host = Obio@dbDetailList$host, 
+    host = Obio@dbDetailList$host,
+    port = Obio@dbDetailList$port,
     dbname = "operational"
 )
 
@@ -1303,7 +1330,8 @@ if (nrow(dfTest) > 0 && nchar(enc2native(dfTest$content)) < 200 ){
             drv = RMySQL::MySQL(), 
             user = Obio@dbDetailList$db.user, 
             password = db.pwd, 
-            host = Obio@dbDetailList$host, 
+            host = Obio@dbDetailList$host,
+            port = Obio@dbDetailList$port,
             dbname = "operational"
         )
     
@@ -1337,11 +1365,11 @@ if (createReport){
   reportString5 <- paste0('<p>How to get there: (1) Divide the read counts by the length of each gene in kilobases. This gives you reads per kilobase (RPK). (2) Count up all the RPK values in a sample and divide this number by 1,000,000. This is your per million\x94 scaling factor. (3) Divide the RPK values by the \x93per million\x94 scaling factor. This gives you TPM.</p><p><strong>Information on duplicaton rates</strong></p><p><a href="https://www.ncbi.nlm.nih.gov/pubmed/27156886">Parekh et al.</a> have examined the impact of PCR-amplification on differential gene expression analyses by RNA-Seq.</p><p><strong>Relevance and implication of the number of sample replicates in an RNA-seq experiment</strong></p><p><a href="https://www.ncbi.nlm.nih.gov/pubmed/27022035">Schurch et al.</a> have systematically examined the impact of the number of replicates on the quality of the results differential gene expression analyses in RNA-seq experiments.</p>')
   
   reportString <- paste0(
-      reportString1,
-      reportString2,
-      reportString3,
-      reportString4, 
-      reportString5
+      iconv(reportString1, to = "UTF-8"),
+      iconv(reportString2, to = "UTF-8"),
+      iconv(reportString3, to = "UTF-8"),
+      iconv(reportString4, to = "UTF-8"),
+      iconv(reportString5, to = "UTF-8")
   )
   
   timeStamp <- format(as.POSIXlt(Sys.time()),'%Y-%m-%d %H:%M:%S')
@@ -1356,6 +1384,7 @@ if (createReport){
   
   biologicSeqTools2::upload.datatable.to.database(
       host = Obio@dbDetailList$host,
+      port = Obio@dbDetailList$port,
       user = Obio@dbDetailList$db.user,
       password = db.pwd,
       prim.data.db = "operational",
