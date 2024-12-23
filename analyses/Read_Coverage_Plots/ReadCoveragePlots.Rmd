@@ -29,10 +29,11 @@ always_allow_html: yes
 ###############################################################################
 ## Recommended R-version                                                     ##
 
-# old :module purge;source /nemo/stp/babs/working/software/modulepath_new_software_tree_2018-08-13;module load pandoc/2.2.3.2-foss-2016b;ml R/4.0.3-foss-2020a;R
+# old, but used for this project :
+module purge;source /nemo/stp/babs/working/software/modulepath_new_software_tree_2018-08-13;module load pandoc/2.2.3.2-foss-2016b;ml R/4.0.3-foss-2020a;R
 
-# New
-module load R/4.3.2-gfbf-2023a
+# New > future
+# module load R/4.3.2-gfbf-2023a
 
 ml Singularity/3.6.4
 
@@ -58,6 +59,8 @@ R
 # }
 # 
 # remotes::install_github("rstudio/renv")
+
+
 
 if (!file.exists("renv.lock")){
     renv::init()
@@ -129,22 +132,18 @@ library(ggplot2)
 
 
 geneCoveragePlotVec <- c(
-        "Yap1",
-        "Wwtr1",
-        "Ctnnb1",
-        "Jak1",
-        "Apc",
-        "Kras",
-        "Trp53",
-        "Tgfbr2",
-        "Smad4",
-        "Pik3ca",
-        "Pten",
-        "Fbxw7",
-        "Mlh1",
-        "Msh2",
-        "Msh6",
-        "Pms2"
+        "SFPQ",
+        "FUS",
+        "OGT",
+        "PTBP2",
+        "HNRNPDL",
+        "DDX39A",
+        "TUSC3",
+        "RBM25",
+        "NNAT",
+        "VCP",
+        #"HNRNPH1",
+        "UPF1"
 )
 
 
@@ -1174,13 +1173,13 @@ makeTxDbFromBiomart <- function(biomart="ENSEMBL_MART_ENSEMBL",
 }
 
 biomartURL <- gsub("https:", "http:", biomartURL)
-
+# biomartURL <- gsub("http:", "https:", biomartURL)
 
 
 txdb = GenomicFeatures::makeTxDbFromBiomart(
     biomart = "ENSEMBL_MART_ENSEMBL",
     dataset = selString,
-    host=biomartURL
+    host= biomartURL
 )
 
 ## Use legacy function defined above:
@@ -1986,8 +1985,9 @@ chnkVec <- as.vector(NULL, mode="character")
     
 
 ## Begin loop ##
-
+print("Create BigWig")
 for (i in 1:length(geneCoveragePlotVec)){
+    print(geneCoveragePlotVec[i])
     chr <- unique(data[data$gene_name == geneCoveragePlotVec[i],"chromosome_name"])
     regionStart <- min(data[data$gene_name == geneCoveragePlotVec[i],"start_position"]) - 1000
     regionEnd   <- max(data[data$gene_name == geneCoveragePlotVec[i],"end_position"]) + 1000
@@ -2019,8 +2019,7 @@ for (i in 1:length(geneCoveragePlotVec)){
     for (j in 1:length(bamFiles)){
         bwFN <- gsub(".bam", ".bw", bamFiles[j])
         newCmd <- paste0(
-            'sbatch --time=02:00:00 --wrap "ml deepTools/2.5.3; bamCoverage -b ',bamFiles[j],' -o ',bwFN, regionVar ,' --binSize 20 --normalizeTo1x 130000000 --smoothLength 60 --extendReads 150 --centerReads
-    " --job-name=$project --mem=40G -o BW',j,'.slurm >> commands.txt'
+            'sbatch --time=02:00:00 --wrap "ml deepTools/3.5.5-foss-2022a; bamCoverage -b ',bamFiles[j],' -o ',bwFN, regionVar ,' --binSize 20 --normalizeUsing RPKM --smoothLength 60 --extendReads 150 --centerReads" --job-name=$project --mem=40G -o BW',j,'.slurm >> commands.txt'
         )
         
         cmdVec <- c(
@@ -2064,7 +2063,7 @@ for (i in 1:length(geneCoveragePlotVec)){
     }
     
     fileExists <- rep(F, length(bwFNall))
-    while( sum ( fileExists ) < length(bwFNall)){
+    while( sum( fileExists ) < length(bwFNall)){
         Sys.sleep(60)
         fileExists <- file.exists(bwFNall)
         print(paste0("Processing bigWig files: ", sum(fileExists), " out of ", length(bwFNall), " files processed."))
@@ -2132,7 +2131,8 @@ for (i in 1:length(geneCoveragePlotVec)){
     tx_ids_c <- tx_ids[tx_ids %in% names(cdss)]
     
     if ((length(tx_ids_e) > 0) && (length(tx_ids_c) > 0)){
-      
+        # activate Cairo library
+
         plotList[[tag]] <- plotCoverage(
             exons = exons[tx_ids_e], 
             cdss = cdss[tx_ids_c], 
