@@ -298,6 +298,8 @@ chnkVec <- as.vector(NULL, mode="character")
 tag <- "CorHM"
 
 plotListCHM[[tag]] <- Heatmap(
+    use_raster = TRUE,
+    raster_resize_mat = TRUE,
     mHmBase,
     column_title = paste0("TS Correlation Heatmap ", Obio@parameterList$NtopGenes),
     name = "HM1", 
