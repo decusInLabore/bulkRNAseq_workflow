@@ -9,7 +9,9 @@ VersionPdfExt <- VersionPdfExt <- paste0(".",chnkPrefix,"V", gsub("-", "", Sys.D
 
 ###############################################################################
 ## Load Obio object                                                          ##
-
+if (is.null(Obio@dbDetailList$port)){
+    Obio@dbDetailList$port <- 6008
+}
 ## Done Loading Obio object                                                  ##
 ###############################################################################
 
@@ -39,7 +41,8 @@ dbDB <- DBI::dbConnect(
     drv = RMySQL::MySQL(), 
     user = Obio@dbDetailList$db.user, 
     password = db.pwd, 
-    host = Obio@dbDetailList$host, 
+    host = Obio@dbDetailList$host,
+    port = Obio@dbDetailList$port,
     dbname = Obio@dbDetailList$ref.cat.db
 )
         
@@ -56,7 +59,8 @@ if (dfOut[1,1] == 0){
       drv = RMySQL::MySQL(), 
       user = Obio@dbDetailList$db.user, 
       password = db.pwd, 
-      host = Obio@dbDetailList$host, 
+      host = Obio@dbDetailList$host,
+      port = Obio@dbDetailList$port,
       dbname = Obio@dbDetailList$ref.cat.db
   )
           
@@ -264,7 +268,8 @@ if (createProjectRefDbTables){
             drv = RMySQL::MySQL(), 
             user = Obio@dbDetailList$db.user, 
             password = db.pwd, 
-            host = Obio@dbDetailList$host, 
+            host = Obio@dbDetailList$host,
+            port = Obio@dbDetailList$port,
             dbname = Obio@dbDetailList$ref.cat.db
         )
         
@@ -287,7 +292,8 @@ if (createProjectRefDbTables){
             drv = RMySQL::MySQL(), 
             user = Obio@dbDetailList$db.user, 
             password = db.pwd, 
-            host = Obio@dbDetailList$host, 
+            host = Obio@dbDetailList$host,
+            port = Obio@dbDetailList$port,
             dbname = Obio@dbDetailList$ref.cat.db
     )
     
@@ -333,7 +339,8 @@ if (createProjectRefDbTables){
             drv = RMySQL::MySQL(), 
             user = Obio@dbDetailList$db.user, 
             password = db.pwd, 
-            host = Obio@dbDetailList$host, 
+            host = Obio@dbDetailList$host,
+            port = Obio@dbDetailList$port,
             dbname = Obio@dbDetailList$ref.cat.db
         )
         
@@ -469,7 +476,7 @@ rm(geneVec)
 
 ## Receptors
 catGenes = retrieve.gene.category.from.db(
-  cat_id = "sc_lab_categories__1597",
+  cat_id = "sc_lab_categories__1598",
   password = db.pwd,
   gene.symbol = queryGS,
   user = Obio@dbDetailList$db.user,
@@ -505,7 +512,7 @@ rm(geneVec)
 
 ## Cytokines
 catGenes = retrieve.gene.category.from.db(
-  cat_id = "sc_lab_categories__1597",
+  cat_id = "mysigdb_c5_BP__3745",
   password = db.pwd,
   gene.symbol = queryGS,
   user = Obio@dbDetailList$db.user,
