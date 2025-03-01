@@ -901,7 +901,7 @@
       "RemoteUsername": "decusInLabore",
       "RemoteRepo": "biologicSeqTools2",
       "RemoteRef": "main",
-      "RemoteSha": "60f9457f34a543acaab86986bd57960eb66eb62e",
+      "RemoteSha": "a5d1dc94a43a0820168521df8de77f44a9697dbc",
       "Requirements": [
         "DBI",
         "DESeq2",
@@ -914,7 +914,7 @@
         "methods",
         "openxlsx"
       ],
-      "Hash": "8330924ac2534d599ebcadd2397a5967"
+      "Hash": "61ec567311c28bcec7855d70eb7e0f35"
     },
     "biomaRt": {
       "Package": "biomaRt",

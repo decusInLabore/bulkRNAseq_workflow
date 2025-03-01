@@ -28,7 +28,7 @@ knitr::opts_chunk$set(
 # module purge;source /nemo/stp/babs/working/software/modulepath_new_software_tree_2018-08-13;module load pandoc/2.2.3.2-foss-2016b;ml R/4.0.3-foss-2020a;R
 
 # Run singularity-R
-# ml Singularity/3.11.3
+# ml Singularity/3.6.4
 # mkdir -p ~/.R;echo 'CXX17 = g++-7 -std=gnu++17 -fPIC' > ~/.R/Makevars;
 # singularity shell --bind  /nemo:/nemo,/nemo:/nemo /nemo/stp/babs/working/boeings/singularity_images/r431.ubuntu.16.04.sif;
 
@@ -84,8 +84,7 @@ dfSettings <- dfbase
 ## Get available files
 
 seqDir <-  c(
-    "/nemo/stp/sequencing/outputs/babs/data/reisesousac/lucia.gandullo-sanchez/RN24057/primary_data/20240604_LH00442_0015_B22JNVJLT3/fastq/",
-    "/nemo/stp/sequencing/outputs/babs/data/reisesousac/lucia.gandullo-sanchez/RN24057/primary_data/240614_A01366_0550_BHHJYJDSXC/fastq/"
+    "/nemo/stp/sequencing/outputs/babs/data/anastasioud/anna.benedetti/RN24300/primary_data/20241203_LH00442_0071_A22TTNVLT3/fastq/"
 )
 
 
@@ -178,7 +177,7 @@ GTFfile <- "/flask/reference/Genomics/babs_nfcore/genomes/mus_musculus/ensembl/G
 #genomeFa <- "/flask/reference/Genomics/babs/mus_musculus/ensembl/GRCm38/release-95/genome/Mus_musculus.GRCm38.dna_sm.toplevel.fa"
 #GTFfile <- "/flask/reference/Genomics/babs/mus_musculus/ensembl/GRCm38/release-95/gtf/Mus_musculus.GRCm38.95.rnaseqc.gtf"
 
-project_id = "RN24057"
+project_id = "RN24300"
 
 biologicSeqTools2::createbulkRNASeqAnalysisNFcoreScript(
     outdir = workdir,
@@ -330,6 +329,12 @@ if (length(pos) == 0){
 designDir <- unlist(strsplit(getwd(), "analyses/"))[1]
 designFN <-  paste0(designDir, "design/design.table.txt")
 #designFN <- "design/E7E10E14.design.table.txt"
+
+## make sure that the sample order is the same as in the base design file
+sampleOrder <- dfSetting$sample.id
+sampleOrder <- sampleOrder[sampleOrder %in% dfDesign$sample.id]
+row.names(dfDesign) <- dfDesign$sample.id
+dfDesign <- dfDesign[sampleOrder,]
 
 write.table(
     dfDesign,
