@@ -148,7 +148,7 @@ figureCount <- 1
 
 
 <!-- Optional set data access parameters for R-users ------------------------->
-```{r child = '02-B.1.2.set.data.access.parameters.for.R.data.import.Rmd', eval=TRUE, tidy=TRUE}
+```{r child = '02-B.1.2.set.data.access.parameters.for.R.data.import.Rmd', eval=TRUE, tidy=FALSE}
 ```
 
 ## Custom PCA Plot Creation
@@ -176,41 +176,27 @@ dfDesign <- import.db.table.from.db(
   dbname = db,
   dbtable = designTB,
   host = host,
+  port = port,
   user = username,
   password = pass
 )
 
 # Subset df design
 pcaSampleList <- list(
-    "PCAset1" = unique(
-      dfDesign[dfDesign$dataseries == "InVitro","sample_id"]
-    ), #  All in vitro samples only
-    "PCAset2" = unique(
-      dfDesign[dfDesign$f_cell_line %in% c("AKPT_main", "AKPT_org", "AKPT2D_org"), "sample_id"]
-    ),   #AKPTmain, AKPTorg and AKPT2Dorg
-    "PCAset3" = unique(
-      dfDesign[dfDesign$f_cell_line %in% c("AKPT_NTCsgRNA", "AKPT_Yap1KO", "AKPT_Ctnnb1KO"), "sample_id"]
-    ),   #AKPTNTCsgRNA, AKPTYap1KO, AKPTWwtr1KO and AKPTCtnnb1KO
-    "PCAset4" = unique(
-      dfDesign[dfDesign$f_cell_line %in% c("AKPT_+_PBS", "AKPT_+_IFNg", "AKPT_+_IFNb", "AKPT_+_TNFa", "AKPT_+_IFNg_+_TNFa"), "sample_id"]
-    ),   # AKPTplusPBS, AKPTplusIFNg, AKPTplusIFNb, AKPTplusTNFa and AKPTplusIFNgplusTNFa
-    "PCAset5" = unique(
-      dfDesign[dfDesign$f_cell_line %in% c("AKPT_NSG_NT_wk3", "AKPT_B6_control_wk3", "AKPT_org", "AKPT_main", "AKPT2D_org"), "sample_id"]
-    ),   #AKPTNSGNTwk3, AKPTB6Ctrlwk3, AKPTorg, AKPTmain and AKPT2Dorg
-    "PCAset6" = unique(
-      dfDesign[dfDesign$dataseries != "InVitro","sample_id"]
-    ), #  All in vivo samples only
-	"PCAset7" = unique(
-      dfDesign[dfDesign$f_cell_line %in% c("AKPT_B6_control_wk3", "AKPTmets_control_wk4", "AKPS1_NT_wk3", "AKPS2_NT_wk3", "AKP1_NT_wk3", "AKP2_NT_wk4"), "sample_id"]
-    ),   # AKPTB6Ctrlwk3, AKPTmetsCtrlwk4, AKPS1NTwk3, AKPS2NTwk3, AKP1NTwk3 and AKP2NTwk4
-    "PCAset8" = unique(
-      dfDesign[dfDesign$f_cell_line %in% c("AKPT_NSG_NT_wk3", "AKPT_B6_control_wk3", "AKPT_B6_ICB_wk4", "AKPT_B6_ICB_wk5"), "sample_id"]
-    ),   # AKPTNSGNTwk3, AKPTB6Ctrlwk3, AKPTB6ICBwk4 and AKPTB6ICBwk5
-    "PCAset9" = unique(
-      dfDesign[dfDesign$f_cell_line %in% c("AKPT_B6_control_wk3", "AKPT_B6_ICB_wk4", "AKPTmets_control_wk4", "AKPTmets_ICB_wk4"), "sample_id"]
-    )   # AKPTB6Ctrlwk3, AKPTB6ICBwk4, AKPTmetsCtrlwk4 and AKPTmetsICBwk4
-
+  "PCAset1" = unique(
+    dfDesign[dfDesign$dataseries %in% c("WTCD452", "WTCD451"), "sample_id"]
+  ), #  All in vitro samples only
+  "PCAset2" = unique(
+    dfDesign[dfDesign$dataseries %in% c("KOCD451", "KOCD452"), "sample_id"]
+  ), #AKPTmain, AKPTorg and AKPT2Dorg
+  "PCAset3" = unique(
+    dfDesign[dfDesign$dataseries %in% c("WTCD451", "KOCD451"), "sample_id"]
+  ), #AKPTNTCsgRNA, AKPTYap1KO, AKPTWwtr1KO and AKPTCtnnb1KO
+  "PCAset4" = unique(
+    dfDesign[dfDesign$dataseries %in% c("WTCD452", "KOCD452"), "sample_id"]
+  )
 )
+
 
 library(DESeq2)
 chnkVec <- as.vector(NULL, mode = "character")
@@ -221,6 +207,7 @@ for (d in 1:length(pcaSampleList)){
       dbname = db,
       dbtable = designTB,
       host = host,
+      port = port,
       user = username,
       password = pass
     )
@@ -517,9 +504,9 @@ names(plotList)
 print(plotList[[1]])
 
 ## Writing all plots to a pdf file
-FN <- output.pdf
+FN <- "output.pdf"
 pdf(FN)
-    plotList[[i]])
+    plotList[[i]]
 dev.off()
 
 ```

@@ -63,6 +63,7 @@ pcaTB <- Obio@parameterList$PCAdbTableName
 countDbTable <- paste0(Obio@parameterList$project_id, "_count_table")
 
 host <- Obio@dbDetailList$host
+port <- Obio@dbDetailList$port
 db <- Obio@dbDetailList$primDataDB
 designString <- designTB
 mainTBstring <- mainTB
@@ -73,6 +74,7 @@ countDbTable <- countDbTable
 userString <- paste0('username <- "', username,'"')
 passString <- paste0('pass <- "', pass,'"')
 hostString <- paste0('host <- "', host,'"')
+portString <- paste0('port <- ', port)
 dbString <- paste0('db <- "', db,'"')
 designString <- paste0('designTB <- "', designTB,'"')
 mainTBstring <- paste0('mainTB <- "', mainTB,'"')
@@ -95,8 +97,6 @@ if (length(pos) > 0){
 } else {
     timepointString <- ""   
 }
-
-NtopGenesString <- paste0('NtopGenes <- ', Obio@parameterList$NtopGenes,'')  
 ```
 
 <style>
@@ -115,6 +115,8 @@ Here we set the database access variables so we can get your data in </br></br>
                 passString,
                 "\n",
                 hostString,
+                "\n",
+                portString,
                 "\n",
                 dbString,
                 "\n"
@@ -158,11 +160,7 @@ threeString <- paste0(
     "\n",
     alignmentGeneIDString,
     "\n",
-    timepointString,
-    "\n",
-    NtopGenesString,
-    "\n",
-    "figureCount <- 1"
+    timepointString
 )
 cat(threeString)
 ```
@@ -171,17 +169,10 @@ cat(threeString)
 ## Load Data into R
 Next, let's load your project data. We will need this as a basis for making the plots further down. 
 
-```{r, echo=TRUE, eval=F, warning=FALSE, class.source = 'fold-show', tidy=TRUE}
+```{r, echo=TRUE, eval=F, warning=FALSE, class.source = 'fold-show', tidy=FALSE}
 
 ## The line below will install an R-package that we need to connect to the  Crick database
-if (!requireNamespace("remotes")){
-  install.packages("remotes")
-}
-
-if (!requireNamespace("bioLOGIC")){
-  remotes::install_github("decusinlabore/bioLOGIC")
-}
-
+devtools::install_github("decusinlabore/bioLOGIC")
 
 library(bioLOGIC)
 ## Load the design table from database. Here we will retrieve information on samples. 
@@ -189,6 +180,7 @@ dfDesign <- import.db.table.from.db(
     dbname = db,
     dbtable = designTB,
     host = host,
+    port = port,
     user = username,
     password = pass
 )
@@ -197,6 +189,7 @@ dfMainData <- import.db.table.from.db(
     dbname = db,
     dbtable = mainTB,
     host = host,
+    port = port,
     user = username,
     password = pass
 )
@@ -205,6 +198,7 @@ dfPCA <- import.db.table.from.db(
     dbname = db,
     dbtable = pcaTB,
     host = host,
+    port = port,
     user = username,
     password = pass
 )
@@ -214,13 +208,13 @@ dfCount <- import.db.table.from.db(
   dbname = db,
   dbtable = countTB,
   host = host,
+  port = port,
   user = username,
   password = pass
 )
 row.names(dfCount) <- dfCount[, alignmentGeneID]
 dfCount$row_names <- NULL
 dfCount <- data.matrix(dfCount)
-
 ## For some plots we want to limit the number of genes to the most interesting, so let's get those in a vector:
 # Most variable gene names
 dfVar <- dfMainData[dfMainData$logFC_cut_off != 0 ,c(geneIDcolumn, alignmentGeneID)]
@@ -229,26 +223,19 @@ mostVarGenes <- na.omit(mostVarGenes[mostVarGenes != ""])
 # Most variable gene IDs
 mostVarIDs <- as.vector(unique(sort(dfVar[,alignmentGeneID])))
 mostVarIDs <- na.omit(mostVarIDs[mostVarIDs != ""])
-
-
-
 ```
 
 
-```{r, echo=F, eval=T, warning=FALSE,comment=NA, tidy=TRUE}
+```{r, echo=F, eval=T, warning=FALSE,comment=NA}
 ## In this section the data for this report is loaded from file in order to maintain version control. The data loaded in this section should be identical with the version of the proejct kept in the database. 
 dfDesign <- Obio@dfDesign
-names(dfDesign) <- gsub("\\.", "_", names(dfDesign))
-
-dfMainData <- Obio@databaseTable
-dfPCA <- Obio@dfPCA
+# dfMainData <- Obio@databaseTable
+# dfPCA <- Obio@dfPCA
 dfModel <- Obio@dfModel
-dfCount <- Obio@RSEMcountMatrix
-dfVar <- dfMainData[dfMainData$logFC_cut_off != 0 ,c(geneIDcolumn, alignmentGeneID)]
-mostVarGenes <- as.vector(unique(sort(dfVar[,geneIDcolumn])))
-mostVarGenes <- na.omit(mostVarGenes[mostVarGenes != ""])
+# dfVar <- dfMainData[dfMainData$logFC_cut_off != 0 ,c(geneIDcolumn, alignmentGeneID)]
+# mostVarGenes <- as.vector(unique(sort(dfVar[,geneIDcolumn])))
+# mostVarGenes <- na.omit(mostVarGenes[mostVarGenes != ""])
 # Most variable gene IDs
-mostVarIDs <- as.vector(unique(sort(dfVar[,alignmentGeneID])))
-mostVarIDs <- na.omit(mostVarIDs[mostVarIDs != ""])
-NtopGenes <- as.numeric(Obio@parameterList$NtopGenes)
+# mostVarIDs <- as.vector(unique(sort(dfVar[,alignmentGeneID])))
+#mostVarIDs <- na.omit(mostVarIDs[mostVarIDs != ""])
 ```
