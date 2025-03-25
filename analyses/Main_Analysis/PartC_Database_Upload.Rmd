@@ -213,6 +213,34 @@ biologicSeqTools2::upload.pca.table.to.db(
 
 # Finished creating pca database table
 
+###################################
+# Upload RSEM table to database   #
+###################################
+
+## Add sample.group_colors to include custom colors in the interactive display
+dfRSEM <- data.frame(Obio@RSEMcountMatrix)
+dfRSEM[[Obio@parameterList$primaryAlignmentGeneID]] <- rownames(dfRSEM)
+
+countDbTable <- paste0(Obio@parameterList$project_id, "_count_table")
+
+
+biologicSeqTools2::upload.datatable.to.database(
+  host = Obio@dbDetailList$host,
+  port = Obio@dbDetailList$port,
+  user = Obio@dbDetailList$db.user,
+  password = db.pwd,
+  prim.data.db = Obio@dbDetailList$primDataDB,
+  dbTableName = countDbTable,
+  df.data = dfRSEM,
+  db.col.parameter.list = biologicSeqTools2::inferDBcategories(
+    dfRSEM
+  ),
+
+  new.table = TRUE
+)
+
+# Finished creating count database table
+
 ###############################################################################
 # Upload design file to database                                              #
 ###############################################################################
