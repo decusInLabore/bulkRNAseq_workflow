@@ -222,7 +222,7 @@ dfRSEM <- data.frame(Obio@RSEMcountMatrix)
 dfRSEM[[Obio@parameterList$primaryAlignmentGeneID]] <- rownames(dfRSEM)
 
 countDbTable <- paste0(Obio@parameterList$project_id, "_count_table")
-
+Obio@parameterList$countDbTable <- countDbTable
 
 biologicSeqTools2::upload.datatable.to.database(
   host = Obio@dbDetailList$host,
@@ -230,7 +230,7 @@ biologicSeqTools2::upload.datatable.to.database(
   user = Obio@dbDetailList$db.user,
   password = db.pwd,
   prim.data.db = Obio@dbDetailList$primDataDB,
-  dbTableName = countDbTable,
+  dbTableName = Obio@parameterList$countDbTable,
   df.data = dfRSEM,
   db.col.parameter.list = biologicSeqTools2::inferDBcategories(
     dfRSEM
@@ -370,6 +370,10 @@ doQuery(Obio, query = query3)
 pcaTB <- Obio@parameterList$PCAdbTableName
 query4 <- paste0("GRANT SELECT on ",Obio@dbDetailList$primDataDB,".",pcaTB ," TO ",username,"@'10.%';")
 doQuery(Obio, query = query4)
+
+countTB <- Obio@parameterList$countDbTable
+query5 <- paste0("GRANT SELECT on ",Obio@dbDetailList$primDataDB,".",countTB ," TO ",username,"@'10.%';")
+doQuery(Obio, query = query5)
 
 
 
