@@ -375,6 +375,11 @@ countTB <- Obio@parameterList$countDbTable
 query5 <- paste0("GRANT SELECT on ",Obio@dbDetailList$primDataDB,".",countTB ," TO ",username,"@'10.%';")
 doQuery(Obio, query = query5)
 
+query6 <- paste0("GRANT SELECT ON `reference_categories_db_new'.* TO '", username,"'@'10.%';")
+
+query6 <- paste0("GRANT SELECT ON `reference_categories_db_new`.* TO '", username,"'@'10.%';")
+doQuery(Obio, query = query6)
+
 
 
 ###############################################################################
