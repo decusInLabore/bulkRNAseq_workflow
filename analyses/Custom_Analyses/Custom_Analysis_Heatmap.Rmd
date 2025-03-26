@@ -1,0 +1,575 @@
+---
+title: "Custom Heatmap Chapter"
+author: "Stefan Boeing stefan.boeing@crick.ac.uk"
+date: 'Compiled: `r format(Sys.Date(), "%B %d, %Y")`'
+abstract: "The main purpose of this module is to give you a copy-and-paste option to create custom PCA for your project. In the first part you will be able do download all relevant data directly into your R-session. For this you need to be inside the Crick or VPN connected to the Crick. Once you have the data loaded into your R-session, you can copy and paste the code to generate PCA plots on various sample selections."
+
+output: 
+    html_document:
+        code_folding: show
+        df_print: tibble
+        toc: true
+        toc_depth: 5
+        toc_float: true
+        css: ../Main_Analysis/src/style/style.css
+
+always_allow_html: yes
+
+---
+
+```{css setup_css, echo=FALSE}
+
+
+.table{
+  width:auto;
+  font-size: 10px;
+}
+
+```
+
+```{r setup, include=FALSE, warning=FALSE, message=F, echo=F, results=F}
+knitr::opts_chunk$set(
+    tidy = TRUE,
+    tidy.opts = list(width.cutoff = 120),
+    message = FALSE,
+    warning = FALSE
+)
+
+# module purge;source /camp/stp/babs/working/software/modulepath_new_software_tree_2018-08-13;module load pandoc/2.2.3.2-foss-2016b;ml R/4.0.3-foss-2020a
+
+#if (!require("remotes")){
+#  install.packages("remotes")
+#}
+
+#remotes::install_github("rstudio/renv")
+
+if (!file.exists("renv.lock")){
+    renv::init()
+} else {
+    renv::restore(prompt = FALSE)
+}
+
+urlString <- "biologic.crick.ac.uk"
+```
+
+
+
+```{r set_directories, eval=T, echo=F, results=F}
+## Setup plot collection object
+library(knitr)
+library(ggplot2)
+library(ggpubr)
+library(DT)
+library(biologicSeqTools2)
+
+addCorCatsToLabDb <- FALSE
+figureCount <- 1
+chnkVec <- as.vector(NULL, mode = "character")
+
+VersionPdfExt <- paste0(".V", gsub("-", "", Sys.Date()), ".pdf")
+
+if (dir.exists("/Volumes/babs/working/boeings/")){
+    hpc.mount <- "/Volumes/babs/working/boeings/"
+} else if (dir.exists("Y:/working/boeings/")){
+    hpc.mount <- "Y:/working/boeings/"
+} else if (dir.exists("/camp/stp/babs/working/boeings/")){
+    hpc.mount <- "/camp/stp/babs/working/boeings/"
+} else {
+    hpc.mount <- ""
+}
+
+if (!exists("figureCount")){
+    figureCount <- 1
+}
+
+
+
+## Heatmap setup ##
+## Select Heatmap samples ##
+FN <- paste0(hpc.mount, "Projects/reference_data/pwd_folder/babs.txt")
+dbTable <- read.delim(
+  FN,
+  header = F,
+  sep = "\t",
+  stringsAsFactors = F
+)
+
+db.pwd <- as.vector(dbTable[1,1])
+#setwd(Obio@parameterList$localWorkDir)
+
+# The active biologic data object is expected to be found in ../../../../data/biologic_active_object/
+source("../Main_Analysis/load.biologic.robj.R")
+#
+# # ObioFN <- paste0("../",list.files("..")[grep(".bioLOGIC.Robj", list.files(".."))])
+# #
+# # load(ObioFN)
+#
+#
+# Obio <- setMountingPoint(Obio)
+# Obio <- setAnalysisPaths(Obio)
+# Obio <- setCrickGenomeAndGeneNameTable(Obio)
+# Obio <- createAnalysisFolders(
+#     Obio
+# )
+# Obio <- setDataBaseParameters(Obio)
+
+
+# if (is.null(Obio@parameterList[["reportFigDir"]])){
+#     Obio@parameterList[["reportFigDir"]] <- paste0(Obio@parameterList$html_local, "report_figures/")
+# }
+#
+#
+#
+# ## Create outputfolders ##
+# if (!dir.exists(Obio@parameterList[["reportFigDir"]])){
+#     dir.create(Obio@parameterList[["reportFigDir"]])
+# }
+
+reportFigDir <- paste0(hpc.mount, "../../../../report_figures/")
+
+if (!dir.exists(reportFigDir)){
+    dir.create(reportFigDir)
+}
+
+figureCount <- 1
+
+## Order design file ##
+# dfDesign <- Obio@dfDesign
+# orderVec <- unique(dfDesign$dataseries)
+# orderVec <- c("WtFemale", "HetFemale", "HomFemale", "WtMale", "HomMale")
+# 
+# dfDesign$dataseries <- factor(dfDesign$dataseries, levels = orderVec)
+# dfDesign <- dfDesign[order(dfDesign$dataseries),]
+# Obio@dfDesign <- data.frame(NULL)
+# Obio@dfDesign <- dfDesign
+# source("save.biologic.robj.R")
+
+```
+
+
+<!-- Optional set data access parameters for R-users ------------------------->
+```{r child = '02-B.1.2.set.data.access.parameters.for.R.data.import.Rmd', eval=TRUE, tidy=FALSE}
+```
+
+# Custom Heatmap Creation
+You can use the provided code to generate the Heatmap plots.
+
+```{r, echo=FALSE, eval=TRUE, warning=FALSE, results=F}
+
+###############################################################################
+## Load Obio object                                                          ##
+
+## Done Loading Obio object                                                  ##
+###############################################################################
+
+dfMainData <- Obio@databaseTable
+geneIDcolumn <- Obio@parameterList$geneIDcolumn
+if (geneIDcolumn != "hgnc_symbol" | geneIDcolumn != "mgi_symbol"){
+  geneSelCol <- "hgnc_symbol"
+} else {
+  geneSelCol <- geneIDColumn
+}
+NtopGenes <- Obio@dataTableList$NtopGenes
+HmDisplayCatsFromDb <- Obio@parameterList$HmDisplayCatsFromDb
+project_id <- Obio@parameterList$project_id
+alignmentGeneID <- Obio@parameterList$primaryAlignmentGeneID
+lab.categories.table <- Obio@parameterList$lab.categories.table
+
+
+
+ref.cat.db.table = lab.categories.table
+reportFigDir <- Obio@parameterList$reportFigDir
+labname <- Obio@parameterList$labname
+dfDesign <- Obio@dfDesign
+names(dfDesign) <- gsub("[.]", "_", names(dfDesign))
+
+###############################################################################
+## Check if lab.categories.table exists, and create if it does not           ##
+dbDB <- DBI::dbConnect(
+  drv = RMySQL::MySQL(),
+  user = Obio@dbDetailList$db.user,
+  password = db.pwd,
+  host = Obio@dbDetailList$host,
+  port = Obio@dbDetailList$port,
+  dbname = Obio@dbDetailList$ref.cat.db
+)
+
+query <- paste0(
+  'SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = "',lab.categories.table,'";'
+)
+
+dfOut <-  DBI::dbGetQuery(dbDB, query)
+DBI::dbDisconnect(dbDB)
+
+## Create lab table if it doesn't exists ##
+if (dfOut[1,1] == 0){
+  dbDB <- DBI::dbConnect(
+    drv = RMySQL::MySQL(),
+    user = Obio@dbDetailList$db.user,
+    password = db.pwd,
+    host = Obio@dbDetailList$host,
+    port = Obio@dbDetailList$port,
+    dbname = Obio@dbDetailList$ref.cat.db
+  )
+
+  cat_id_string <- paste0(lab.categories.table, "__1")
+
+  query1 <- paste0(
+    "CREATE TABLE ",lab.categories.table," AS SELECT * FROM ag_lab_categories WHERE row_names = 10"
+  )
+  res <-  DBI::dbGetQuery(dbDB, query1)
+
+  query2 <- paste0(
+    "UPDATE ",lab.categories.table," SET row_names = 1 WHERE row_names = 10;"
+  )
+  res <-  DBI::dbGetQuery(dbDB, query2)
+  query3 <- paste0(
+    "UPDATE ",lab.categories.table," SET cat_id = '",cat_id_string,"' WHERE row_names = 1;"
+  )
+  res <-  DBI::dbGetQuery(dbDB, query3)
+
+
+  DBI::dbDisconnect(dbDB)
+}
+## Done                                                                      ##
+###############################################################################
+```
+
+
+```{r, echo=T, eval=TRUE, warning=FALSE, results=F}
+## Make heatmap gene list
+logFCselections <- names(dfMainData)[grep("_logFC_", names(dfMainData))]
+padjSelections <- gsub("_logFC_", "_padj_", logFCselections)
+dfSelections <- data.frame(logFCselections, padjSelections)
+dfSelections <- dfSelections[dfSelections[,"padjSelections"] %in% names(dfMainData),]
+if (nrow(dfSelections) > 2){
+  tabVar <- ".tabset .tabset-fade .tabset-dropdown"
+} else {
+  tabVar <- ".tabset .tabset-fade .tabset-pills"
+}
+```
+
+
+
+
+```{r, echo=TRUE, eval=TRUE, warning=FALSE, results="asis"}
+## Create Heatmaps ##
+
+
+###############################################################################
+##                                                                           ##
+
+## Retrieving two example gene sets for the heatmap.
+
+## In the cat_id argument in the functions below you can put any category id
+## you find on the biologic website. Alternatively, you can type out your own
+## gene list. Or you can read it from file.
+
+
+TFs = retrieve.gene.category.from.db(
+        cat_id = "ag_lab_categories__10",
+        password = pass,
+        gene.symbol = "mgi_symbol",
+        user = username,
+        host = host,
+        port = 6008
+)
+
+
+cytokines = retrieve.gene.category.from.db(
+        cat_id = "sc_lab_categories__1597",
+        password = pass,
+        gene.symbol = "mgi_symbol",
+        user = username,
+        host = host,
+        port = 6008
+)
+
+
+# For this example we will take only the top 20 genes from each category
+geneList <- list(
+        "TF" = TFs[1:20],
+        "cytokines" = cytokines[1:20]
+)
+
+
+## Example for manually typed heatmap
+# geneList <- list(
+#         "TF" = c(
+#             "Sox2",
+#             "Sox1",
+#             "Sox3",
+#             "Sox4",
+#          "B_set" = c(
+#             "Ezh2",
+#             "Il6",
+#             "Il1b",
+#             "Il10",
+#             "Il12b"
+#          )
+# )
+
+##                                                                            ##
+################################################################################
+
+################################################################################
+## Sample selection                                                           ##
+
+sampleSelection <- paste0("norm_counts_", unique(dfDesign$sample_id))
+selVec <- c(geneIDcolumn, sampleSelection )
+
+print(sampleSelection)
+
+## You can edit the sample selection and order.
+
+## Done sample selection                                                      ##
+################################################################################
+
+
+
+geneSel <- as.vector(unique(unlist(geneList)))
+
+
+## Create count matrix for heatmap
+dfDataTable <- dfMainData
+dfDataTable <- unique(
+  dfDataTable[dfDataTable[, geneIDcolumn] %in% geneSel, selVec]
+)
+dfHmBase <- unique(dfDataTable[,selVec])
+
+## Making sure no duplicated gene names exist
+i=1
+while (sum(duplicated(dfHmBase[, geneIDcolumn])) > 0){
+      dfHmBase[duplicated(dfHmBase[, geneIDcolumn]), geneIDcolumn] <- paste0(
+        dfHmBase[duplicated(dfHmBase[, geneIDcolumn]),
+                 geneIDcolumn], "_", i
+      )
+      i=i+1
+}
+
+
+row.names(dfHmBase) <- dfHmBase[, geneIDcolumn]
+dfHmBase[, geneIDcolumn] <- NULL
+
+rowMeans <- apply(
+  dfHmBase,
+  1,
+  function(x) mean(x)
+)
+
+rowMeans[rowMeans ==0] <- 0.001
+
+hmMax <- 4
+for (i in 1:ncol(dfHmBase)){
+  dfHmBase[,i] <- log2(dfHmBase[,i] / rowMeans)
+}
+
+dfHmBase[dfHmBase > hmMax] <- hmMax
+dfHmBase[dfHmBase < -1*hmMax] <- -1*hmMax
+
+
+names(dfHmBase) <- gsub("norm_counts_", "", names(dfHmBase))
+names(dfHmBase) <- gsub("_TPM", "", names(dfHmBase))
+
+mHmBase <- data.matrix(dfHmBase)
+
+if ( nrow(mHmBase) < 101){
+  showRowNames <- TRUE
+} else {
+  showRowNames <- FALSE
+}
+
+
+## Create heatmap plot ##
+#library(ComplexHeatmap)
+
+f1 = circlize::colorRamp2(seq(-4, 4, length = 3), c("#3060cf", "#fffbbc","#c4463a"))
+
+anno <- as.data.frame(colnames(mHmBase))
+colnames(anno) <- "Sample"
+anno$Group <- sapply(as.vector(anno[,1]), function(x) paste0(unlist(strsplit(x, "_"))[1], "_",unlist(strsplit(x, "_"))[2]))
+
+## Color sample groups in line with the designated sample group color ##
+#######################################################################
+## Add sample group colors if needed
+pos <- grep("sample_group_color", names(dfDesign))
+
+if (length(pos) == 0){
+  sample.group <- unique(dfDesign$sample.group)
+  sample.group_color <- sample.group
+  #library(scales)
+  sample.group_color = scales::hue_pal()(length(sample.group_color))
+  #sample.group_color = c("#990000", "#009900")
+  dfGroupColors <- unique(data.frame(sample.group, sample.group_color))
+  dfDesign <- merge(dfDesign, dfGroupColors, by.x = "sample.group", "sample.group")
+  if (exists("Obio")){
+    Obio@dfDesign <- dfDesign
+  }
+
+}
+
+
+
+#library(scales)
+#hue_pal()(2)
+df <- unique(data.frame(dfDesign[,c("sample_id", "sample_group", "sample_group_color")]))
+df <- df[df$sample_id %in% colnames(mHmBase),]
+df2 <- data.frame(df[,"sample_group"])
+names(df2) <- "Group"
+
+dfCol <- unique(dfDesign[,c("sample_group", "sample_group_color")])
+dfCol <- dfCol[order(dfCol$sample_group_color),]
+
+GroupVec <- as.vector(dfCol$sample_group_color)
+names(GroupVec) <- as.vector(dfCol$sample_group)
+
+## Split rows
+rowSplitVec <- row.names(mHmBase)
+for (i in 1:length(geneList)){
+  rowSplitVec[rowSplitVec %in% geneList[[i]]] <- names(geneList)[i]
+}
+
+
+#df2 <- unique(data.frame(Obio@dfDesign[,c("sample_id","sample.group", "sample.group_color")]))
+#df2 <- data.frame(df2[,c("sample.group")])
+
+
+
+ha = ComplexHeatmap::HeatmapAnnotation(df = df2, col = list(Group = GroupVec))
+
+ComplexHeatmap::ht_opt(
+  legend_border = "black",
+  heatmap_border = TRUE,
+  annotation_border = TRUE
+)
+
+tag <- "Heatmap_1"
+hmTitle <- "HM1"
+
+rowFontSize <- 10
+if (nrow(mHmBase) > 50){
+  rowFontSize <- 5
+}
+
+plotList <- list()
+
+
+plotList[[tag]] = ComplexHeatmap::Heatmap(
+  mHmBase,
+
+  row_split = rowSplitVec,
+  cluster_columns  = TRUE,
+  cluster_rows  = TRUE,
+  column_title = gsub(
+    "_",
+    " ",
+    hmTitle
+  ),
+  name = tag,
+  column_title_gp         = grid::gpar(fontsize = 6),
+  row_title_rot           = 0, # Must be 0 or 90
+  column_title_rot        = 90,
+  # column_split            = dfMeta[,columnSplitCol],
+  #row_km = 5,
+  col = f1,
+
+  # column_split = NULL,
+  show_column_names = T,
+  show_row_names = showRowNames,
+  ## row text size
+  row_names_gp = grid::gpar(fontsize = rowFontSize),
+  border = TRUE,
+
+  #Dendrogram configurations: columns
+  clustering_distance_columns="euclidean",
+  clustering_method_columns="complete",
+  column_dend_height= grid::unit(10,"mm"),
+
+  #Dendrogram configurations: rows
+  clustering_distance_rows="euclidean",
+  clustering_method_rows="complete",
+  row_dend_width=grid::unit(10,"mm"),
+  top_annotation = ha,
+  show_heatmap_legend = TRUE
+  #row_title = NULL,
+  #show_row_dend = FALSE
+)
+
+ComplexHeatmap::ht_opt(RESET = TRUE)
+
+
+###########################################################################
+## Save plot to file                                                     ##
+reportFigDir <- Obio@parameterList$reportFigDir
+
+
+FNbase <- paste0("Heatmap.", tag, ".pdf")
+FN <- paste0(reportFigDir, FNbase)
+FNrel <- paste0("report_figures/", FNbase)
+
+pdf(FN)
+print(plotList[[tag]])
+dev.off()
+##                                                                       ##
+###########################################################################
+
+#     figCap <- paste0(
+#       '**Figure ',
+#       figureCount,
+#       ':** Heatmap showing the gene category ', gsub('_', ' ', tag), '. ',
+#       'Download a pdf of this figure <a href="',FNrel,'" target="_blank">here</a>. ',
+#       link
+#     )
+#
+#     figureCount <- figureCount + 1
+#
+#     NewChnk <- paste0(
+#       "## HM_",tag,
+#       "\n```{r, results='asis', echo=F, eval=TRUE, warning=FALSE, fig.cap='",figCap,"'}\n",
+#       "\n",
+#       "\n print(plotList[['",tag,"']])",
+#       "\n cat(  '\n')",
+#       "\n\n\n```\n"
+#     )
+#
+#     chnkVec <- c(
+#       chnkVec,
+#       NewChnk
+#     )
+#
+#
+#
+# ## End heatmap plotting loop
+# ## Done                                                                      ##
+# ###############################################################################
+# if (length(HMplotList) > 2){
+#   tabVar <- ".tabset .tabset-fade .tabset-dropdown"
+# } else {
+#   tabVar <- ".tabset .tabset-fade .tabset-pills"
+# }
+
+```
+
+
+# Heatmaps {`r tabVar`}
+
+```{r, echo=FALSE, eval=TRUE, warning=FALSE, results="asis"}
+# cat(paste(knitr::knit(text = chnkVec, quiet = T), collapse = '\n'))
+
+plotList[[tag]]
+
+```
+
+
+# Documentation
+```{r documentation, eval=TRUE, echo=F, results=T, error=F}
+#renv::snapshot(prompt=FALSE)
+
+print(paste0("Projectfolder: ", getwd()))
+
+if (exists("Obio")){
+    print(paste0("Project ID: ", Obio@parameterList$project_id))
+}
+
+sessionInfo()
+```
